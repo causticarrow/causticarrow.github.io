@@ -225,15 +225,19 @@ body, .main-content, table, td, th {
 
 @media (max-width: 768px) {
   body {
-    font-size: 12px;
+    font-size: 12px; /* Smaller base font size for mobile */
   }
-  
+  .summary-table td, .summary-table th, .detailed-table td, .detailed-table th {
+    font-size: 10px; /* Even smaller for table cells */
+    padding: 5px; /* Reduce padding to compensate for smaller text */
+  }
+  .main-content {
+    padding: 10px; /* Reduce padding for more content space */
+  }
+  .sidebar {
+    font-size: 12px; /* Sidebar text size */
+  }
   .search-bar {
-    font-size: 14px;
-  }
-  
-  .sidebar a, .sidebar li {
-    font-size: 14px;
-    padding: 8px 0;
+    font-size: 12px;  /* Adjust search bar font size */
   }
 }
