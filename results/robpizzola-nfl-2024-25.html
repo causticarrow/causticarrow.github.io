@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>2024-25 NFL @robpizzola Results - causticarrow.com</title>
+        <link rel="stylesheet" href="../style.css" />
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <aside class="sidebar">
+                <input type="text" class="search-bar" placeholder="Search" />
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="https://x.com/causticarrow">𝕏 (Twitter)</a></li>
+
+                    <li class="category-header">
+                        <span class="category-toggle">Results</span>
+                        <ul class="category-content">
+                            <li><a href="robpizzola-nfl-2024-25.html" class="active">2024-25 NFL @robpizzola</a></li>
+                            <li><a href="clivebixby41-nfl-2024-25.html" class="active">2024-25 NFL @CliveBixby41</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </aside>
+            <main class="main-content">
+                <div id="chart-container" style="width: 100%; height: 300px">
+                    <canvas id="myChart" style="width: 100%; height: 300px"></canvas>
+                </div>
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>n</th>
+                            <th>Record</th>
+                            <th>Units</th>
+                            <th>ROI</th>
+                            <th>BTCL</th>
+                            <th>No-Vig CLV</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="n"></td>
+                            <td id="record"></td>
+                            <td id="units"></td>
+                            <td id="roi"></td>
+
+                            <td id="btcl"></td>
+                            <td id="noVigClv"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="detailed-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Play</th>
+                            <th>Result</th>
+                            <th>Units</th>
+                            <th>Score</th>
+                            <th>Close</th>
+                            <th>No-Vig CLV</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody"></tbody>
+                </table>
+            </main>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var data = [
+{date: "2025-01-05",sport: "NFL",play: "357 Both: Seattle +2.5 (-115) vs. LA Rams",result: "Win",score: "30-25",close: "-472.5",clv: "28.06%"},
+{date: "2025-01-05",sport: "NFL",play: "347 Both: LA Chargers/Las Vegas Over 40.5",result: "Win",score: "34-20",close: "-134.4",clv: "3.36%"},
+{date: "2024-12-28",sport: "NFL",play: "408 Both: New England +6 (-115) vs. LA Chargers",result: "Loss",score: "7-40",close: "-105",clv: "-3.73%"},
+{date: "2024-12-25",sport: "NFL",play: "404 Both: Baltimore/Houston Under 48",result: "Win",score: "31-2",close: "-129.2",clv: "2.37%"},
+{date: "2024-12-22",sport: "NFL",play: "111 Both: New England/Buffalo Over 44.5 (-115)",result: "Win",score: "21-24",close: "-179.1",clv: "9.19%"},
+{date: "2024-12-22",sport: "NFL",play: "109 Both: Arizona/Carolina Over 46",result: "Win",score: "30-36 OT",close: "-122.8",clv: "1.10%"},
+{date: "2024-12-15",sport: "NFL",play: "477 Both: New England/Arizona Over 44",result: "Win",score: "17-30",close: "-152.5",clv: "6.46%"},
+{date: "2024-12-09",sport: "NFL",play: "144 Both: Dallas +6 (-105) vs. Cincinnati",result: "Loss",score: "20-27",close: "-135",clv: "4.85%"},
+{date: "2024-12-08",sport: "NFL",play: "133 Both: NY Jets/Miami Over 44.5",result: "Win",score: "26-32",close: "-122.7",clv: "1.08%"},
+{date: "2024-12-08",sport: "NFL",play: "131 Both: Carolina +13 vs. Philadelphia",result: "Win",score: "16-22",close: "-102.3",clv: "-3.28%"},
+{date: "2024-12-02",sport: "NFL",play: "483 Both: Cleveland/Denver Over 40.5 (-115)",result: "Win",score: "32-41",close: "-126.2",clv: "0.68%"},
+{date: "2024-12-01",sport: "NFL",play: "474 Both: Seattle/NY Jets Under 43.5 (-115)",result: "Loss",score: "26-21",close: "-135",clv: "2.36%"},
+{date: "2024-12-01",sport: "NFL",play: "461 Both: Tennessee +6 vs. Washington",result: "Loss",score: "19-42",close: "-117",clv: "0.11%"},
+{date: "2024-11-28",sport: "NFL",play: "309 Both: Miami +3.5 (-115) vs. Green Bay",result: "Loss",score: "17-30",close: "-114",clv: "-1.65%"},
+{date: "2024-11-24",sport: "NFL",play: "267 Both: Arizona +1 (-105) vs. Seattle",result: "Loss",score: "6-16",close: "-122.6",clv: "2.45%"},
+{date: "2024-11-24",sport: "NFL",play: "265 Both: Denver TT Over 22.5 vs. Las Vegas",result: "Win",score: "29",close: "-150",clv: "6.06%"},
+{date: "2024-11-24",sport: "NFL",play: "261 Both: New England +7.5 vs. Miami",result: "Loss",score: "15-34",close: "-116",clv: "-0.10%"},
+{date: "2024-11-24",sport: "NFL",play: "261 Both: New England/Miami Over 44.5",result: "Win",score: "15-34",close: "-124.8",clv: "1.51%"},
+{date: "2024-11-17",sport: "NFL",play: "470 Both: Kansas City/Buffalo Under 46.5 (-115)",result: "Loss",score: "21-30",close: "+100",clv: "-5.21%"},
+{date: "2024-11-17",sport: "NFL",play: "453 Both: Cleveland +2.5 vs. New Orleans",result: "Loss",score: "14-35",close: "-141",clv: "4.77%"},
+{date: "2024-11-17",sport: "NFL",play: "452 Both: Green Bay/Chicago Under 42.5",result: "Win",score: "20-19",close: "-145",clv: "5.23%"},
+{date: "2024-11-10",sport: "NFL",play: "275 Both: New England +7 vs. Chicago",result: "Win",score: "19-3",close: "-125",clv: "1.77%"},
+{date: "2024-11-07",sport: "NFL",play: "109 Both: Cincinnati/Baltimore Over 51.5",result: "Win",score: "34-35",close: "-143",clv: "4.89%"},
+{date: "2024-11-03",sport: "NFL",play: "476 Both: Philadelphia -6.5 (-115) vs. Jacksonville",result: "Loss",score: "28-23",close: "-137",clv: "2.95%"},
+{date: "2024-11-03",sport: "NFL",play: "471 Both: LA Rams/Seattle Over 48.5",result: "Loss",score: "26-20 OT",close: "-115",clv: "-0.55%"},
+{date: "2024-11-03",sport: "NFL",play: "461 Both: Denver/Baltimore Over 43.5",result: "Win",score: "10-41",close: "-167",clv: "8.65%"},
+{date: "2024-11-03",sport: "NFL",play: "458 Both: Miami/Buffalo Under 48.5",result: "Loss",score: "27-30",close: "+102",clv: "-4.60%"},
+{date: "2024-10-27",sport: "NFL",play: "280 Both: Buffalo/Seattle Under 48.5",result: "Win",score: "31-10",close: "-163.2",clv: "8.10%"},
+{date: "2024-10-20",sport: "NFL",play: "463 Both: Detroit TT Under 24.5 (-115) vs. Minnesota",result: "Loss",score: "31",close: "-115",clv: "-1.66%"},
+{date: "2024-10-13",sport: "NFL",play: "286 Both: Cincinnati/NY Giants Under 48.5",result: "Win",score: "17-7",close: "-141.2",clv: "4.58%"},
+{date: "2024-10-13",sport: "NFL",play: "275 Both: LA Chargers -1.5 (-115) vs. Denver",result: "Win",score: "23-16",close: "-141.2",clv: "3.69%"},
+{date: "2024-10-13",sport: "NFL",play: "269 Both: Houston/Cleveland Over 38",result: "Win",score: "41-21",close: "-114.6",clv: "-0.64%"},
+{date: "2024-10-06",sport: "NFL",play: "469 Both: Green Bay/LA Rams Over 46.5 (-115)",result: "Loss",score: "24-19",close: "-172.1",clv: "8.26%"},
+{date: "2024-10-06",sport: "NFL",play: "459 Both: Indianapolis/Jacksonville Over 45.5",result: "Win",score: "34-37",close: "-101.3",clv: "-3.77%"},
+{date: "2024-09-29",sport: "NFL",play: "284 Both: Cleveland/Las Vegas Under 39.5",result: "Win",score: "16-20",close: "-143.7",clv: "5.01%"},
+{date: "2024-09-26",sport: "NFL",play: "101 Both: Dallas/NY Giants Over 43.5 (-115)",result: "Loss",score: "20-15",close: "-147",clv: "4.46%"},
+{date: "2024-09-22",sport: "NFL",play: "451 Both: LA Chargers +2.5 vs. Pittsburgh",result: "Loss",score: "10-20",close: "-102",clv: "-3.36%"},
+{date: "2024-09-15",sport: "NFL",play: "281 Both: NY Giants/Washington Over 41",result: "Loss",score: "18-21",close: "-127.2",clv: "1.98%"},
+{date: "2024-09-15",sport: "NFL",play: "278 Both: Seattle/New England Under 40",result: "Loss",score: "23-20 OT",close: "-121",clv: "0.73%"},
+{date: "2024-12-28",sport: "NFL",play: "416 Arizona/LA Rams Under 49",result: "Win",score: "9-13",close: "-124",clv: "1.34%"},
+{date: "2024-12-26",sport: "NFL",play: "405 Seattle -3 (-120) vs. Chicago",result: "Push",score: "6-3",close: "-154.8",clv: "4.88%"},
+{date: "2024-12-22",sport: "NFL",play: "115 NY Giants/Atlanta Over 41.5",result: "Loss",score: "7-34",close: "-130",clv: "2.53%"},
+{date: "2024-12-22",sport: "NFL",play: "110 Carolina +4.5 vs. Arizona",result: "Win",score: "36-30 OT",close: "+102.2",clv: "-4.41%"},
+{date: "2024-12-22",sport: "NFL",play: "107 Detroit/Chicago Over 46.5",result: "Win",score: "34-17",close: "-125",clv: "1.55%"},
+{date: "2024-12-16",sport: "NFL",play: "483 Atlanta/Las Vegas Over 42.5",result: "Loss",score: "15-9",close: "-147",clv: "5.57%"},
+{date: "2024-12-16",sport: "NFL",play: "481 Chicago/Minnesota Over 43",result: "Loss",score: "12-30",close: "-123",clv: "1.14%"},
+{date: "2024-12-15",sport: "NFL",play: "473 Indianapolis +5.5 vs. Denver",result: "Loss",score: "13-31",close: "-118",clv: "0.33%"},
+{date: "2024-12-15",sport: "NFL",play: "463 Baltimore -14 (-115) vs. NY Giants",result: "Win",score: "35-14",close: "-153.8",clv: "5.78%"},
+{date: "2024-12-08",sport: "NFL",play: "127 Tampa Bay -7 vs. Las Vegas",result: "Win",score: "28-13",close: "-105.3",clv: "-2.55%"},
+{date: "2024-12-01",sport: "NFL",play: "475 Tampa Bay/Carolina Over 45.5",result: "Win",score: "26-23 OT",close: "-118",clv: "0.10%"},
+{date: "2024-12-01",sport: "NFL",play: "463 LA Chargers/Atlanta Over 46.5",result: "Loss",score: "17-13",close: "-120.7",clv: "0.67%"},
+{date: "2024-11-17",sport: "NFL",play: "474 Indianapolis/NY Jets Under 45",result: "Loss",score: "28-27",close: "-145",clv: "5.23%"},
+{date: "2024-11-10",sport: "NFL",play: "275 New England/Chicago Over 38.5 (-115)",result: "Loss",score: "19-3",close: "110",clv: "-7.63%"},
+{date: "2024-11-03",sport: "NFL",play: "459 Dallas/Atlanta Over 48.5",result: "Loss",score: "21-27",close: "-165",clv: "8.36%"},
+{date: "2024-11-03",sport: "NFL",play: "453 LA Chargers/Cleveland Over 39.5",result: "Loss",score: "27-10",close: "-139",clv: "4.19%"},
+{date: "2024-10-27",sport: "NFL",play: "283 Philadelphia/Cincinnati Over 46.5",result: "Win",score: "37-17",close: "-130.3",clv: "2.59%"},
+{date: "2024-10-27",sport: "NFL",play: "266 Cleveland +10 vs. Baltimore",result: "Win",score: "29-24",close: "-139.1",clv: "4.43%"},
+{date: "2024-10-20",sport: "NFL",play: "461 Miami +4.5 (-115) vs. Indianapolis",result: "Loss",score: "10-16",close: "-164.3",clv: "7.37%"},
+{date: "2024-10-20",sport: "NFL",play: "459 Houston +3 vs. Green Bay",result: "Win",score: "22-24",close: "+105",clv: "-5.09%"},
+{date: "2024-10-20",sport: "NFL",play: "453 Seattle +3 (-115) vs. Atlanta",result: "Win",score: "34-14",close: "-105",clv: "-3.73%"},
+{date: "2024-10-20",sport: "NFL",play: "451 New England/Jacksonville Over 42",result: "Win",score: "16-32",close: "-113",clv: "-1.00%"},
+{date: "2024-10-17",sport: "NFL",play: "311 Denver +1.5 vs. New Orleans",result: "Win",score: "33-10",close: "-163.8",clv: "8.40%"},
+{date: "2024-10-13",sport: "NFL",play: "281 Atlanta -5.5 vs. Carolina",result: "Win",score: "38-20",close: "-118.2",clv: "0.37%"},
+{date: "2024-10-13",sport: "NFL",play: "276 Denver TT Under 16.5 (-115) vs. LA Chargers",result: "Win",score: "16",close: "-125",clv: "0.44%"},
+{date: "2024-10-13",sport: "NFL",play: "276 LA Chargers/Denver Under 37",result: "Loss",score: "23-16",close: "-108",clv: "-2.14%"},
+{date: "2024-10-06",sport: "NFL",play: "466 Denver -1.5 vs. Las Vegas",result: "Win",score: "34-18",close: "-162.2",clv: "8.17%"},
+{date: "2024-10-06",sport: "NFL",play: "463 Cleveland/Washington Over 43.5",result: "Win",score: "13-34",close: "-111.7",clv: "-1.29%"},
+{date: "2024-10-06",sport: "NFL",play: "453 Carolina/Chicago Over 42.5 (-105)",result: "Win",score: "10-36",close: "+120.6",clv: "-7.68%"},
+{date: "2024-09-30",sport: "NFL",play: "291 Seattle +4.5 vs. Detroit",result: "Loss",score: "29-42",close: "-117.1",clv: "0.13%"},
+{date: "2024-09-26",sport: "NFL",play: "102 NY Giants +5.5 vs. Dallas",result: "Win",score: "15-20",close: "-110",clv: "-1.44%"},
+{date: "2024-09-23",sport: "NFL",play: "477 Jacksonville +6 vs. Buffalo",result: "Loss",score: "10-47",close: "-136.1",clv: "3.89%"},
+{date: "2024-09-22",sport: "NFL",play: "474 LA Rams +7 vs. San Francisco",result: "Win",score: "27-24",close: "-141.5",clv: "4.85%"},
+{date: "2024-09-22",sport: "NFL",play: "464 Tennessee -2 vs. Green Bay",result: "Loss",score: "14-30",close: "-135.9",clv: "3.86%"},
+{date: "2024-09-22",sport: "NFL",play: "457 NY Giants/Cleveland Over 38",result: "Loss",score: "21-15",close: "-115",clv: "-0.55%"}
+
+                ];
+
+                console.log("Data before processing:", data);
+
+                function formatValue(value, isPercentage = false) {
+                    if (isPercentage) {
+                        return value > 0 ? `+${value.toFixed(2)}%` : value < 0 ? `${value.toFixed(2)}%` : "0.00%";
+                    } else {
+                        return value > 0 ? `+${value.toFixed(2)}` : value < 0 ? `${value.toFixed(2)}` : "0.00";
+                    }
+                }
+
+                function filterSidebar() {
+                    var input, filter, ul, li, a, i, txtValue;
+                    input = document.querySelector(".search-bar");
+                    filter = input.value.toUpperCase();
+                    ul = document.querySelector(".sidebar ul");
+                    li = ul.getElementsByTagName("li");
+
+                    for (i = 0; i < li.length; i++) {
+                        a = li[i].getElementsByTagName("a")[0];
+                        if (a) {
+                            txtValue = a.textContent || a.innerText;
+                            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                li[i].style.display = "";
+                            } else {
+                                li[i].style.display = "none";
+                            }
+                        }
+                    }
+                }
+
+                function calculateUnits(row) {
+                    console.log("Processing row for units:", row);
+                    if (row.result === "Win") {
+                        console.log("Win detected, returning 1 unit");
+                        return 1;
+                    } else if (row.result === "Loss") {
+                        if (row.play.includes("(")) {
+                            console.log("Odds found in play:", row.play);
+                            var oddsMatch = row.play.match(/\(([-+]?\d+(?:\.\d+)?)\)/);
+                            if (oddsMatch) {
+                                var odds = parseFloat(oddsMatch[1]);
+                                console.log("Parsed odds:", odds);
+                                if (odds > 0) {
+                                    console.log("Positive odds calculation:", -(100 / odds));
+                                    return -(100 / odds);
+                                } else {
+                                    console.log("Negative odds calculation:", -(Math.abs(odds) / 100));
+                                    return -(Math.abs(odds) / 100);
+                                }
+                            } else {
+                                console.log("No odds format found, returning default loss");
+                                return -1.1;
+                            }
+                        } else {
+                            console.log("No odds found, returning default loss");
+                            return -1.1;
+                        }
+                    } else {
+                        console.log("Push or other result, returning 0");
+                        return 0;
+                    }
+                }
+
+                function calculateRisk(row) {
+                    console.log("Processing row for risk:", row);
+                    if (row.play.includes("(")) {
+                        console.log("Odds found in play:", row.play);
+                        var oddsMatch = row.play.match(/\(([-+]?\d+(?:\.\d+)?)\)/);
+                        if (oddsMatch) {
+                            var odds = parseFloat(oddsMatch[1]);
+                            console.log("Parsed odds:", odds);
+                            if (odds > 0) {
+                                console.log("Positive odds risk calculation:", odds / 100);
+                                return odds / 100;
+                            } else {
+                                console.log("Negative odds risk calculation:", Math.abs(odds) / 100);
+                                return Math.abs(odds) / 100;
+                            }
+                        } else {
+                            console.log("No odds format found, returning default risk");
+                            return 1.1;
+                        }
+                    } else {
+                        console.log("No odds found, returning default risk");
+                        return 1.1;
+                    }
+                }
+
+                function updateSummaryTable() {
+                    let wins = 0,
+                        losses = 0,
+                        pushes = 0,
+                        totalUnits = 0,
+                        positiveClv = 0,
+                        totalClv = 0,
+                        totalRisked = 0;
+
+                    data.forEach((row) => {
+                        if (row.result === "Win") {
+                            wins++;
+                            let units = calculateUnits(row);
+                            if (isNaN(units)) {
+                                console.error("NaN detected in units calculation for:", row);
+                            } else {
+                                totalUnits += units;
+                            }
+                        } else if (row.result === "Loss") {
+                            losses++;
+                            let units = calculateUnits(row);
+                            if (isNaN(units)) {
+                                console.error("NaN detected in units calculation for:", row);
+                            } else {
+                                totalUnits += units;
+                            }
+                        } else if (row.result === "Push") {
+                            pushes++;
+                        }
+                        let risk = calculateRisk(row);
+                        if (isNaN(risk)) {
+                            console.error("NaN detected in risk calculation for:", row);
+                        } else {
+                            totalRisked += risk;
+                        }
+                        if (parseFloat(row.clv.replace("%", "")) > 0) positiveClv++;
+                        totalClv += parseFloat(row.clv.replace("%", ""));
+                    });
+
+                    console.log("Summary stats:", {
+                        wins,
+                        losses,
+                        pushes,
+                        totalUnits,
+                        totalRisked,
+                        positiveClv,
+                        totalClv
+                    });
+
+                    let nElement = document.getElementById("n");
+                    let recordElement = document.getElementById("record");
+                    let unitsElement = document.getElementById("units");
+                    let roiElement = document.getElementById("roi");
+                    let btclElement = document.getElementById("btcl");
+                    let noVigClvElement = document.getElementById("noVigClv");
+
+                    if (nElement) nElement.textContent = data.length;
+                    if (recordElement)
+                        recordElement.textContent = `${wins} - ${losses} - ${pushes} (${((wins / (wins + losses)) * 100).toFixed(2)}%)`;
+
+                    if (unitsElement) {
+                        unitsElement.textContent = formatValue(totalUnits);
+                        console.log("Units element content set to:", unitsElement.textContent);
+                        unitsElement.style.color = totalUnits > 0 ? "#1ea672" : totalUnits < 0 ? "#ff5252" : "#8c99ad";
+                    }
+
+                    if (roiElement) {
+                        let roi = (totalUnits / totalRisked) * 100;
+                        roiElement.textContent = formatValue(roi, true);
+                        console.log("ROI element content set to:", roiElement.textContent);
+                        roiElement.style.color = roi > 0 ? "#1ea672" : roi < 0 ? "#ff5252" : "#8c99ad";
+                    }
+
+                    if (btclElement) btclElement.textContent = `${((positiveClv / data.length) * 100).toFixed(2)}%`;
+
+                    if (noVigClvElement) {
+                        noVigClvElement.textContent = formatValue(totalClv / data.length, true);
+                        console.log("No-Vig CLV element content set to:", noVigClvElement.textContent);
+                        noVigClvElement.style.color =
+                            parseFloat(noVigClvElement.textContent.replace("%", "")) > 0 ? "#1ea672" : "#ff5252";
+                    }
+                }
+
+                function populateDetailedTable() {
+                    let tbody = document.getElementById("resultsTableBody");
+                    if (!tbody) {
+                        console.error("Table body not found");
+                        return;
+                    }
+                    console.log("Table body found, clearing and repopulating", tbody);
+                    tbody.innerHTML = "";
+
+                    console.log("Data before sort:", data);
+                    data.sort((a, b) => {
+                        var dateA = new Date(a.date).getTime();
+                        var dateB = new Date(b.date).getTime();
+
+                        if (dateA === dateB) {
+                            var rotationA = a.play.match(/^\d+/) ? parseInt(a.play.match(/^\d+/)[0]) : 0;
+                            var rotationB = b.play.match(/^\d+/) ? parseInt(b.play.match(/^\d+/)[0]) : 0;
+                            return rotationB - rotationA;
+                        }
+
+                        return dateB - dateA;
+                    });
+                    console.log("Data after sort:", data);
+
+                    data.forEach((row, index) => {
+                        console.log("Processing row for detailed table:", index, row);
+                        let units = calculateUnits(row);
+                        let tr = document.createElement("tr");
+                        let unitColor = units > 0 ? "#1ea672" : units < 0 ? "#ff5252" : "#8c99ad";
+                        if (formatValue(units) === "0.00") {
+                            unitColor = "#8c99ad";
+                        }
+                        tr.innerHTML = `
+            <td style="color: #8c99ad; text-align: center;"><span class="date">${row.date}</span>${row.sport}</td>
+            <td style="color: #8c99ad;">${row.play}</td>
+            <td style="color: ${row.result === "Win" ? "#1ea672" : row.result === "Loss" ? "#ff5252" : "#8c99ad"}; text-align: center;">${row.result}</td>
+            <td style="color: ${unitColor}; text-align: center;">${formatValue(units)}</td>
+            <td style="color: #8c99ad; text-align: center;">${row.score}</td>
+            <td style="color: #8c99ad; text-align: center;">${row.close}</td>
+            <td style="color: ${parseFloat(row.clv) > 0 ? "#1ea672" : parseFloat(row.clv) < 0 ? "#ff5252" : "#8c99ad"}; text-align: right;">${formatValue(parseFloat(row.clv), true)}</td>
+        `;
+                        tbody.appendChild(tr);
+                        console.log("Row added:", tr);
+                    });
+                    console.log("Table population complete. Total rows:", tbody.children.length);
+                }
+
+                function populateDetailedTable() {
+                    let tbody = document.getElementById("resultsTableBody");
+                    if (!tbody) {
+                        console.error("Table body not found");
+                        return;
+                    }
+                    console.log("Table body found, clearing and repopulating", tbody);
+                    tbody.innerHTML = "";
+
+                    console.log("Data before sort:", data);
+                    data.sort((a, b) => {
+                        var dateA = new Date(a.date).getTime();
+                        var dateB = new Date(b.date).getTime();
+
+                        if (dateA === dateB) {
+                            var rotationA = a.play.match(/^\d+/) ? parseInt(a.play.match(/^\d+/)[0]) : 0;
+                            var rotationB = b.play.match(/^\d+/) ? parseInt(b.play.match(/^\d+/)[0]) : 0;
+                            return rotationB - rotationA;
+                        }
+
+                        return dateB - dateA;
+                    });
+                    console.log("Data after sort:", data);
+
+                    data.forEach((row, index) => {
+                        console.log("Processing row:", index, row);
+                        let units = calculateUnits(row);
+                        let tr = document.createElement("tr");
+                        let unitColor = units > 0 ? "#1ea672" : units < 0 ? "#ff5252" : "#8c99ad";
+                        if (formatValue(units) === "0.00") {
+                            unitColor = "#8c99ad";
+                        }
+                        tr.innerHTML = `
+            <td style="color: #8c99ad; text-align: center;"><span class="date">${row.date}</span>${row.sport}</td>
+            <td style="color: #8c99ad;">${row.play}</td>
+            <td style="color: ${row.result === "Win" ? "#1ea672" : row.result === "Loss" ? "#ff5252" : "#8c99ad"}; text-align: center;">${row.result}</td>
+            <td style="color: ${unitColor}; text-align: center;">${formatValue(units)}</td>
+            <td style="color: #8c99ad; text-align: center;">${row.score}</td>
+            <td style="color: #8c99ad; text-align: center;">${row.close}</td>
+            <td style="color: ${parseFloat(row.clv) > 0 ? "#1ea672" : parseFloat(row.clv) < 0 ? "#ff5252" : "#8c99ad"}; text-align: right;">${formatValue(parseFloat(row.clv), true)}</td>
+        `;
+                        tbody.appendChild(tr);
+                        console.log("Row added:", tr);
+                    });
+                    console.log("Table population complete. Total rows:", tbody.children.length);
+                }
+
+                function createSimpleChart() {
+                    var chartData = data.reduce((acc, row) => {
+                        var date = new Date(row.date);
+                        var dateString = date.toISOString().split("T")[0];
+                        if (!acc[dateString]) {
+                            acc[dateString] = { date: date, units: 0 };
+                        }
+                        acc[dateString].units += calculateUnits(row);
+                        return acc;
+                    }, {});
+
+                    var chartDataArray = Object.values(chartData).sort((a, b) => a.date - b.date);
+                    var labels = ["\u00A0"].concat(
+                        chartDataArray.map((item) => {
+                            var date = new Date(item.date);
+                            return `${date.toLocaleString("en-US", { month: "short" })} ${date.getUTCDate()}`;
+                        })
+                    );
+                    var cumulativeUnits = chartDataArray.reduce(
+                        (cumulative, item, index) => {
+                            var total = index === 0 ? item.units : cumulative[cumulative.length - 1] + item.units;
+                            cumulative.push(total);
+                            return cumulative;
+                        },
+                        [0]
+                    );
+
+                    var ctx = document.getElementById("myChart").getContext("2d");
+                    window.myChart = new Chart(ctx, {
+                        type: "line",
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: "Cumulative Units",
+                                    data: cumulativeUnits,
+                                    borderColor: "rgba(0, 128, 128, 1)",
+                                    backgroundColor: "rgba(0, 128, 128, 0.2)",
+                                    fill: true,
+                                    lineTension: 0,
+                                    pointRadius: 0,
+                                    pointStyle: "circle",
+                                    pointBackgroundColor: "#1ea672",
+                                    pointBorderColor: "#1ea672",
+                                    pointBorderWidth: 1,
+                                    pointHoverRadius: 3,
+                                    pointHoverBackgroundColor: "#1ea672",
+                                    pointHoverBorderColor: "#1ea672",
+                                    pointHoverBorderWidth: 2,
+                                    responsive: true
+                                }
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    display: false,
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: "#8c99ad"
+                                    }
+                                },
+                                y: {
+                                    display: true,
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: "#8c99ad"
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    mode: "index",
+                                    intersect: false,
+                                    displayColors: false,
+                                    callbacks: {
+                                        title: function (tooltipItems) {
+                                            if (tooltipItems[0].dataIndex === 0) {
+                                                return "\u00A0";
+                                            }
+                                            var date = new Date(chartDataArray[tooltipItems[0].dataIndex - 1].date);
+                                            return `${date.toLocaleString("en-US", { month: "short" })} ${date.getUTCDate()}`;
+                                        },
+                                        label: function (context) {
+                                            return "●  Units: " + context.parsed.y.toFixed(2);
+                                        }
+                                    }
+                                }
+                            },
+                            layout: {
+                                padding: 0
+                            }
+                        }
+                    });
+                }
+
+                document.querySelector(".search-bar").addEventListener("input", filterSidebar);
+                updateSummaryTable();
+                populateDetailedTable();
+                createSimpleChart();
+            });
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.3.1/decimal.min.js"></script>
+    </body>
+</html>
