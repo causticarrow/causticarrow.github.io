@@ -150,25 +150,31 @@
                     }
                 }
 
-                function filterSidebar() {
-                    var input, filter, ul, li, a, i, txtValue;
-                    input = document.querySelector(".search-bar");
-                    filter = input.value.toUpperCase();
-                    ul = document.querySelector(".sidebar ul");
-                    li = ul.getElementsByTagName("li");
+    function filterSidebar() {
+        var input, filter, ul, li, i;
+        input = document.querySelector(".search-bar");
+        filter = input.value.toUpperCase();
+        ul = document.querySelector(".sidebar ul");
+        li = ul.getElementsByTagName("li");
 
-                    for (i = 0; i < li.length; i++) {
-                        a = li[i].getElementsByTagName("a")[0];
-                        if (a) {
-                            txtValue = a.textContent || a.innerText;
-                            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                                li[i].style.display = "";
-                            } else {
-                                li[i].style.display = "none";
-                            }
+        for (i = 0; i < li.length; i++) {
+            var a = li[i].getElementsByTagName("a")[0];
+            if (a) {
+                var txtValue = li[i].textContent || li[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    li[i].style.display = "";
+                } else {
+                    var shouldHide = true;
+                    li[i].querySelectorAll('*').forEach(node => {
+                        if ((node.textContent || node.innerText).toUpperCase().indexOf(filter) > -1) {
+                            shouldHide = false;
                         }
-                    }
+                    });
+                    li[i].style.display = shouldHide ? "none" : "";
                 }
+            }
+        }
+    }
 
                 function calculateUnits(row) {
                     console.log("Processing row for units:", row);
