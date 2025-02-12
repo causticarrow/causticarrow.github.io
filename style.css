@@ -1,0 +1,213 @@
+/* style.css */
+
+/* Base styles */
+body {
+    font-family: 'Sohne', 'Segoe UI', sans-serif;
+    font-size: 14px;
+    background-color: #09090b;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+/* Summary Table */
+.summary-table {
+    width: 100%;
+    margin-bottom: 20px;
+    background-color: #1b1e25;
+    border-radius: 8px;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.summary-table th, .summary-table td {
+    padding: 10px;
+    text-align: center;
+    border: none;
+    width: auto;
+}
+
+.summary-table th {
+    background-color: #21252c;
+}
+
+.summary-table td {
+    background-color: #1b1e25;
+    color: #8c99ad;
+}
+
+.summary-table th:nth-child(1), .summary-table td:nth-child(1) { width: 1%; } /* n */
+.summary-table th:nth-child(2), .summary-table td:nth-child(2) { width: 1%; } /* Record */
+.summary-table th:nth-child(3), .summary-table td:nth-child(3) { width: 1%; } /* Units */
+.summary-table th:nth-child(4), .summary-table td:nth-child(4) { width: 1%; } /* ROI */
+.summary-table th:nth-child(5), .summary-table td:nth-child(5) { width: 1%; } /* BTCL */
+.summary-table th:nth-child(6), .summary-table td:nth-child(6) { width: 1%; } /* No-Vig CLV */
+
+/* Detailed Table */
+.detailed-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1c1b22;
+    border-radius: 8px;
+}
+
+.detailed-table th, .detailed-table td {
+    padding: 10px;
+    border: none;
+    width: auto;
+}
+
+.detailed-table th {
+    background-color: #21252c;
+    text-align: center;
+}
+
+.detailed-table td {
+    background-color: #1b1e25;
+}
+
+.detailed-table th:nth-child(1), .detailed-table td:nth-child(1) { width: 1%; text-align: center; } /* Date */
+.detailed-table th:nth-child(2), .detailed-table td:nth-child(2) { width: 2%; text-align: left} /* Play */
+.detailed-table th:nth-child(3), .detailed-table td:nth-child(3) { width: 1%; text-align: center; } /* Result */
+.detailed-table th:nth-child(4), .detailed-table td:nth-child(4) { width: 1%; text-align: center; } /* Units */
+.detailed-table th:nth-child(5), .detailed-table td:nth-child(5) { width: 1%; text-align: center; } /* Score */
+.detailed-table th:nth-child(6), .detailed-table td:nth-child(6) { width: 1%; text-align: center; } /* Close */
+.detailed-table th:nth-child(7), .detailed-table td:nth-child(7) { width: 1%; text-align: center; } /* CLV */
+
+/* Ensure tables have consistent widths */
+table {
+    table-layout: fixed;
+}
+
+.detailed-table td:nth-child(6) {
+    text-align: center !important; /* Centers the text in the CLV column */
+}
+
+.detailed-table td:last-child {
+    text-align: center !important; /* Centers the text in the last (CLV) column with high specificity */
+}
+
+.detailed-table td:nth-child(7) {
+    text-align: center !important; /* Centers the text in the 7th column */
+}
+
+/* Date for each play */
+.date {
+    display: block;
+    font-weight: bold;
+    color: #8c99ad;
+    margin-bottom: 5px;
+}
+
+/* Link styles */
+a {
+    color: #1ea672;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #efffed;
+}
+
+/* Container layout */
+.container {
+    display: flex;
+    min-height: 100vh; /* Ensures the container is at least as tall as the viewport */
+}
+
+/* Sidebar styles */
+.sidebar {
+    width: 250px;
+    background-color: #09090b;
+    padding: 20px;
+    border-right: 1px solid #22252a;
+    height: 100vh; /* Full viewport height */
+    position: fixed; /* Fixed position */
+    top: 0; /* Stick to the top */
+    left: 0; /* Align to the left edge */
+    overflow-y: auto; /* Allows vertical scrolling if content overflows */
+    overflow-x: hidden; /* Prevents horizontal scrolling */
+    box-sizing: border-box; /* Ensures padding is included in the width */
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    margin-bottom: 10px;
+    padding-left: 10px;
+}
+
+.sidebar a {
+    color: #8c99ad;
+    display: block;
+    padding: 5px 0;
+    padding-left: 0;
+}
+
+.sidebar a.active {
+    color: #198e64;
+    background-color: #0b3733;
+    margin-left: -10px;
+    padding-left: 10px;
+    border-radius: 4px;
+}
+
+/* Search bar styles */
+.search-bar {
+    width: 100%; /* Full width of the sidebar */
+    max-width: 250px; /* Ensure it doesn't exceed sidebar width */
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #22252a;
+    background-color: #22252a;
+    color: #ffffff;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%238c99ad" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><line x1="17" y1="17" x2="22" y2="22"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    padding-left: 30px;
+    text-indent: 10px;
+    box-sizing: border-box; /* Ensures padding is included in the width */
+}
+
+.main-content {
+    width: calc(100% - 250px); /* Adjust for sidebar width */
+    margin-left: 250px; /* Push content to the right of the sidebar */
+    padding: 20px;
+    min-height: 100vh; /* Ensure it fills the viewport height */
+    box-sizing: border-box; /* Ensures padding is included in the width */
+}
+
+.main-content, #chart-container, .summary-table, .detailed-table {
+    box-sizing: border-box;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+    }
+}
+
+.category-header .category-toggle {
+    display: block;
+    color: #ffffff;
+    cursor: pointer;
+    margin-top: 30px !important;
+    margin-bottom: 10px !important; /* This might override other rules */
+}
+
+.sidebar .category-header .category-toggle {
+    display: block;
+    color: #ffffff;
+    cursor: pointer;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}

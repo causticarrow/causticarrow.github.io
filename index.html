@@ -4,19 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Caustic Arrow's Site</title>
-    <style>
-        body {
-            font-family: 'Segoe UI';
-            text-align: center;
-            padding: 50px;
-            background-color: #f0f0f0;
-        }
-        h1 {
-            color: #333;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>causticarrow.com</h1>
+    <div class="container">
+<aside class="sidebar">
+    <input type="text" class="search-bar" placeholder="Search" />
+    <ul>
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="https://x.com/causticarrow">𝕏 (Twitter)</a></li>
+
+<li class="category-header">
+    <span class="category-toggle">Results</span>
+    <ul class="category-content">
+        <li><a href="results/clive.html">Clive</a></li>
+    </ul>
+</li>
+    </ul>
+</aside>
+        <main class="main-content">
+            <!-- Content will be added here dynamically or through other means -->
+        </main>
+    </div>
+<script>function filterSidebar() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.querySelector('.search-bar');
+    filter = input.value.toUpperCase();
+    ul = document.querySelector('.sidebar ul');
+    li = ul.getElementsByTagName('li');
+
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        if (a) {
+            txtValue = a.textContent || a.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
+            }
+        }
+    }
+}
+document.querySelector('.search-bar').addEventListener('input', filterSidebar);</script>
 </body>
 </html>
