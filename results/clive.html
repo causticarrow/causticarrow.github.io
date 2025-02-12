@@ -44,7 +44,7 @@
                             <td id="record"></td>
                             <td id="units"></td>
                             <td id="roi"></td>
-                            
+
                             <td id="btcl"></td>
                             <td id="noVigClv"></td>
                         </tr>
@@ -461,7 +461,7 @@
 
                     if (nElement) nElement.textContent = data.length;
                     if (recordElement)
-                        recordElement.textContent = `${wins} - ${losses} - ${pushes} (${((wins / (wins + losses + pushes)) * 100).toFixed(2)}%)`;
+                        recordElement.textContent = `${wins} - ${losses} - ${pushes} (${((wins / (wins + losses)) * 100).toFixed(2)}%)`;
 
                     if (unitsElement) {
                         unitsElement.textContent = formatValue(totalUnits);

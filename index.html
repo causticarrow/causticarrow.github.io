@@ -1,50 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clive Results - causticarrow.com</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="container">
-<aside class="sidebar">
-    <input type="text" class="search-bar" placeholder="Search" />
-    <ul>
-        <li><a href="index.html" class="active">Home</a></li>
-        <li><a href="https://x.com/causticarrow">𝕏 (Twitter)</a></li>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Clive Results - causticarrow.com</title>
+        <link rel="stylesheet" href="style.css" />
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <aside class="sidebar">
+                <input type="text" class="search-bar" placeholder="Search" />
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="https://x.com/causticarrow">𝕏 (Twitter)</a></li>
 
-<li class="category-header">
-    <span class="category-toggle">Results</span>
-    <ul class="category-content">
-        <li><a href="results/clive.html">Clive</a></li>
-    </ul>
-</li>
-    </ul>
-</aside>
-        <main class="main-content">
-        </main>
-    </div>
-<script>function filterSidebar() {
-    var input, filter, ul, li, a, i, txtValue;
-    input = document.querySelector('.search-bar');
-    filter = input.value.toUpperCase();
-    ul = document.querySelector('.sidebar ul');
-    li = ul.getElementsByTagName('li');
+                    <li class="category-header">
+                        <span class="category-toggle">Results</span>
+                        <ul class="category-content">
+                            <li><a href="results/clive.html">Clive</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </aside>
+            <main class="main-content"></main>
+        </div>
+        <script>
+            function filterSidebar() {
+                var input, filter, ul, li, a, i, txtValue;
+                input = document.querySelector(".search-bar");
+                filter = input.value.toUpperCase();
+                ul = document.querySelector(".sidebar ul");
+                li = ul.getElementsByTagName("li");
 
-    for (i = 0; i < li.length; i++) {
-        a = li[i].getElementsByTagName("a")[0];
-        if (a) {
-            txtValue = a.textContent || a.innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                li[i].style.display = "";
-            } else {
-                li[i].style.display = "none";
+                for (i = 0; i < li.length; i++) {
+                    a = li[i].getElementsByTagName("a")[0];
+                    if (a) {
+                        txtValue = a.textContent || a.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            li[i].style.display = "";
+                        } else {
+                            li[i].style.display = "none";
+                        }
+                    }
+                }
             }
-        }
-    }
-}
-document.querySelector('.search-bar').addEventListener('input', filterSidebar);</script>
-</body>
+            document.querySelector(".search-bar").addEventListener("input", filterSidebar);
+        </script>
+    </body>
 </html>
