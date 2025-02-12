@@ -70,249 +70,73 @@
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 var data = [
-                    {
-                        date: "2025-01-12",
-                        sport: "NFL",
-                        play: "Green Bay TT Under 20.5 (-105) vs. Philadelphia",
-                        result: "Win",
-                        score: "10",
-                        close: "-135",
-                        clv: "4.63%"
-                    },
-                    {
-                        date: "2024-12-30",
-                        sport: "NFL",
-                        play: "Detroit TT Over 27.5 vs. San Francisco",
-                        result: "Win",
-                        score: "40",
-                        close: "-120",
-                        clv: "0.52%"
-                    },
-                    {
-                        date: "2024-12-26",
-                        sport: "NFL",
-                        play: "Seattle/Chicago Under 42.5",
-                        result: "Win",
-                        score: "6-3",
-                        close: "-110",
-                        clv: "-2.79%"
-                    },
-                    {
-                        date: "2024-12-25",
-                        sport: "NFL",
-                        play: "Baltimore -3.5 vs. Houston",
-                        result: "Win",
-                        score: "31-2",
-                        close: "-161.1",
-                        clv: "8.00%"
-                    },
-                    {
-                        date: "2024-12-22",
-                        sport: "NFL",
-                        play: "Atlanta TT Over 24.5 (-120) vs. NY Giants",
-                        result: "Win",
-                        score: "34",
-                        close: "-154.4",
-                        clv: "4.60%"
-                    },
-                    {
-                        date: "2024-12-21",
-                        sport: "NFL",
-                        play: "Pittsburgh/Baltimore Under 46.5",
-                        result: "Loss",
-                        score: "17-34",
-                        close: "-149",
-                        clv: "5.90%"
-                    },
-                    {
-                        date: "2024-12-15",
-                        sport: "NFL",
-                        play: "Indianapolis/Denver Under 43.5",
-                        result: "Loss",
-                        score: "13-31",
-                        close: "-116.9",
-                        clv: "-0.14%"
-                    },
-                    {
-                        date: "2024-12-15",
-                        sport: "NFL",
-                        play: "Pittsburgh/Philadelphia Under 44",
-                        result: "Win",
-                        score: "13-27",
-                        close: "-128.1",
-                        clv: "2.16%"
-                    },
-                    {
-                        date: "2024-12-15",
-                        sport: "NFL",
-                        play: "Baltimore TT Over 28.5 (-120) vs. NY Giants",
-                        result: "Win",
-                        score: "35",
-                        close: "-144",
-                        clv: "2.90%"
-                    },
-                    {
-                        date: "2024-12-08",
-                        sport: "NFL",
-                        play: "Miami TT Over 26.5 (+100) vs. NY Jets",
-                        result: "Win",
-                        score: "32",
-                        close: "-135",
-                        clv: "5.85%"
-                    },
-                    {
-                        date: "2024-12-01",
-                        sport: "NFL",
-                        play: "Tampa Bay TT Over 26.5 vs. Carolina",
-                        result: "Loss",
-                        score: "26 OT",
-                        close: "-121",
-                        clv: "0.73%"
-                    },
-                    {
-                        date: "2024-12-01",
-                        sport: "NFL",
-                        play: "LA Chargers -1.5 (-105) vs. Atlanta",
-                        result: "Win",
-                        score: "17-13",
-                        close: "-103.5",
-                        clv: "-1.82%"
-                    },
-                    {
-                        date: "2024-11-24",
-                        sport: "NFL",
-                        play: "Minnesota -3 (-120) vs. Chicago",
-                        result: "Push",
-                        score: "30-27 OT",
-                        close: "-108",
-                        clv: "-4.07%"
-                    },
-                    {
-                        date: "2024-11-10",
-                        sport: "NFL",
-                        play: "NY Giants/Carolina Under 41.5 (-105)",
-                        result: "Win",
-                        score: "17-20 OT",
-                        close: "-139",
-                        clv: "5.35%"
-                    },
-                    {
-                        date: "2024-11-03",
-                        sport: "NFL",
-                        play: "New England/Tennessee Under 38.5",
-                        result: "Win",
-                        score: "17-20",
-                        close: "-115",
-                        clv: "-0.55%"
-                    },
-                    {
-                        date: "2024-10-31",
-                        sport: "NFL",
-                        play: "Houston/NY Jets Under 42.5",
-                        result: "Win",
-                        score: "13-21",
-                        close: "104",
-                        clv: "-5.10%"
-                    },
-                    {
-                        date: "2024-10-27",
-                        sport: "NFL",
-                        play: "Dallas/San Francisco Under 48",
-                        result: "Loss",
-                        score: "24-30",
-                        close: "-117.6",
-                        clv: "0.01%"
-                    },
-                    {
-                        date: "2024-10-27",
-                        sport: "NFL",
-                        play: "Cincinnati -2.5 vs. Philadelphia",
-                        result: "Loss",
-                        score: "17-37",
-                        close: "-129.7",
-                        clv: "2.70%"
-                    },
-                    {
-                        date: "2024-10-17",
-                        sport: "NFL",
-                        play: "Denver/New Orleans Over 37",
-                        result: "Win",
-                        score: "33-10",
-                        close: "-110",
-                        clv: "-1.68%"
-                    },
-                    {
-                        date: "2024-10-13",
-                        sport: "NFL",
-                        play: "Atlanta TT Over 27.5 (+110) vs. Carolina",
-                        result: "Win",
-                        score: "38",
-                        close: "110",
-                        clv: "-1.76%"
-                    },
-                    {
-                        date: "2024-10-13",
-                        sport: "NFL",
-                        play: "Arizona/Green Bay Under 50 (-115)",
-                        result: "Win",
-                        score: "13-34",
-                        close: "-159.3",
-                        clv: "6.41%"
-                    },
-                    {
-                        date: "2024-10-07",
-                        sport: "NFL",
-                        play: "New Orleans/Kansas City Under 42.5",
-                        result: "Win",
-                        score: "13-26",
-                        close: "-103.6",
-                        clv: "-3.20%"
-                    },
-                    {
-                        date: "2024-09-29",
-                        sport: "NFL",
-                        play: "Pittsburgh -1.5 vs. Indianapolis",
-                        result: "Loss",
-                        score: "24-27",
-                        close: "-119.6",
-                        clv: "0.67%"
-                    },
-                    {
-                        date: "2024-09-22",
-                        sport: "NFL",
-                        play: "Detroit/Arizona Under 52",
-                        result: "Win",
-                        score: "20-13",
-                        close: "-118.5",
-                        clv: "0.20%"
-                    },
-                    {
-                        date: "2024-09-15",
-                        sport: "NFL",
-                        play: "LA Rams/Arizona Over 49",
-                        result: "Win",
-                        score: "10-41",
-                        close: "117",
-                        clv: "-8.08%"
-                    },
-                    {
-                        date: "2024-09-15",
-                        sport: "NFL",
-                        play: "Cleveland/Jacksonville Under 42",
-                        result: "Win",
-                        score: "18-13",
-                        close: "-123.4",
-                        clv: "1.22%"
-                    },
-                    {
-                        date: "2024-09-12",
-                        sport: "NFL",
-                        play: "Buffalo/Miami Under 50.5",
-                        result: "Win",
-                        score: "31-10",
-                        close: "-124.3",
-                        clv: "1.40%"
-                    }
+{date: "2025-01-12",sport: "NFL",play: "381 Green Bay TT Under 20.5 (-105) vs. Philadelphia",result: "Win",score: "10",close: "-135",clv: "4.63%"},
+{date: "2024-12-30",sport: "NFL",play: "431 Detroit TT Over 27.5 vs. San Francisco",result: "Win",score: "40",close: "-120",clv: "0.52%"},
+{date: "2024-12-26",sport: "NFL",play: "406 Seattle/Chicago Under 42.5 (-115)",result: "Win",score: "6-3",close: "-110",clv: "-2.79%"},
+{date: "2024-12-25",sport: "NFL",play: "403 Baltimore -3.5 vs. Houston",result: "Win",score: "31-2",close: "-161.1",clv: "8.00%"},
+{date: "2024-12-22",sport: "NFL",play: "116 Atlanta TT Over 24.5 (-120) vs. NY Giants",result: "Win",score: "34",close: "-154.4",clv: "4.60%"},
+{date: "2024-12-21",sport: "NFL",play: "106 Pittsburgh/Baltimore Under 46.5",result: "Loss",score: "17-34",close: "-149",clv: "5.90%"},
+{date: "2024-12-15",sport: "NFL",play: "474 Indianapolis/Denver Under 43.5",result: "Loss",score: "13-31",close: "-116.9",clv: "-0.14%"},
+{date: "2024-12-15",sport: "NFL",play: "470 Pittsburgh/Philadelphia Under 44",result: "Win",score: "13-27",close: "-128.1",clv: "2.16%"},
+{date: "2024-12-15",sport: "NFL",play: "463 Baltimore TT Over 28.5 (-120) vs. NY Giants",result: "Win",score: "35",close: "-144",clv: "2.90%"},
+{date: "2024-12-08",sport: "NFL",play: "134 Miami TT Over 26.5 vs. NY Jets (100)",result: "Win",score: "32",close: "-135",clv: "5.85%"},
+{date: "2024-12-01",sport: "NFL",play: "475 Tampa Bay TT Over 26.5 vs. Carolina",result: "Loss",score: "26 OT",close: "-121",clv: "0.73%"},
+{date: "2024-12-01",sport: "NFL",play: "463 LA Chargers -1.5 (-105) vs. Atlanta",result: "Win",score: "17-13",close: "-103.5",clv: "-1.82%"},
+{date: "2024-11-24",sport: "NFL",play: "255 Minnesota -3 (-120) vs. Chicago",result: "Push",score: "30-27 OT",close: "-108",clv: "-4.07%"},
+{date: "2024-11-10",sport: "NFL",play: "262 NY Giants/Carolina Under 41.5 (-105)",result: "Win",score: "17-20 OT",close: "-139",clv: "5.35%"},
+{date: "2024-11-03",sport: "NFL",play: "452 New England/Tennessee Under 38.5",result: "Win",score: "17-20",close: "-115",clv: "-0.55%"},
+{date: "2024-10-31",sport: "NFL",play: "312 Houston/NY Jets Under 42.5",result: "Win",score: "13-21",close: "104",clv: "-5.10%"},
+{date: "2024-10-27",sport: "NFL",play: "290 Dallas/San Francisco Under 48",result: "Loss",score: "24-30",close: "-117.6",clv: "0.01%"},
+{date: "2024-10-27",sport: "NFL",play: "284 Cincinnati -2.5 vs. Philadelphia",result: "Loss",score: "17-37",close: "-129.7",clv: "2.70%"},
+{date: "2024-10-17",sport: "NFL",play: "311 Denver/New Orleans Over 37",result: "Win",score: "33-10",close: "-110",clv: "-1.68%"},
+{date: "2024-10-13",sport: "NFL",play: "281 Atlanta TT Over 27.5 (+110) vs. Carolina",result: "Win",score: "38",close: "110",clv: "-1.76%"},
+{date: "2024-10-13",sport: "NFL",play: "268 Arizona/Green Bay Under 50 (-115)",result: "Win",score: "13-34",close: "-159.3",clv: "6.41%"},
+{date: "2024-10-07",sport: "NFL",play: "476 New Orleans/Kansas City Under 42.5",result: "Win",score: "13-26",close: "-103.6",clv: "-3.20%"},
+{date: "2024-09-29",sport: "NFL",play: "265 Pittsburgh -1.5 vs. Indianapolis",result: "Loss",score: "24-27",close: "-119.6",clv: "0.67%"},
+{date: "2024-09-22",sport: "NFL",play: "470 Detroit/Arizona Under 52",result: "Win",score: "20-13",close: "-118.5",clv: "0.20%"},
+{date: "2024-09-15",sport: "NFL",play: "283 LA Rams/Arizona Over 49",result: "Win",score: "10-41",close: "117",clv: "-8.08%"},
+{date: "2024-09-15",sport: "NFL",play: "274 Cleveland/Jacksonville Under 42",result: "Win",score: "18-13",close: "-123.4",clv: "1.22%"},
+{date: "2024-09-12",sport: "NFL",play: "104 Buffalo/Miami Under 50.5",result: "Win",score: "31-10",close: "-124.3",clv: "1.40%"},
+{date: "2025-01-05",sport: "NFL",play: "357 Seattle +2.5 (-115) vs. LA Rams",result: "Win",score: "30-25",close: "-472.5",clv: "28.06%"},
+{date: "2025-01-05",sport: "NFL",play: "347 LA Chargers/Las Vegas Over 40.5",result: "Win",score: "34-20",close: "-134.4",clv: "3.36%"},
+{date: "2024-12-28",sport: "NFL",play: "408 New England +6 (-115) vs. LA Chargers",result: "Loss",score: "7-40",close: "-105",clv: "-3.73%"},
+{date: "2024-12-25",sport: "NFL",play: "404 Baltimore/Houston Under 48",result: "Win",score: "31-2",close: "-129.2",clv: "2.37%"},
+{date: "2024-12-22",sport: "NFL",play: "111 New England/Buffalo Over 44.5 (-115)",result: "Win",score: "21-24",close: "-179.1",clv: "9.19%"},
+{date: "2024-12-22",sport: "NFL",play: "109 Arizona/Carolina Over 46",result: "Win",score: "30-36 OT",close: "-122.8",clv: "1.10%"},
+{date: "2024-12-15",sport: "NFL",play: "477 New England/Arizona Over 44",result: "Win",score: "17-30",close: "-152.5",clv: "6.46%"},
+{date: "2024-12-09",sport: "NFL",play: "144 Dallas +6 (-105) vs. Cincinnati",result: "Loss",score: "20-27",close: "-135",clv: "4.85%"},
+{date: "2024-12-08",sport: "NFL",play: "133 NY Jets/Miami Over 44.5",result: "Win",score: "26-32",close: "-122.7",clv: "1.08%"},
+{date: "2024-12-08",sport: "NFL",play: "131 Carolina +13 vs. Philadelphia",result: "Win",score: "16-22",close: "-102.3",clv: "-3.28%"},
+{date: "2024-12-02",sport: "NFL",play: "483 Cleveland/Denver Over 40.5 (-115)",result: "Win",score: "32-41",close: "-126.2",clv: "0.68%"},
+{date: "2024-12-01",sport: "NFL",play: "474 Seattle/NY Jets Under 43.5 (-115)",result: "Loss",score: "26-21",close: "-135",clv: "2.36%"},
+{date: "2024-12-01",sport: "NFL",play: "461 Tennessee +6 vs. Washington",result: "Loss",score: "19-42",close: "-117",clv: "0.11%"},
+{date: "2024-11-28",sport: "NFL",play: "309 Miami +3.5 (-115) vs. Green Bay",result: "Loss",score: "17-30",close: "-114",clv: "-1.65%"},
+{date: "2024-11-24",sport: "NFL",play: "267 Arizona +1 (-105) vs. Seattle",result: "Loss",score: "6-16",close: "-122.6",clv: "2.45%"},
+{date: "2024-11-24",sport: "NFL",play: "265 Denver TT Over 22.5 vs. Las Vegas",result: "Win",score: "29",close: "-150",clv: "6.06%"},
+{date: "2024-11-24",sport: "NFL",play: "261 New England +7.5 vs. Miami",result: "Loss",score: "15-34",close: "-116",clv: "-0.10%"},
+{date: "2024-11-24",sport: "NFL",play: "261 New England/Miami Over 44.5",result: "Win",score: "15-34",close: "-124.8",clv: "1.51%"},
+{date: "2024-11-17",sport: "NFL",play: "470 Kansas City/Buffalo Under 46.5 (-115)",result: "Loss",score: "21-30",close: "100",clv: "-5.21%"},
+{date: "2024-11-17",sport: "NFL",play: "453 Cleveland +2.5 vs. New Orleans",result: "Loss",score: "14-35",close: "-141",clv: "4.77%"},
+{date: "2024-11-17",sport: "NFL",play: "452 Green Bay/Chicago Under 42.5",result: "Win",score: "20-19",close: "-145",clv: "5.23%"},
+{date: "2024-11-10",sport: "NFL",play: "275 New England +7 vs. Chicago",result: "Win",score: "19-3",close: "-125",clv: "1.77%"},
+{date: "2024-11-07",sport: "NFL",play: "109 Cincinnati/Baltimore Over 51.5",result: "Win",score: "34-35",close: "-143",clv: "4.89%"},
+{date: "2024-11-03",sport: "NFL",play: "476 Philadelphia -6.5 vs. Jacksonville (-115)",result: "Loss",score: "28-23",close: "-137",clv: "2.95%"},
+{date: "2024-11-03",sport: "NFL",play: "471 LA Rams/Seattle Over 48.5",result: "Loss",score: "26-20 OT",close: "-115",clv: "-0.55%"},
+{date: "2024-11-03",sport: "NFL",play: "461 Denver/Baltimore Over 43.5",result: "Win",score: "10-41",close: "-167",clv: "8.65%"},
+{date: "2024-11-03",sport: "NFL",play: "458 Miami/Buffalo Under 48.5",result: "Loss",score: "27-30",close: "102",clv: "-4.60%"},
+{date: "2024-10-27",sport: "NFL",play: "280 Buffalo/Seattle Under 48.5",result: "Win",score: "31-10",close: "-163.2",clv: "8.10%"},
+{date: "2024-10-20",sport: "NFL",play: "463 Detroit TT Under 24.5 (-115) vs. Minnesota",result: "Loss",score: "31",close: "-115",clv: "-1.66%"},
+{date: "2024-10-13",sport: "NFL",play: "286 Cincinnati/NY Giants Under 48.5",result: "Win",score: "17-7",close: "-141.2",clv: "4.58%"},
+{date: "2024-10-13",sport: "NFL",play: "275 LA Chargers -1.5 (-115) vs. Denver",result: "Win",score: "23-16",close: "-141.2",clv: "3.69%"},
+{date: "2024-10-13",sport: "NFL",play: "269 Houston/Cleveland Over 38",result: "Win",score: "41-21",close: "-114.6",clv: "-0.64%"},
+{date: "2024-10-06",sport: "NFL",play: "469 Green Bay/LA Rams Over 46.5 (-115)",result: "Loss",score: "24-19",close: "-172.1",clv: "8.26%"},
+{date: "2024-10-06",sport: "NFL",play: "459 Indianapolis/Jacksonville Over 45.5",result: "Win",score: "34-37",close: "-101.3",clv: "-3.77%"},
+{date: "2024-09-29",sport: "NFL",play: "284 Cleveland/Las Vegas Under 39.5",result: "Win",score: "16-20",close: "-143.7",clv: "5.01%"},
+{date: "2024-09-26",sport: "NFL",play: "101 Dallas/NY Giants Over 43.5 (-115)",result: "Loss",score: "20-15",close: "-147",clv: "4.46%"},
+{date: "2024-09-22",sport: "NFL",play: "451 LA Chargers +2.5 vs. Pittsburgh",result: "Loss",score: "10-20",close: "-102",clv: "-3.36%"},
+{date: "2024-09-15",sport: "NFL",play: "281 NY Giants/Washington Over 41",result: "Loss",score: "18-21",close: "-127.2",clv: "1.98%"},
+{date: "2024-09-15",sport: "NFL",play: "278 Seattle/New England Under 40",result: "Loss",score: "23-20 OT",close: "-121",clv: "0.73%"}
+
                 ];
 
                 console.log("Data before processing:", data);
