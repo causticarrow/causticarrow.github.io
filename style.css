@@ -2,7 +2,7 @@ body {
     font-family: "Sohne", "Segoe UI", sans-serif;
     font-size: 14px;
     background-color: #09090b;
-    color: #ffffff;
+    color: #8c99ad;
     margin: 0;
     padding: 0;
 }
@@ -177,7 +177,7 @@ a:hover {
     margin-bottom: 20px;
     border: 1px solid #22252a;
     background-color: #22252a;
-    color: #ffffff;
+    color: #8c99ad;
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%238c99ad" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><line x1="17" y1="17" x2="22" y2="22"/></svg>');
     background-repeat: no-repeat;
     background-position: 10px center;
@@ -191,6 +191,46 @@ a:hover {
     padding: 20px;
     min-height: 100vh;
     box-sizing: border-box;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.main-content img.logo {
+    width: 100px;
+}
+.main-content h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: #8c99ad;
+}
+.main-content p {
+    font-size: 1em;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    color: #8c99ad;
+    text-align: left;
+    max-width: 600px;
+}
+.section-header {
+    font-weight: bold;
+    margin: 20px 0 10px;
+    color: #8c99ad;
+}
+.main-content a {
+    color: #1ea672;
+    text-decoration: none;
+}
+.main-content ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: left;
+    max-width: 600px;
+}
+
+.main-content ul li {
+    margin-bottom: 10px;
+    color: #8c99ad;
 }
 .main-content,
 #chart-container,
@@ -212,6 +252,12 @@ a:hover {
     .main-content {
         margin-left: 0;
         width: 100%;
+    }
+.main-content h1 {
+        font-size: 1.5em;
+    }
+    .main-content p, .main-content ul li {
+        font-size: 0.9em;
     }
 }
 .category-header .category-toggle {
