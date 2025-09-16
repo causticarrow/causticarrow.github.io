@@ -1,9 +1,44 @@
-<!doctype html>
+// Auto-generate title and header based on config
+                function setTitleAndHeader() {
+                    var title = `${config.name}'s ${config.year} ${config.sport} Results - causticarrow.com`;
+                    var header = `${config.year} ${config.sport} (${config.name})`;
+                    
+                    document.title = title;
+                    document.getElementById("pageHeader").textContent = header;
+                }
+
+                // Auto-set active class in sidebar based on current page filename
+                function setActiveSidebarItem() {
+                    // Generate expected filename from config
+                    var expectedFilename = generateFilename(config);
+                    
+                    // Find all sidebar links
+                    var sidebarLinks = document.querySelectorAll('.category-content a');
+                    
+                    sidebarLinks.forEach(function(link) {
+                        var href = link.getAttribute('href');
+                        // Remove the 'active' class from all links first
+                        link.classList.remove('active');
+                        
+                        // Check if this link's href matches our expected filename
+                        if (href === expectedFilename) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+
+                // Generate filename based on config (customize this logic as needed)
+                function generateFilename(config) {
+                    // This function should match your filename patterns
+                    // Adjust the logic based on your actual filename conventions
+                    var name = config.name.toLowerCase();
+                    var year = config.year.toLowerCase();
+                    v<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>elementary_pygmy_marmoset8949's 2025 NFL Results - causticarrow.com</title>
+        <title>Results - causticarrow.com</title>
         <link rel="stylesheet" href="../style.css" />
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </head>
@@ -18,7 +53,7 @@
                     <li class="category-header">
                         <span class="category-toggle">Results</span>
                         <ul class="category-content">
-                            <li><a href="elementary_pygmy_marmoset8949-2025.html" class="active">2025 NFL (elementary_pygmy)</a></li>
+                            <li><a href="elementary_pygmy_marmoset8949-2025.html">2025 NFL (elementary_pygmy)</a></li>
                             <li><a href="robpizzola-nfl-2024-25.html">2024-25 NFL (@robpizzola)</a></li>
                             <li><a href="clivebixby41-nfl-2024-25.html">2024-25 NFL (@CliveBixby41)</a></li>
                             <li><a href="raspicks-cbase-2021-24.html">2021-24 CBASE (@RASPicks)</a></li>
@@ -27,7 +62,7 @@
                 </ul>
             </aside>
             <main class="main-content">
-                <h1>2025 NFL (elementary_pygmy_marmoset8949)</h1>
+                <h1 id="pageHeader">Results</h1>
                 <div id="chart-container" style="width: 100%; height: 300px">
                     <canvas id="myChart" style="width: 100%; height: 300px"></canvas>
                 </div>
@@ -48,7 +83,6 @@
                             <td id="record"></td>
                             <td id="units"></td>
                             <td id="roi"></td>
-
                             <td id="btcl"></td>
                             <td id="noVigClv"></td>
                         </tr>
@@ -73,11 +107,26 @@
 
         <script>
             document.addEventListener("DOMContentLoaded", function () {
+                // Configuration - Update these values for each page
+                var config = {
+                    name: "elementary_pygmy_marmoset8949",  // The bettor's name/handle
+                    year: "2025",                           // The year/season
+                    sport: "NFL"                            // The sport/league
+                };
+
                 var data = [
 {date: "2025-09-15",sport: "NFL",play: "Justin Herbert Over 227.5 Passing Yards (-115)",result: "Win",score: "242",close: "—",clv: "0"},
 {date: "2025-09-15",sport: "NFL",play: "Tyler Conklin Under 10.5 Longest Reception (-125)",result: "Win",score: "0",close: "—",clv: "0"},
-
                 ];
+
+                // Auto-generate title and header based on config
+                function setTitleAndHeader() {
+                    var title = `${config.name}'s ${config.year} ${config.sport} Results - causticarrow.com`;
+                    var header = `${config.year} ${config.sport} (${config.name})`;
+                    
+                    document.title = title;
+                    document.getElementById("pageHeader").textContent = header;
+                }
 
                 console.log("Data before processing:", data);
 
@@ -92,31 +141,31 @@
                     }
                 }
 
-    function filterSidebar() {
-        var input, filter, ul, li, i;
-        input = document.querySelector(".search-bar");
-        filter = input.value.toUpperCase();
-        ul = document.querySelector(".sidebar ul");
-        li = ul.getElementsByTagName("li");
+                function filterSidebar() {
+                    var input, filter, ul, li, i;
+                    input = document.querySelector(".search-bar");
+                    filter = input.value.toUpperCase();
+                    ul = document.querySelector(".sidebar ul");
+                    li = ul.getElementsByTagName("li");
 
-        for (i = 0; i < li.length; i++) {
-            var a = li[i].getElementsByTagName("a")[0];
-            if (a) {
-                var txtValue = li[i].textContent || li[i].innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    li[i].style.display = "";
-                } else {
-                    var shouldHide = true;
-                    li[i].querySelectorAll('*').forEach(node => {
-                        if ((node.textContent || node.innerText).toUpperCase().indexOf(filter) > -1) {
-                            shouldHide = false;
+                    for (i = 0; i < li.length; i++) {
+                        var a = li[i].getElementsByTagName("a")[0];
+                        if (a) {
+                            var txtValue = li[i].textContent || li[i].innerText;
+                            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                li[i].style.display = "";
+                            } else {
+                                var shouldHide = true;
+                                li[i].querySelectorAll('*').forEach(node => {
+                                    if ((node.textContent || node.innerText).toUpperCase().indexOf(filter) > -1) {
+                                        shouldHide = false;
+                                    }
+                                });
+                                li[i].style.display = shouldHide ? "none" : "";
+                            }
                         }
-                    });
-                    li[i].style.display = shouldHide ? "none" : "";
+                    }
                 }
-            }
-        }
-    }
 
                 function calculateUnits(row) {
                     console.log("Processing row for units:", row);
@@ -425,6 +474,8 @@
                     });
                 }
 
+                // Initialize the page
+                setTitleAndHeader();
                 document.querySelector(".search-bar").addEventListener("input", filterSidebar);
                 updateSummaryTable();
                 populateDetailedTable();
