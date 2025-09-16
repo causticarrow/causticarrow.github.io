@@ -66,13 +66,39 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        // Configuration - Update these values for each page
-        var config = {
-          name: "elementary_pygmy_marmoset8949", // The bettor's name/handle
-          year: "2025", // The year/season
-          sport: "NFL", // The sport/league
-        };
+        // -------------------------
+        // Auto-config from filename
+        // -------------------------
+        function getConfigFromFilename() {
+          const fileName = window.location.pathname.split("/").pop().replace(".html", "");
+          const parts = fileName.split("-");
 
+          let name = "";
+          let sport = "";
+          let year = "";
+
+          if (parts.length === 1) {
+            // Only name
+            name = parts[0];
+          } else if (parts.length === 2) {
+            // e.g. alexcaruso-2024-25.html
+            name = parts[0];
+            year = parts[1];
+          } else if (parts.length >= 3) {
+            // e.g. CliveBixby41-NFL-2024-25.html
+            name = parts[0];
+            sport = parts[1];
+            year = parts.slice(2).join("-");
+          }
+
+          return { name, sport, year };
+        }
+
+        const config = getConfigFromFilename();
+
+        // -------------------------
+        // Example data (replace with real data)
+        // -------------------------
         var data = [
 {date: "2025-01-12",sport: "NFL",play: "381 Green Bay TT Under 20.5 (-105) vs. Philadelphia",result: "Win",score: "10",close: "-135",clv: "4.63%"},
 {date: "2024-12-30",sport: "NFL",play: "431 Detroit TT Over 27.5 vs. San Francisco",result: "Win",score: "40",close: "-120",clv: "0.52%"},
@@ -180,12 +206,14 @@
         function setTitleAndHeader() {
           var title =
             config.name +
-            "'s " +
-            config.year +
-            " " +
-            config.sport +
+            (config.year ? " " + config.year : "") +
+            (config.sport ? " " + config.sport : "") +
             " Results - causticarrow.com";
-          var header = config.year + " " + config.sport + " (" + config.name + ")";
+
+          var header =
+            (config.year ? config.year + " " : "") +
+            (config.sport ? config.sport + " " : "") +
+            "(" + config.name + ")";
 
           document.title = title;
           document.getElementById("pageHeader").textContent = header;
@@ -272,18 +300,12 @@
         }
 
         function formatValue(value, isPercentage = false) {
-          if (value === null) {
-            return "—";
-          }
+          if (value === null) return "—";
           if (isPercentage) {
-            if (value === 0) {
-              return "—";
-            }
+            if (value === 0) return "—";
             return value > 0
               ? `+${value.toFixed(2)}%`
-              : value < 0
-              ? `${value.toFixed(2)}%`
-              : "0.00%";
+              : `${value.toFixed(2)}%`;
           } else {
             return value > 0
               ? `+${value.toFixed(2)}`
@@ -360,16 +382,11 @@
           let btclPercent =
             settledBetsCount > 0 ? (positiveClv / settledBetsCount) * 100 : 0;
           if (btclElement) {
-            if (btclPercent === 0) {
-              btclElement.textContent = "—";
-            } else {
-              btclElement.textContent = `${btclPercent.toFixed(2)}%`;
-            }
+            btclElement.textContent = btclPercent === 0 ? "—" : `${btclPercent.toFixed(2)}%`;
           }
 
           if (noVigClvElement) {
-            let avgClv =
-              settledBetsCount > 0 ? totalClv / settledBetsCount : 0;
+            let avgClv = settledBetsCount > 0 ? totalClv / settledBetsCount : 0;
             noVigClvElement.textContent = formatValue(avgClv, true);
             noVigClvElement.style.color =
               avgClv > 0 ? "#1ea672" : avgClv < 0 ? "#ff5252" : "#8c99ad";
@@ -394,9 +411,7 @@
             if (units !== null) {
               unitColor =
                 units > 0 ? "#1ea672" : units < 0 ? "#ff5252" : "#8c99ad";
-              if (formattedUnits === "0.00") {
-                unitColor = "#8c99ad";
-              }
+              if (formattedUnits === "0.00") unitColor = "#8c99ad";
             }
 
             let clvValue = parseFloat(row.clv.replace("%", ""));
@@ -501,9 +516,7 @@
                   displayColors: false,
                   callbacks: {
                     title: function (tooltipItems) {
-                      if (tooltipItems[0].dataIndex === 0) {
-                        return "\u00A0";
-                      }
+                      if (tooltipItems[0].dataIndex === 0) return "\u00A0";
                       var date = new Date(
                         chartDataArray[tooltipItems[0].dataIndex - 1].date
                       );
