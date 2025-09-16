@@ -80,7 +80,7 @@
                 };
 
                 var data = [
-{date: "2025-09-16",sport: "NFL",play: "Tetairoa McMillan to win Offensive Rookie of The Year (+700)",result: "Pending",score: "—",close: "—",clv: "0"},
+{date: "2025-09-16",sport: "NFL",play: "Tetairoa McMillan to win Offensive Rookie of the Year (+700)",result: "Pending",score: "Pending",close: "—",clv: "0"},
 {date: "2025-09-15",sport: "NFL",play: "Justin Herbert Over 227.5 Passing Yards (-115)",result: "Win",score: "242",close: "—",clv: "0"},
 {date: "2025-09-15",sport: "NFL",play: "Tyler Conklin Under 10.5 Longest Reception (-125)",result: "Win",score: "0",close: "—",clv: "0"},
                 ];
@@ -138,6 +138,9 @@
                 console.log("Data before processing:", data);
 
                 function formatValue(value, isPercentage = false) {
+                    if (value === null) {
+                        return "—";
+                    }
                     if (isPercentage) {
                         if (value === 0) {
                             return "—";
@@ -201,6 +204,9 @@
                             console.log("No odds found, returning default loss");
                             return -1.1;
                         }
+                    } else if (row.result === "Pending") {
+                        console.log("Pending result, returning null for dash display");
+                        return null;
                     } else {
                         console.log("Push or other result, returning 0");
                         return 0;
@@ -261,15 +267,18 @@
                         } else if (row.result === "Push") {
                             pushes++;
                         }
-                        let risk = calculateRisk(row);
-                        if (isNaN(risk)) {
-                            console.error("NaN detected in risk calculation for:", row);
-                        } else {
-                            totalRisked += risk;
+                        // Skip pending bets in summary calculations
+                        if (row.result !== "Pending") {
+                            let risk = calculateRisk(row);
+                            if (isNaN(risk)) {
+                                console.error("NaN detected in risk calculation for:", row);
+                            } else {
+                                totalRisked += risk;
+                            }
+                            let clvValue = parseFloat(row.clv.replace("%", ""));
+                            if (clvValue > 0) positiveClv++;
+                            totalClv += clvValue;
                         }
-                        let clvValue = parseFloat(row.clv.replace("%", ""));
-                        if (clvValue > 0) positiveClv++;
-                        totalClv += clvValue;
                     });
 
                     console.log("Summary stats:", {
@@ -307,7 +316,8 @@
                     }
 
                     // BTCL calculation - show "—" if exactly 0%
-                    let btclPercent = (positiveClv / data.length) * 100;
+                    let settledBetsCount = data.filter(row => row.result !== "Pending").length;
+                    let btclPercent = settledBetsCount > 0 ? (positiveClv / settledBetsCount) * 100 : 0;
                     if (btclElement) {
                         if (btclPercent === 0) {
                             btclElement.textContent = "—";
@@ -318,7 +328,7 @@
 
                     // No-Vig CLV calculation - show "—" if exactly 0%
                     if (noVigClvElement) {
-                        let avgClv = totalClv / data.length;
+                        let avgClv = settledBetsCount > 0 ? totalClv / settledBetsCount : 0;
                         noVigClvElement.textContent = formatValue(avgClv, true);
                         console.log("No-Vig CLV element content set to:", noVigClvElement.textContent);
                         noVigClvElement.style.color = avgClv > 0 ? "#1ea672" : avgClv < 0 ? "#ff5252" : "#8c99ad";
@@ -353,9 +363,14 @@
                         console.log("Processing row:", index, row);
                         let units = calculateUnits(row);
                         let tr = document.createElement("tr");
-                        let unitColor = units > 0 ? "#1ea672" : units < 0 ? "#ff5252" : "#8c99ad";
-                        if (formatValue(units) === "0.00") {
-                            unitColor = "#8c99ad";
+                        let unitColor = "#8c99ad"; // Default gray for pending and pushes
+                        let formattedUnits = formatValue(units);
+                        
+                        if (units !== null) {
+                            unitColor = units > 0 ? "#1ea672" : units < 0 ? "#ff5252" : "#8c99ad";
+                            if (formattedUnits === "0.00") {
+                                unitColor = "#8c99ad";
+                            }
                         }
                         
                         // Parse CLV value and format it
@@ -367,7 +382,7 @@
             <td style="color: #8c99ad; text-align: center;"><span class="date">${row.date}</span>${row.sport}</td>
             <td style="color: #8c99ad;">${row.play}</td>
             <td style="color: ${row.result === "Win" ? "#1ea672" : row.result === "Loss" ? "#ff5252" : "#8c99ad"}; text-align: center;">${row.result}</td>
-            <td style="color: ${unitColor}; text-align: center;">${formatValue(units)}</td>
+            <td style="color: ${unitColor}; text-align: center;">${formattedUnits}</td>
             <td style="color: #8c99ad; text-align: center;">${row.score}</td>
             <td style="color: #8c99ad; text-align: center;">${row.close}</td>
             <td style="color: ${clvColor}; text-align: right;">${formattedClv}</td>
