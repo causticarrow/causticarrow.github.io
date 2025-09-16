@@ -1,39 +1,4 @@
-// Auto-generate title and header based on config
-                function setTitleAndHeader() {
-                    var title = `${config.name}'s ${config.year} ${config.sport} Results - causticarrow.com`;
-                    var header = `${config.year} ${config.sport} (${config.name})`;
-                    
-                    document.title = title;
-                    document.getElementById("pageHeader").textContent = header;
-                }
-
-                // Auto-set active class in sidebar based on current page filename
-                function setActiveSidebarItem() {
-                    // Generate expected filename from config
-                    var expectedFilename = generateFilename(config);
-                    
-                    // Find all sidebar links
-                    var sidebarLinks = document.querySelectorAll('.category-content a');
-                    
-                    sidebarLinks.forEach(function(link) {
-                        var href = link.getAttribute('href');
-                        // Remove the 'active' class from all links first
-                        link.classList.remove('active');
-                        
-                        // Check if this link's href matches our expected filename
-                        if (href === expectedFilename) {
-                            link.classList.add('active');
-                        }
-                    });
-                }
-
-                // Generate filename based on config (customize this logic as needed)
-                function generateFilename(config) {
-                    // This function should match your filename patterns
-                    // Adjust the logic based on your actual filename conventions
-                    var name = config.name.toLowerCase();
-                    var year = config.year.toLowerCase();
-                    v<!doctype html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -121,11 +86,52 @@
 
                 // Auto-generate title and header based on config
                 function setTitleAndHeader() {
-                    var title = `${config.name}'s ${config.year} ${config.sport} Results - causticarrow.com`;
-                    var header = `${config.year} ${config.sport} (${config.name})`;
+                    var title = config.name + "'s " + config.year + " " + config.sport + " Results - causticarrow.com";
+                    var header = config.year + " " + config.sport + " (" + config.name + ")";
                     
                     document.title = title;
                     document.getElementById("pageHeader").textContent = header;
+                }
+
+                // Auto-set active class in sidebar based on current page filename
+                function setActiveSidebarItem() {
+                    // Generate expected filename from config
+                    var expectedFilename = generateFilename(config);
+                    
+                    // Find all sidebar links
+                    var sidebarLinks = document.querySelectorAll('.category-content a');
+                    
+                    sidebarLinks.forEach(function(link) {
+                        var href = link.getAttribute('href');
+                        // Remove the 'active' class from all links first
+                        link.classList.remove('active');
+                        
+                        // Check if this link's href matches our expected filename
+                        if (href === expectedFilename) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+
+                // Generate filename based on config (customize this logic as needed)
+                function generateFilename(config) {
+                    // This function should match your filename patterns
+                    // Adjust the logic based on your actual filename conventions
+                    var name = config.name.toLowerCase();
+                    var year = config.year.toLowerCase();
+                    var sport = config.sport.toLowerCase();
+                    
+                    // Handle different patterns
+                    if (sport === 'nfl') {
+                        if (year.includes('-')) {
+                            return name + "-" + sport + "-" + year + ".html";
+                        } else {
+                            return name + "-" + year + ".html";
+                        }
+                    } else {
+                        // For other sports like CBASE
+                        return name + "-" + sport.toLowerCase() + "-" + year + ".html";
+                    }
                 }
 
                 console.log("Data before processing:", data);
@@ -476,6 +482,7 @@
 
                 // Initialize the page
                 setTitleAndHeader();
+                setActiveSidebarItem();
                 document.querySelector(".search-bar").addEventListener("input", filterSidebar);
                 updateSummaryTable();
                 populateDetailedTable();
