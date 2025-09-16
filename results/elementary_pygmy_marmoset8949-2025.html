@@ -18,7 +18,7 @@
                     <li class="category-header">
                         <span class="category-toggle">Results</span>
                         <ul class="category-content">
-                            <li><a href="relementary_pygmy_marmoset8949-2025.html">2025 @elementary_pygmy_marmoset8949</a></li>
+                            <li><a href="relementary_pygmy_marmoset8949-2025.html">2025 NFL elementary_pygmy</a></li>
                             <li><a href="robpizzola-nfl-2024-25.html">2024-25 NFL @robpizzola</a></li>
                             <li><a href="clivebixby41-nfl-2024-25.html">2024-25 NFL @CliveBixby41</a></li>
                             <li><a href="alexcaruso-2024-25.html" class="active">2024-25 @AlexCaruso</a></li>
@@ -75,8 +75,8 @@
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 var data = [
-{date: "2025-09-15",sport: "NFL",play: "Justin Herbert Over 227.5 Passing Yards (-115)",result: "Win",score: "242",close: "—",clv: "—"},
-{date: "2025-09-15",sport: "NFL",play: "Tyler Conklin Under 10.5 Longest Reception (-125)",result: "Win",score: "0",close: "—",clv: "—"},
+{date: "2025-09-15",sport: "NFL",play: "Justin Herbert Over 227.5 Passing Yards (-115)",result: "Win",score: "242",close: "—",clv: "0"},
+{date: "2025-09-15",sport: "NFL",play: "Tyler Conklin Under 10.5 Longest Reception (-125)",result: "Win",score: "0",close: "—",clv: "0"},
 
                 ];
 
@@ -84,6 +84,9 @@
 
                 function formatValue(value, isPercentage = false) {
                     if (isPercentage) {
+                        if (value === 0) {
+                            return "—";
+                        }
                         return value > 0 ? `+${value.toFixed(2)}%` : value < 0 ? `${value.toFixed(2)}%` : "0.00%";
                     } else {
                         return value > 0 ? `+${value.toFixed(2)}` : value < 0 ? `${value.toFixed(2)}` : "0.00";
@@ -209,8 +212,9 @@
                         } else {
                             totalRisked += risk;
                         }
-                        if (parseFloat(row.clv.replace("%", "")) > 0) positiveClv++;
-                        totalClv += parseFloat(row.clv.replace("%", ""));
+                        let clvValue = parseFloat(row.clv.replace("%", ""));
+                        if (clvValue > 0) positiveClv++;
+                        totalClv += clvValue;
                     });
 
                     console.log("Summary stats:", {
@@ -247,61 +251,23 @@
                         roiElement.style.color = roi > 0 ? "#1ea672" : roi < 0 ? "#ff5252" : "#8c99ad";
                     }
 
-                    if (btclElement) btclElement.textContent = `${((positiveClv / data.length) * 100).toFixed(2)}%`;
+                    // BTCL calculation - show "—" if exactly 0%
+                    let btclPercent = (positiveClv / data.length) * 100;
+                    if (btclElement) {
+                        if (btclPercent === 0) {
+                            btclElement.textContent = "—";
+                        } else {
+                            btclElement.textContent = `${btclPercent.toFixed(2)}%`;
+                        }
+                    }
 
+                    // No-Vig CLV calculation - show "—" if exactly 0%
                     if (noVigClvElement) {
-                        noVigClvElement.textContent = formatValue(totalClv / data.length, true);
+                        let avgClv = totalClv / data.length;
+                        noVigClvElement.textContent = formatValue(avgClv, true);
                         console.log("No-Vig CLV element content set to:", noVigClvElement.textContent);
-                        noVigClvElement.style.color =
-                            parseFloat(noVigClvElement.textContent.replace("%", "")) > 0 ? "#1ea672" : "#ff5252";
+                        noVigClvElement.style.color = avgClv > 0 ? "#1ea672" : avgClv < 0 ? "#ff5252" : "#8c99ad";
                     }
-                }
-
-                function populateDetailedTable() {
-                    let tbody = document.getElementById("resultsTableBody");
-                    if (!tbody) {
-                        console.error("Table body not found");
-                        return;
-                    }
-                    console.log("Table body found, clearing and repopulating", tbody);
-                    tbody.innerHTML = "";
-
-                    console.log("Data before sort:", data);
-                    data.sort((a, b) => {
-                        var dateA = new Date(a.date).getTime();
-                        var dateB = new Date(b.date).getTime();
-
-                        if (dateA === dateB) {
-                            var rotationA = a.play.match(/^\d+/) ? parseInt(a.play.match(/^\d+/)[0]) : 0;
-                            var rotationB = b.play.match(/^\d+/) ? parseInt(b.play.match(/^\d+/)[0]) : 0;
-                            return rotationB - rotationA;
-                        }
-
-                        return dateB - dateA;
-                    });
-                    console.log("Data after sort:", data);
-
-                    data.forEach((row, index) => {
-                        console.log("Processing row for detailed table:", index, row);
-                        let units = calculateUnits(row);
-                        let tr = document.createElement("tr");
-                        let unitColor = units > 0 ? "#1ea672" : units < 0 ? "#ff5252" : "#8c99ad";
-                        if (formatValue(units) === "0.00") {
-                            unitColor = "#8c99ad";
-                        }
-                        tr.innerHTML = `
-            <td style="color: #8c99ad; text-align: center;"><span class="date">${row.date}</span>${row.sport}</td>
-            <td style="color: #8c99ad;">${row.play}</td>
-            <td style="color: ${row.result === "Win" ? "#1ea672" : row.result === "Loss" ? "#ff5252" : "#8c99ad"}; text-align: center;">${row.result}</td>
-            <td style="color: ${unitColor}; text-align: center;">${formatValue(units)}</td>
-            <td style="color: #8c99ad; text-align: center;">${row.score}</td>
-            <td style="color: #8c99ad; text-align: center;">${row.close}</td>
-            <td style="color: ${parseFloat(row.clv) > 0 ? "#1ea672" : parseFloat(row.clv) < 0 ? "#ff5252" : "#8c99ad"}; text-align: right;">${formatValue(parseFloat(row.clv), true)}</td>
-        `;
-                        tbody.appendChild(tr);
-                        console.log("Row added:", tr);
-                    });
-                    console.log("Table population complete. Total rows:", tbody.children.length);
                 }
 
                 function populateDetailedTable() {
@@ -336,6 +302,12 @@
                         if (formatValue(units) === "0.00") {
                             unitColor = "#8c99ad";
                         }
+                        
+                        // Parse CLV value and format it
+                        let clvValue = parseFloat(row.clv.replace("%", ""));
+                        let formattedClv = formatValue(clvValue, true);
+                        let clvColor = clvValue > 0 ? "#1ea672" : clvValue < 0 ? "#ff5252" : "#8c99ad";
+                        
                         tr.innerHTML = `
             <td style="color: #8c99ad; text-align: center;"><span class="date">${row.date}</span>${row.sport}</td>
             <td style="color: #8c99ad;">${row.play}</td>
@@ -343,7 +315,7 @@
             <td style="color: ${unitColor}; text-align: center;">${formatValue(units)}</td>
             <td style="color: #8c99ad; text-align: center;">${row.score}</td>
             <td style="color: #8c99ad; text-align: center;">${row.close}</td>
-            <td style="color: ${parseFloat(row.clv) > 0 ? "#1ea672" : parseFloat(row.clv) < 0 ? "#ff5252" : "#8c99ad"}; text-align: right;">${formatValue(parseFloat(row.clv), true)}</td>
+            <td style="color: ${clvColor}; text-align: right;">${formattedClv}</td>
         `;
                         tbody.appendChild(tr);
                         console.log("Row added:", tr);
