@@ -17,12 +17,7 @@
 
                     <li class="category-header">
                         <span class="category-toggle">Results</span>
-                        <ul class="category-content">
-                            <li><a href="elementary_pygmy_marmoset8949-2025.html">2025 NFL (elementary_pygmy)</a></li>
-                            <li><a href="robpizzola-nfl-2024-25.html">2024-25 NFL (@robpizzola)</a></li>
-                            <li><a href="clivebixby41-nfl-2024-25.html">2024-25 NFL (@CliveBixby41)</a></li>
-                            <li><a href="raspicks-cbase-2021-24.html">2021-24 CBASE (@RASPicks)</a></li>
-                        </ul>
+                            <ul class="category-content" id="results-list"></ul>
                     </li>
                 </ul>
             </aside>
@@ -504,6 +499,26 @@
                 populateDetailedTable();
                 createSimpleChart();
             });
+async function populateSidebar() {
+    const ul = document.getElementById("results-list");
+    ul.innerHTML = ""; // Clear any placeholder content
+
+    try {
+        // Adjust path if your results.json is in a subfolder
+        const response = await fetch("results.json");
+        const pages = await response.json();
+
+        pages.forEach(p => {
+            const li = document.createElement("li");
+            li.innerHTML = `<a href="${p.file}">${p.label}</a>`;
+            ul.appendChild(li);
+        });
+    } catch (err) {
+        console.error("Could not load results.json", err);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", populateSidebar);
         </script>
         <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.3.1/decimal.min.js"></script>
     </body>
