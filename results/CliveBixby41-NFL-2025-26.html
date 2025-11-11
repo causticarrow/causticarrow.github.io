@@ -66,9 +66,7 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        // -------------------------
-        // Auto-config from filename
-        // -------------------------
+
         function getConfigFromFilename() {
           const fileName = window.location.pathname.split("/").pop().replace(".html", "");
           const parts = fileName.split("-");
@@ -78,14 +76,14 @@
           let year = "";
 
           if (parts.length === 1) {
-            // Only name
+
             name = parts[0];
           } else if (parts.length === 2) {
-            // e.g. alexcaruso-2024-25.html
+
             name = parts[0];
             year = parts[1];
           } else if (parts.length >= 3) {
-            // e.g. CliveBixby41-NFL-2024-25.html
+
             name = parts[0];
             sport = parts[1];
             year = parts.slice(2).join("-");
@@ -96,9 +94,6 @@
 
         const config = getConfigFromFilename();
 
-        // -------------------------
-        // Example data (replace with real data)
-        // -------------------------
         var data = [
 { date: "2025-10-12", sport: "NFL", play: "Tennessee/Las Vegas Under 41.5", result: "Win", score: "10-20", close: "-114", clv: "+0.39%" },
 { date: "2025-10-12", sport: "NFL", play: "LA Chargers/Miami Under 45.5", result: "Loss", score: "29-27", close: "-114", clv: "-0.78%" },
@@ -119,9 +114,6 @@
 { date: "2025-09-14", sport: "NFL", play: "New Orleans TT Under 18.5", result: "Loss", score: "21", close: "-101", clv: "-3.85%" },
         ];
 
-        // -------------------------
-        // Sidebar auto-loader
-        // -------------------------
         async function populateSidebar() {
           const ul = document.getElementById("results-list");
           ul.innerHTML = "";
@@ -138,7 +130,6 @@
               a.href = p.file;
               a.textContent = p.label;
 
-              // Highlight current page
               if (p.file === currentPage) {
                 a.classList.add("active");
               }
@@ -151,9 +142,6 @@
           }
         }
 
-        // -------------------------
-        // Title/Header
-        // -------------------------
         function setTitleAndHeader() {
           var title =
             config.name +
@@ -170,9 +158,6 @@
           document.getElementById("pageHeader").textContent = header;
         }
 
-        // -------------------------
-        // Search filter
-        // -------------------------
         function filterSidebar() {
           var input, filter, ul, li, i;
           input = document.querySelector(".search-bar");
@@ -203,9 +188,6 @@
           }
         }
 
-        // -------------------------
-        // Units & Risk Calculations
-        // -------------------------
         function calculateUnits(row) {
           if (row.result === "Win") {
             return 1;
@@ -266,9 +248,6 @@
           }
         }
 
-        // -------------------------
-        // Summary Table
-        // -------------------------
         function updateSummaryTable() {
           let wins = 0,
             losses = 0,
@@ -344,9 +323,6 @@
           }
         }
 
-        // -------------------------
-        // Detailed Table
-        // -------------------------
         function populateDetailedTable() {
           let tbody = document.getElementById("resultsTableBody");
           tbody.innerHTML = "";
@@ -391,9 +367,6 @@
           });
         }
 
-        // -------------------------
-        // Chart
-        // -------------------------
         function createSimpleChart() {
           var chartData = data.reduce((acc, row) => {
             var date = new Date(row.date);
@@ -486,9 +459,6 @@
           });
         }
 
-        // -------------------------
-        // Init
-        // -------------------------
         setTitleAndHeader();
         populateSidebar();
         document
