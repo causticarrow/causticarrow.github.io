@@ -204,7 +204,6 @@
       return `${sign}${c}c (+${p}%)`.replace('+(–', '(–');
     }
 
-    // Sort picks newest first
     const sortedPicks = [...PICKS].sort((a, b) => new Date(b.date) - new Date(a.date));
     const tbody = document.getElementById('tableBody');
     const labels = [];
@@ -222,8 +221,8 @@
       const units = calculateUnits(myOdds, pick.result);
       sumUnits += units;
       totalRisk += risk;
-      labels.unshift(pick.date);
-      values.unshift(sumUnits);
+      labels.push(pick.date);
+      values.push(sumUnits);
 
       if (pick.result === 'W') wins++; else losses++;
 
@@ -257,14 +256,13 @@
     document.getElementById('roi').textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
     document.getElementById('avgClv').textContent = (avgClv >= 0 ? '+' : '–') + Math.abs(avgClv).toFixed(2) + 'c';
 
-    // Simple chart without Luxon
     const ctx = document.getElementById('pnlChart').getContext('2d');
     new Chart(ctx, {
       type: 'line',
        {
-        labels: labels.reverse(),
+        labels: labels,
         datasets: [{
-          data: values.reverse(),
+          data: values,
           borderColor: '#4ade80',
           backgroundColor: 'rgba(74, 222, 128, 0.1)',
           borderWidth: 3,
