@@ -134,7 +134,6 @@
   </div>
 
   <script>
-    // ✅ YOUR PICKS — just edit this array
     const PICKS = [
       {
         date: "2025-11-12",
@@ -152,7 +151,6 @@
       },
     ];
 
-    // --- Core Logic ---
     function extractOdds(play) {
       const m = play.match(/\(([-+]?\d+)\)/);
       return m ? m[1] : null;
@@ -187,7 +185,6 @@
       return `${sign}${c}c (+${p}%)`.replace('+(–', '(–');
     }
 
-    // --- Render ---
     const sortedPicks = [...PICKS].sort((a, b) => new Date(b.date) - new Date(a.date));
     const tbody = document.getElementById('tableBody');
     const cumulative = [];
@@ -222,12 +219,10 @@
       tbody.appendChild(row);
     });
 
-    // Stats
     document.getElementById('totalUnits').textContent = (sumUnits >= 0 ? '+' : '') + sumUnits.toFixed(2);
     document.getElementById('record').textContent = `${wins}-${losses}`;
     document.getElementById('totalClv').textContent = (totalClvCents >= 0 ? '+' : '–') + Math.abs(totalClvCents).toFixed(2) + 'c';
 
-    // Chart
     const ctx = document.getElementById('pnlChart').getContext('2d');
     new Chart(ctx, {
       type: 'line',
