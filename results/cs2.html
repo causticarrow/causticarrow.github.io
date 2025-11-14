@@ -2,38 +2,169 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>causticarrow</title>
+  <title>causticarrow // CS2</title>
   <style>
-    body { font-family: "Segoe UI", sans-serif; background: #0a0f0a; color: #e0f0e0; padding: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid #253a25; }
-    th { color: #88a888; font-size: 13px; text-transform: uppercase; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: #0d0d0d;
+      color: #e6e6e6;
+      padding: 32px;
+      margin: 0;
+      font-size: 15px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-weight: 600;
+      font-size: 30px;
+      color: #f0f0f0;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, auto));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-box {
+      background: #161616;
+      padding: 16px;
+      border-radius: 10px;
+      text-align: right;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: right;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 600;
+      margin-top: 6px;
+      color: #f0f0f0;
+      text-align: right;
+    }
+    .stat-positive { color: #4ade80 !important; }
+    .stat-negative { color: #f87171 !important; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #161616;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      margin-bottom: 16px;
+    }
+    th, td {
+      padding: 12px 16px;
+      font-weight: normal;
+    }
+    th {
+      font-weight: 600;
+      color: #aaa;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #1a1a1a;
+    }
+    .col-date { text-align: left; }
+    .col-play { text-align: left; }
+    .col-result { text-align: center; }
+    .col-units { text-align: right; }
+    .col-score { text-align: center; }
+    .col-close { text-align: right; }
+    .col-clv { text-align: right; }
+    .col-xroi { text-align: right; }
+
+    .hdr-date { text-align: left; }
+    .hdr-play { text-align: left; }
+    .hdr-result { text-align: center; }
+    .hdr-units { text-align: right; }
+    .hdr-score { text-align: center; }
+    .hdr-close { text-align: right; }
+    .hdr-clv { text-align: right; }
+    .hdr-xroi { text-align: right; }
+
     .positive { color: #4ade80; }
     .negative { color: #f87171; }
+
+    .bet-type {
+      font-weight: 600;
+      color: #f0f0f0;
+    }
+
+    .note-pill {
+      display: inline-block;
+      background: #2a2a2a;
+      color: #aaa;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-left: 8px;
+      font-weight: 500;
+    }
+
+    .month-title {
+      text-align: center;
+      font-weight: 500;
+      font-size: 16px;
+      color: #f0f0f0;
+      margin: 24px 0 12px;
+      padding: 8px 16px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      display: block;
+    }
   </style>
 </head>
 <body>
-  <h1>causticarrow</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Play</th>
-        <th>Result</th>
-        <th>Units</th>
-        <th>Score</th>
-        <th>Close</th>
-        <th>CLV</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+  <div class="container">
+    <h1>causticarrow // CS2</h1>
+
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-label">Total Plays</div>
+        <div class="stat-value" id="totalPlays">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Net Risk</div>
+        <div class="stat-value" id="netRisk">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Net Profit</div>
+        <div class="stat-value" id="netProfit">+0.0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">ROI</div>
+        <div class="stat-value" id="roi">+0.0%</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">No-Vig CLV</div>
+        <div class="stat-value" id="avgClv">+0.00c (+0.00%)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Expected ROI</div>
+        <div class="stat-value" id="avgXROI">+0.0%</div>
+      </div>
+    </div>
+
+    <div id="tablesContainer"></div>
+  </div>
 
   <script>
+    // --- DATA ---
     const PICKS = [
       {
         date: "2025-11-12",
-        play: "Spirit ML (+162) vs. Falcons",
+        play: "Spirit PK (+162) vs. Falcons",
+        note: "",
         result: "L",
         score: "0-2",
         close_odds: "+133"
@@ -41,24 +172,92 @@
       {
         date: "2025-10-12",
         play: "Falcons PK (+128) vs. Vitality",
+        note: "Map 3",
         result: "L",
         score: "5-13",
         close_odds: "+106"
       }
     ];
 
-    function extractOdds(play) {
-      const m = play.match(/\(([-+]?\d+)\)/);
-      return m ? m[1] : null;
+    // --- Formatting ---
+    function stripTrailingZeros(numStr) {
+      if (numStr.includes('.')) {
+        numStr = numStr.replace(/\.?0+$/, '');
+      }
+      return numStr;
+    }
+
+    function formatGeneralNumber(num) {
+      let s = num.toFixed(2);
+      s = stripTrailingZeros(s);
+      return s;
+    }
+
+    function formatUnits(num) {
+      if (Math.abs(num - Math.round(num)) < 0.001) {
+        return (num >= 0 ? '+' : '-') + Math.abs(num).toFixed(1);
+      } else {
+        let s = Math.abs(num).toFixed(2);
+        s = stripTrailingZeros(s);
+        return (num >= 0 ? '+' : '-') + s;
+      }
+    }
+
+    function formatSignedNumber(num) {
+      let s = Math.abs(num).toFixed(2);
+      s = stripTrailingZeros(s);
+      return (num >= 0 ? '+' : '-') + s;
+    }
+
+    function formatSignedPercent(num) {
+      let s = Math.abs(num).toFixed(2);
+      s = stripTrailingZeros(s);
+      return (num >= 0 ? '+' : '-') + s + '%';
+    }
+
+    function formatCLV(cents, pct) {
+      const cStr = formatGeneralNumber(Math.abs(cents));
+      const pStr = formatGeneralNumber(Math.abs(pct));
+      const cSign = cents >= 0 ? '+' : '-';
+      const pSign = pct >= 0 ? '+' : '-';
+      return `${cSign}${cStr}c (${pSign}${pStr}%)`;
     }
 
     function americanToDecimal(a) {
-      const num = parseInt(a);
-      return num > 0 ? (num / 100) + 1 : (100 / -num) + 1;
+      const n = parseInt(a);
+      return n > 0 ? (n / 100) + 1 : (100 / -n) + 1;
     }
 
-    function americanToProb(a) {
-      return 1 / americanToDecimal(a);
+    function probToAmerican(prob) {
+      return prob >= 0.5 ? -Math.round(100 * prob / (1 - prob)) : Math.round(100 * (1 - prob) / prob);
+    }
+
+    function solveForC(d1, d2) {
+      let c = 1.0;
+      for (let i = 0; i < 50; i++) {
+        const p1 = Math.pow(1 / d1, c);
+        const p2 = Math.pow(1 / d2, c);
+        const f = p1 + p2 - 1;
+        if (Math.abs(f) < 1e-10) break;
+        const df = p1 * Math.log(1 / d1) + p2 * Math.log(1 / d2);
+        if (Math.abs(df) < 1e-12) break;
+        c = c - f / df;
+      }
+      return c;
+    }
+
+    function getOtherSide(closeOdds) {
+      const close = parseInt(closeOdds);
+      const p_close = close > 0 ? 100 / (close + 100) : -close / (-close + 100);
+      const other_p = 1.0476 - p_close;
+      return other_p >= 0.5 ? -Math.round(100 * other_p / (1 - other_p)) : Math.round(100 * (1 - other_p) / other_p);
+    }
+
+    function calculateFairProb(closeOdds) {
+      const d1 = americanToDecimal(closeOdds);
+      const d2 = americanToDecimal(getOtherSide(closeOdds));
+      const c = solveForC(d1, d2);
+      return Math.pow(1 / d1, c);
     }
 
     function calculateUnits(oddsStr, result) {
@@ -67,43 +266,139 @@
       return result === 'W' ? 1.0 : -risk;
     }
 
-    function calculateCLV(myOdds, closeOdds) {
+    function calculateCLVAndXROI(myOdds, closeOdds) {
       const myDec = americanToDecimal(myOdds);
-      const closeProb = americanToProb(closeOdds);
-      const fairCloseProb = closeProb / 1.0476;
-      const fairCloseDec = 1 / fairCloseProb;
-      const clvDec = myDec - fairCloseDec;
-      const clvPct = (fairCloseProb - (1 / myDec)) * 100;
-      return { cents: clvDec * 100, pct: clvPct };
+      const myProb = 1 / myDec;
+      const fairProb = calculateFairProb(closeOdds);
+      const fairAmerican = probToAmerican(fairProb);
+      const clvCents = parseInt(myOdds) - fairAmerican;
+      const clvPct = (fairProb - myProb) * 100;
+      const xRoi = (fairProb * myDec - 1) * 100;
+      return { cents: clvCents, pct: clvPct, xRoi: xRoi };
     }
 
-    function formatCLV(cents, pct) {
-      const sign = cents >= 0 ? '+' : '–';
-      return `${sign}${Math.abs(cents).toFixed(2)}c (+${Math.abs(pct).toFixed(1)}%)`;
-    }
+    window.addEventListener('load', () => {
+      const container = document.getElementById('tablesContainer');
+      let wins = 0, losses = 0, totalRisk = 0, totalUnits = 0, totalClvCents = 0, totalClvPct = 0, totalXROI = 0;
 
-    const tbody = document.getElementById('tableBody');
-    const sorted = PICKS.sort((a, b) => new Date(b.date) - new Date(a.date));
+      const sortedPicks = [...PICKS].sort((a, b) => new Date(b.date) - new Date(a.date));
+      const grouped = {};
+      sortedPicks.forEach(pick => {
+        const d = new Date(pick.date);
+        const displayKey = `${d.toLocaleString('default', { month: 'long' })} ${d.getFullYear()}`;
+        if (!grouped[displayKey]) grouped[displayKey] = [];
+        grouped[displayKey].push(pick);
+      });
 
-    sorted.forEach(pick => {
-      const myOdds = extractOdds(pick.play);
-      if (!myOdds) return;
+      Object.keys(grouped).sort((a, b) => {
+        const aDate = new Date(grouped[a][0].date);
+        const bDate = new Date(grouped[b][0].date);
+        return bDate - aDate;
+      }).forEach(monthName => {
+        const monthPicks = grouped[monthName];
+        let monthWins = 0, monthLosses = 0, monthRisk = 0, monthUnits = 0, monthClvCents = 0, monthClvPctSum = 0, monthXROI = 0;
 
-      const units = calculateUnits(myOdds, pick.result);
-      const { cents, pct } = calculateCLV(myOdds, pick.close_odds);
-      const unitsStr = (units >= 0 ? '+' : '') + units.toFixed(2);
-      const clvStr = formatCLV(cents, pct);
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th class="hdr-date">Date</th>
+              <th class="hdr-play">Play</th>
+              <th class="hdr-result">Result</th>
+              <th class="hdr-units">Units</th>
+              <th class="hdr-score">Score</th>
+              <th class="hdr-close">Close</th>
+              <th class="hdr-clv">No-Vig CLV</th>
+              <th class="hdr-xroi">Expected ROI</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        `;
+        const tbody = table.querySelector('tbody');
 
-      const row = `<tr>
-        <td>${pick.date}</td>
-        <td>${pick.play}</td>
-        <td>${pick.result}</td>
-        <td class="${units >= 0 ? 'positive' : 'negative'}">${unitsStr}</td>
-        <td>${pick.score}</td>
-        <td>${pick.close_odds}</td>
-        <td class="${cents >= 0 ? 'positive' : 'negative'}">${clvStr}</td>
-      </tr>`;
-      tbody.innerHTML += row;
+        monthPicks.forEach(pick => {
+          const myOdds = pick.play.match(/\(([-+]?\d+)\)/)?.[1];
+          if (!myOdds) return;
+
+          const units = calculateUnits(myOdds, pick.result);
+          const risk = parseInt(myOdds) > 0 ? 100 / parseInt(myOdds) : -parseInt(myOdds) / 100;
+          monthUnits += units;
+          totalUnits += units;
+          monthRisk += risk;
+          totalRisk += risk;
+
+          if (pick.result === 'W') { monthWins++; wins++; } else { monthLosses++; losses++; }
+
+          const { cents, pct, xRoi } = calculateCLVAndXROI(myOdds, pick.close_odds);
+          monthClvCents += cents;
+          monthClvPctSum += pct;
+          monthXROI += xRoi;
+          totalClvCents += cents;
+          totalClvPct += pct;
+          totalXROI += xRoi;
+
+          const unitsStr = formatUnits(units);
+          const clvStr = formatCLV(cents, pct);
+          const xRoiStr = formatSignedPercent(xRoi);
+          const resultText = pick.result === 'W' ? 'Win' : 'Loss';
+
+          let formattedPlay = pick.play;
+          const betMatch = pick.play.match(/(PK|[+-]\d+\.?\d*)/);
+          if (betMatch) {
+            formattedPlay = pick.play.replace(betMatch[0], `<span class="bet-type">${betMatch[0]}</span>`);
+          }
+          if (pick.note) {
+            formattedPlay += ` <span class="note-pill">${pick.note}</span>`;
+          }
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="col-date">${pick.date}</td>
+            <td class="col-play">${formattedPlay}</td>
+            <td class="col-result ${pick.result === 'W' ? 'positive' : 'negative'}">${resultText}</td>
+            <td class="col-units ${units >= 0 ? 'positive' : 'negative'}">${unitsStr}</td>
+            <td class="col-score">${pick.score}</td>
+            <td class="col-close">${pick.close_odds}</td>
+            <td class="col-clv ${cents >= 0 ? 'positive' : 'negative'}">${clvStr}</td>
+            <td class="col-xroi ${xRoi >= 0 ? 'positive' : 'negative'}">${xRoiStr}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        container.appendChild(table);
+
+        const monthTotal = monthWins + monthLosses;
+        const winPct = monthTotal ? ((monthWins / monthTotal) * 100) : 0;
+        const roi = monthRisk ? ((monthUnits / monthRisk) * 100) : 0;
+        const avgClvPct = monthTotal ? monthClvPctSum / monthTotal : 0;
+
+        const header = document.createElement('h2');
+        header.className = 'month-title';
+        header.innerHTML = 
+          `${monthName}: ${monthWins}-${monthLosses} (${formatGeneralNumber(winPct)}%), ` +
+          `<span class="${monthUnits >= 0 ? 'positive' : 'negative'}">${formatUnits(monthUnits)}u</span>, ` +
+          `<span class="${roi >= 0 ? 'positive' : 'negative'}">${formatSignedPercent(roi)} ROI</span>, ` +
+          `<span class="${avgClvPct >= 0 ? 'positive' : 'negative'}">${formatSignedPercent(avgClvPct)} No-Vig CLV</span>`;
+        container.insertBefore(header, table);
+      });
+
+      const totalPlays = wins + losses;
+      const winPct = totalPlays ? ((wins / totalPlays) * 100) : 0;
+      const roi = totalRisk ? ((totalUnits / totalRisk) * 100) : 0;
+      const avgClvCents = totalPlays ? totalClvCents / totalPlays : 0;
+      const avgClvPct = totalPlays ? totalClvPct / totalPlays : 0;
+      const avgXROI = totalPlays ? totalXROI / totalPlays : 0;
+
+      document.getElementById('totalPlays').textContent = `${totalPlays} (${wins}-${losses}, ${formatGeneralNumber(winPct)}%)`;
+      document.getElementById('netRisk').textContent = formatGeneralNumber(totalRisk);
+      document.getElementById('netProfit').textContent = formatSignedNumber(totalUnits);
+      document.getElementById('netProfit').className = totalUnits >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
+      document.getElementById('roi').textContent = formatSignedPercent(roi);
+      document.getElementById('roi').className = roi >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
+      document.getElementById('avgClv').textContent = formatCLV(avgClvCents, avgClvPct);
+      document.getElementById('avgClv').className = avgClvCents >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
+      document.getElementById('avgXROI').textContent = formatSignedPercent(avgXROI);
+      document.getElementById('avgXROI').className = avgXROI >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
     });
   </script>
 </body>
