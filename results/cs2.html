@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Betting Analytics</title>
+  <title>causticarrow</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.min.js"></script>
   <style>
     :root {
-      --bg: #0a0a0a;
-      --card: #141414;
-      --text: #f0f0f0;
-      --muted: #888;
-      --border: #252525;
-      --acc: #00ecc3;
-      --up: #34d399;
+      --bg: #0a0f0a;
+      --card: #0f1a0f;
+      --text: #e0f0e0;
+      --muted: #88a888;
+      --border: #253a25;
+      --acc: #4ade80;
+      --up: #4ade80;
       --down: #f87171;
-      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font: "Segoe UI", system-ui, sans-serif;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -32,39 +32,50 @@
       margin: 0 auto;
     }
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
       margin-bottom: 32px;
       padding-bottom: 20px;
       border-bottom: 1px solid var(--border);
     }
     h1 {
       font-weight: 800;
-      font-size: 32px;
-      background: linear-gradient(90deg, var(--acc), #00b3ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      font-size: 36px;
+      color: var(--acc);
     }
     .stats {
-      display: flex;
-      gap: 24px;
-      font-size: 14px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-top: 12px;
     }
     .stat-box {
       background: var(--card);
-      padding: 12px 18px;
+      padding: 14px;
       border-radius: 10px;
-      text-align: center;
+      text-align: left;
     }
-    .stat-value { font-size: 20px; font-weight: 700; margin-top: 4px; }
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 4px;
+      color: var(--text);
+    }
+    .sub-label {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
     .chart-card {
       background: var(--card);
       border-radius: 16px;
       padding: 24px;
       margin-bottom: 32px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     table {
       width: 100%;
@@ -72,43 +83,50 @@
       background: var(--card);
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     th, td {
-      padding: 16px;
-      text-align: center;
+      padding: 14px 16px;
+      text-align: left;
     }
     th {
       font-weight: 700;
       color: var(--muted);
       font-size: 13px;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
     }
-    .play-col { text-align: left; font-weight: 600; }
     .positive { color: var(--up); }
     .negative { color: var(--down); }
-    .clv-format { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 15px; }
-    .units-format { font-weight: 700; }
+    .clv-format { font-family: monospace; font-size: 15px; }
+    .units-format { font-weight: 600; }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>BETTING ANALYTICS</h1>
+      <h1>causticarrow</h1>
       <div class="stats">
         <div class="stat-box">
-          <div>CLV EDGE</div>
-          <div class="stat-value" id="totalClv">+0.00c</div>
+          <div class="stat-label">Total Plays</div>
+          <div class="stat-value" id="totalPlays">0</div>
+          <div class="sub-label" id="winLoss">0-0 (0%)</div>
         </div>
         <div class="stat-box">
-          <div>RECORD</div>
-          <div class="stat-value" id="record">0-0</div>
+          <div class="stat-label">Net Risk</div>
+          <div class="stat-value" id="netRisk">0.00</div>
         </div>
         <div class="stat-box">
-          <div>UNITS</div>
-          <div class="stat-value" id="totalUnits">+0.00</div>
+          <div class="stat-label">Net Profit</div>
+          <div class="stat-value" id="netProfit">+0.00</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">ROI</div>
+          <div class="stat-value" id="roi">+0.0%</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">No-Vig CLV</div>
+          <div class="stat-value" id="avgClv">+0.00c</div>
         </div>
       </div>
     </header>
@@ -120,12 +138,12 @@
     <table>
       <thead>
         <tr>
-          <th>DATE</th>
-          <th>PLAY</th>
-          <th>RESULT</th>
-          <th>UNITS</th>
-          <th>SCORE</th>
-          <th>CLOSE</th>
+          <th>Date</th>
+          <th>Play</th>
+          <th>Result</th>
+          <th>Units</th>
+          <th>Score</th>
+          <th>Close</th>
           <th>CLV</th>
         </tr>
       </thead>
@@ -133,138 +151,149 @@
     </table>
   </div>
 
-<script>
-  const PICKS = [
-    {
-      date: "2025-11-12",
-      play: "Spirit ML (+162) vs. Falcons",
-      result: "L",
-      score: "0-2",
-      close_odds: "+133"
-    },
-    {
-      date: "2025-10-12",
-      play: "Falcons PK (+128) vs. Vitality",
-      result: "L",
-      score: "5-13",
-      close_odds: "+106"
-    },
-  ];
-
-  function extractOdds(play) {
-    const m = play.match(/\(([-+]?\d+)\)/);
-    return m ? m[1] : null;
-  }
-
-  function americanToDecimal(a) {
-    return a > 0 ? (a / 100) + 1 : (100 / -a) + 1;
-  }
-
-  function americanToProb(a) {
-    return 1 / americanToDecimal(a);
-  }
-
-  function calculateUnits(oddsStr, result) {
-    const a = parseInt(oddsStr);
-    const risk = a > 0 ? 100 / a : -a / 100;
-    return result === 'W' ? 1.0 : -risk;
-  }
-
-  function calculateCLV(myOdds, closeOdds) {
-    const myProb = americanToProb(parseInt(myOdds));
-    const closeProb = americanToProb(parseInt(closeOdds));
-    const fairClose = closeProb / 1.0476;
-    const clvProb = fairClose - myProb;
-    return { cents: clvProb * 100, pct: clvProb * 100 };
-  }
-
-  function formatCLV(cents, pct) {
-    const sign = cents >= 0 ? '+' : '–';
-    const c = Math.abs(cents).toFixed(2);
-    const p = Math.abs(pct).toFixed(1);
-    return `${sign}${c}c (+${p}%)`.replace('+(–', '(–');
-  }
-
-  const sortedPicks = [...PICKS].sort((a, b) => new Date(b.date) - new Date(a.date));
-  const tbody = document.getElementById('tableBody');
-  const cumulative = [];
-  let sumUnits = 0, totalClvCents = 0, wins = 0, losses = 0;
-
-  sortedPicks.forEach(pick => {
-    const myOdds = extractOdds(pick.play);
-    if (!myOdds) return;
-
-    const units = calculateUnits(myOdds, pick.result);
-    sumUnits += units;
-    cumulative.push({ x: pick.date, y: sumUnits });
-
-    if (pick.result === 'W') wins++; else losses++;
-
-    const { cents, pct } = calculateCLV(myOdds, pick.close_odds);
-    totalClvCents += cents;
-
-    const unitsStr = (units >= 0 ? '+' : '') + units.toFixed(2);
-    const clvStr = formatCLV(cents, pct);
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${pick.date}</td>
-      <td class="play-col">${pick.play}</td>
-      <td>${pick.result}</td>
-      <td class="units-format ${units >= 0 ? 'positive' : 'negative'}">${unitsStr}</td>
-      <td>${pick.score}</td>
-      <td>${pick.close_odds}</td>
-      <td class="clv-format ${cents >= 0 ? 'positive' : 'negative'}">${clvStr}</td>
-    `;
-    tbody.appendChild(row);
-  });
-
-  document.getElementById('totalUnits').textContent = (sumUnits >= 0 ? '+' : '') + sumUnits.toFixed(2);
-  document.getElementById('record').textContent = `${wins}-${losses}`;
-  document.getElementById('totalClv').textContent = (totalClvCents >= 0 ? '+' : '–') + Math.abs(totalClvCents).toFixed(2) + 'c';
-
-  const ctx = document.getElementById('pnlChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      datasets: [{
-        data: cumulative.map(p => ({ x: new Date(p.x), y: p.y })),
-        borderColor: '#00ecc3',
-        backgroundColor: 'rgba(0, 236, 195, 0.08)',
-        borderWidth: 3,
-        pointRadius: 0,
-        fill: true,
-        tension: 0.3
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(20, 20, 20, 0.95)',
-          titleColor: '#00ecc3',
-          bodyColor: '#f0f0f0',
-          borderColor: '#252525',
-          borderWidth: 1,
-          padding: 12
-        }
+  <script>
+    const PICKS = [
+      {
+        date: "2025-11-12",
+        play: "Spirit ML (+162) vs. Falcons",
+        result: "L",
+        score: "0-2",
+        close_odds: "+133"
       },
-      scales: {
-        x: {
-          type: 'time',
-          time: { unit: 'day', displayFormats: { day: 'MMM d' } },
-          grid: { color: 'rgba(255,255,255,0.03)' },
-          ticks: { color: '#888' }
+      {
+        date: "2025-10-12",
+        play: "Falcons PK (+128) vs. Vitality",
+        result: "L",
+        score: "5-13",
+        close_odds: "+106"
+      },
+    ];
+
+    function extractOdds(play) {
+      const m = play.match(/\(([-+]?\d+)\)/);
+      return m ? m[1] : null;
+    }
+
+    function americanToDecimal(a) {
+      return a > 0 ? (a / 100) + 1 : (100 / -a) + 1;
+    }
+
+    function americanToProb(a) {
+      return 1 / americanToDecimal(a);
+    }
+
+    function calculateUnits(oddsStr, result) {
+      const a = parseInt(oddsStr);
+      const risk = a > 0 ? 100 / a : -a / 100;
+      return result === 'W' ? 1.0 : -risk;
+    }
+
+    function calculateCLV(myOdds, closeOdds) {
+      const myProb = americanToProb(parseInt(myOdds));
+      const closeProb = americanToProb(parseInt(closeOdds));
+      const fairClose = closeProb / 1.0476;
+      const clvProb = fairClose - myProb;
+      return { cents: clvProb * 100, pct: clvProb * 100 };
+    }
+
+    function formatCLV(cents, pct) {
+      const sign = cents >= 0 ? '+' : '–';
+      const c = Math.abs(cents).toFixed(2);
+      const p = Math.abs(pct).toFixed(1);
+      return `${sign}${c}c (+${p}%)`.replace('+(–', '(–');
+    }
+
+    const sortedPicks = [...PICKS].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const tbody = document.getElementById('tableBody');
+    const cumulative = [];
+    let sumUnits = 0, totalClvCents = 0, wins = 0, losses = 0, totalRisk = 0;
+
+    sortedPicks.forEach(pick => {
+      const myOdds = extractOdds(pick.play);
+      if (!myOdds) return;
+
+      const a = parseInt(myOdds);
+      const risk = a > 0 ? 100 / a : -a / 100;
+      const units = calculateUnits(myOdds, pick.result);
+      sumUnits += units;
+      totalRisk += risk;
+      cumulative.push({ x: pick.date, y: sumUnits });
+
+      if (pick.result === 'W') wins++; else losses++;
+
+      const { cents, pct } = calculateCLV(myOdds, pick.close_odds);
+      totalClvCents += cents;
+
+      const unitsStr = (units >= 0 ? '+' : '') + units.toFixed(2);
+      const clvStr = formatCLV(cents, pct);
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${pick.date}</td>
+        <td>${pick.play}</td>
+        <td>${pick.result}</td>
+        <td class="units-format ${units >= 0 ? 'positive' : 'negative'}">${unitsStr}</td>
+        <td>${pick.score}</td>
+        <td>${pick.close_odds}</td>
+        <td class="clv-format ${cents >= 0 ? 'positive' : 'negative'}">${clvStr}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    const totalPlays = wins + losses;
+    const winPct = totalPlays > 0 ? ((wins / totalPlays) * 100).toFixed(1) : 0;
+    const roi = totalRisk > 0 ? ((sumUnits / totalRisk) * 100) : 0;
+    const avgClv = totalPlays > 0 ? totalClvCents / totalPlays : 0;
+
+    document.getElementById('totalPlays').textContent = totalPlays;
+    document.getElementById('winLoss').textContent = `${wins}-${losses} (${winPct}%)`;
+    document.getElementById('netRisk').textContent = totalRisk.toFixed(2);
+    document.getElementById('netProfit').textContent = (sumUnits >= 0 ? '+' : '') + sumUnits.toFixed(2);
+    document.getElementById('roi').textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
+    document.getElementById('avgClv').textContent = (avgClv >= 0 ? '+' : '–') + Math.abs(avgClv).toFixed(2) + 'c';
+
+    const ctx = document.getElementById('pnlChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+       {
+        datasets: [{
+           cumulative.map(p => ({ x: new Date(p.x), y: p.y })),
+          borderColor: '#4ade80',
+          backgroundColor: 'rgba(74, 222, 128, 0.1)',
+          borderWidth: 3,
+          pointRadius: 0,
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(15, 26, 15, 0.9)',
+            titleColor: '#4ade80',
+            bodyColor: '#e0f0e0',
+            borderColor: '#253a25',
+            borderWidth: 1,
+            padding: 12
+          }
         },
-        y: {
-          grid: { color: 'rgba(255,255,255,0.03)' },
-          ticks: { color: '#888' }
+        scales: {
+          x: {
+            type: 'time',
+            time: { unit: 'day', displayFormats: { day: 'MMM d' } },
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: '#88a888' }
+          },
+          y: {
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: '#88a888' }
+          }
         }
       }
-    }
-  });
-</script>
+    });
+  </script>
 </body>
 </html>
