@@ -95,6 +95,7 @@
     .negative { color: var(--down); }
     .clv-format { font-family: monospace; font-size: 15px; }
     .units-format { font-weight: 600; }
+    #error { color: red; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -143,72 +144,95 @@
       </thead>
       <tbody id="tableBody"></tbody>
     </table>
+    <div id="error"></div>
   </div>
 
-  <script>
-    const PICKS = [
-      {
-        date: "2025-11-12",
-        play: "Spirit ML (+162) vs. Falcons",
-        result: "L",
-        score: "0-2",
-        close_odds: "+133"
-      },
-      {
-        date: "2025-10-12",
-        play: "Falcons PK (+128) vs. Vitality",
-        result: "L",
-        score: "5-13",
-        close_odds: "+106"
-      },
-    ];
+<script>
+  const PICKS = [
+    {
+      date: "2025-11-12",
+      play: "Spirit ML (+162) vs. Falcons",
+      result: "L",
+      score: "0-2",
+      close_odds: "+133"
+    },
+    {
+      date: "2025-10-12",
+      play: "Falcons PK (+128) vs. Vitality",
+      result: "L",
+      score: "5-13",
+      close_odds: "+106"
+    },
+  ];
 
-    function extractOdds(play) {
-      const m = play.match(/\(([-+]?\d+)\)/);
-      return m ? m[1] : null;
+  function extractOdds(play) {
+    const m = play.match(/\(([-+]?\d+)\)/);
+    console.log("Extracting odds from:", play, "→", m ? m[1] : "NOT FOUND");
+    return m ? m[1] : null;
+  }
+
+  function americanToDecimal(a) {
+    const num = parseInt(a);
+    if (isNaN(num)) {
+      console.warn("Invalid odds:", a);
+      return NaN;
     }
+    return num > 0 ? (num / 100) + 1 : (100 / -num) + 1;
+  }
 
-    function americanToDecimal(a) {
-      return a > 0 ? (a / 100) + 1 : (100 / -a) + 1;
+  function americanToProb(a) {
+    const d = americanToDecimal(a);
+    return isNaN(d) ? NaN : 1 / d;
+  }
+
+  function calculateUnits(oddsStr, result) {
+    const a = parseInt(oddsStr);
+    if (isNaN(a)) return 0;
+    const risk = a > 0 ? 100 / a : -a / 100;
+    return result === 'W' ? 1.0 : -risk;
+  }
+
+  function calculateCLV(myOdds, closeOdds) {
+    const myDec = americanToDecimal(myOdds);
+    const closeProbVig = americanToProb(closeOdds);
+    if (isNaN(myDec) || isNaN(closeProbVig)) {
+      return { cents: 0, pct: 0 };
     }
+    const fairCloseProb = closeProbVig / 1.0476;
+    const fairCloseDec = 1 / fairCloseProb;
+    const clvDec = myDec - fairCloseDec;
+    const clvPct = (fairCloseProb - (1 / myDec)) * 100;
+    return { cents: clvDec * 100, pct: clvPct };
+  }
 
-    function americanToProb(a) {
-      return 1 / americanToDecimal(a);
-    }
+  function formatCLV(cents, pct) {
+    const sign = cents >= 0 ? '+' : '–';
+    const c = Math.abs(cents).toFixed(2);
+    const p = Math.abs(pct).toFixed(1);
+    return `${sign}${c}c (+${p}%)`.replace('+(–', '(–');
+  }
 
-    function calculateUnits(oddsStr, result) {
-      const a = parseInt(oddsStr);
-      const risk = a > 0 ? 100 / a : -a / 100;
-      return result === 'W' ? 1.0 : -risk;
-    }
-
-    function calculateCLV(myOdds, closeOdds) {
-      const myDecimal = americanToDecimal(parseInt(myOdds));
-      const closeProbWithVig = americanToProb(parseInt(closeOdds));
-      const fairCloseProb = closeProbWithVig / 1.0476;
-      const fairCloseDecimal = 1 / fairCloseProb;
-      const clvDecimal = myDecimal - fairCloseDecimal;
-      const clvProbPct = (fairCloseProb - (1 / myDecimal)) * 100;
-      return { cents: clvDecimal * 100, pct: clvProbPct };
-    }
-
-    function formatCLV(cents, pct) {
-      const sign = cents >= 0 ? '+' : '–';
-      const c = Math.abs(cents).toFixed(2);
-      const p = Math.abs(pct).toFixed(1);
-      return `${sign}${c}c (+${p}%)`.replace('+(–', '(–');
-    }
-
+  try {
     const sortedPicks = [...PICKS].sort((a, b) => new Date(b.date) - new Date(a.date));
     const tbody = document.getElementById('tableBody');
     const cumulative = [];
     let sumUnits = 0, totalClvCents = 0, wins = 0, losses = 0, totalRisk = 0;
 
     sortedPicks.forEach(pick => {
+      console.log("Processing pick:", pick);
+
       const myOdds = extractOdds(pick.play);
-      if (!myOdds) return;
+      if (!myOdds) {
+        console.error("No odds found in play:", pick.play);
+        return;
+      }
 
       const a = parseInt(myOdds);
+      if (isNaN(a)) {
+        console.error("Invalid odds number:", myOdds);
+        return;
+      }
+
       const risk = a > 0 ? 100 / a : -a / 100;
       const units = calculateUnits(myOdds, pick.result);
       sumUnits += units;
@@ -289,6 +313,10 @@
         }
       }
     });
-  </script>
+  } catch (e) {
+    console.error("Script failed:", e);
+    document.body.innerHTML = "<div style='color:red; padding:20px;'>ERROR: " + e.message + "</div>";
+  }
+</script>
 </body>
 </html>
