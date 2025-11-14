@@ -65,11 +65,6 @@
       margin-top: 4px;
       color: var(--text);
     }
-    .sub-label {
-      font-size: 14px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
     .chart-card {
       background: var(--card);
       border-radius: 16px;
@@ -110,7 +105,6 @@
         <div class="stat-box">
           <div class="stat-label">Total Plays</div>
           <div class="stat-value" id="totalPlays">0</div>
-          <div class="sub-label" id="winLoss">0-0 (0%)</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">Net Risk</div>
@@ -189,11 +183,13 @@
     }
 
     function calculateCLV(myOdds, closeOdds) {
-      const myProb = americanToProb(parseInt(myOdds));
-      const closeProb = americanToProb(parseInt(closeOdds));
-      const fairClose = closeProb / 1.0476;
-      const clvProb = fairClose - myProb;
-      return { cents: clvProb * 100, pct: clvProb * 100 };
+      const myDecimal = americanToDecimal(parseInt(myOdds));
+      const closeProbWithVig = americanToProb(parseInt(closeOdds));
+      const fairCloseProb = closeProbWithVig / 1.0476;
+      const fairCloseDecimal = 1 / fairCloseProb;
+      const clvDecimal = myDecimal - fairCloseDecimal;
+      const clvProbPct = (fairCloseProb - (1 / myDecimal)) * 100;
+      return { cents: clvDecimal * 100, pct: clvProbPct };
     }
 
     function formatCLV(cents, pct) {
@@ -245,8 +241,7 @@
     const roi = totalRisk > 0 ? ((sumUnits / totalRisk) * 100) : 0;
     const avgClv = totalPlays > 0 ? totalClvCents / totalPlays : 0;
 
-    document.getElementById('totalPlays').textContent = totalPlays;
-    document.getElementById('winLoss').textContent = `${wins}-${losses} (${winPct}%)`;
+    document.getElementById('totalPlays').textContent = `${totalPlays} (${wins}-${losses}, ${winPct}%)`;
     document.getElementById('netRisk').textContent = totalRisk.toFixed(2);
     document.getElementById('netProfit').textContent = (sumUnits >= 0 ? '+' : '') + sumUnits.toFixed(2);
     document.getElementById('roi').textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
