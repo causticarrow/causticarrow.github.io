@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>causticarrow</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.min.js"></script>
   <style>
     :root {
       --bg: #0a0f0a;
@@ -95,7 +93,6 @@
     .negative { color: var(--down); }
     .clv-format { font-family: monospace; font-size: 15px; }
     .units-format { font-weight: 600; }
-    #error { color: red; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -144,100 +141,89 @@
       </thead>
       <tbody id="tableBody"></tbody>
     </table>
-    <div id="error"></div>
   </div>
 
-<script>
-  const PICKS = [
-    {
-      date: "2025-11-12",
-      play: "Spirit ML (+162) vs. Falcons",
-      result: "L",
-      score: "0-2",
-      close_odds: "+133"
-    },
-    {
-      date: "2025-10-12",
-      play: "Falcons PK (+128) vs. Vitality",
-      result: "L",
-      score: "5-13",
-      close_odds: "+106"
-    },
-  ];
+  <script>
+    const PICKS = [
+      {
+        date: "2025-11-12",
+        play: "Spirit ML (+162) vs. Falcons",
+        result: "L",
+        score: "0-2",
+        close_odds: "+133"
+      },
+      {
+        date: "2025-10-12",
+        play: "Falcons PK (+128) vs. Vitality",
+        result: "L",
+        score: "5-13",
+        close_odds: "+106"
+      },
+    ];
 
-  function extractOdds(play) {
-    const m = play.match(/\(([-+]?\d+)\)/);
-    console.log("Extracting odds from:", play, "→", m ? m[1] : "NOT FOUND");
-    return m ? m[1] : null;
-  }
-
-  function americanToDecimal(a) {
-    const num = parseInt(a);
-    if (isNaN(num)) {
-      console.warn("Invalid odds:", a);
-      return NaN;
+    function extractOdds(play) {
+      const m = play.match(/\(([-+]?\d+)\)/);
+      return m ? m[1] : null;
     }
-    return num > 0 ? (num / 100) + 1 : (100 / -num) + 1;
-  }
 
-  function americanToProb(a) {
-    const d = americanToDecimal(a);
-    return isNaN(d) ? NaN : 1 / d;
-  }
-
-  function calculateUnits(oddsStr, result) {
-    const a = parseInt(oddsStr);
-    if (isNaN(a)) return 0;
-    const risk = a > 0 ? 100 / a : -a / 100;
-    return result === 'W' ? 1.0 : -risk;
-  }
-
-  function calculateCLV(myOdds, closeOdds) {
-    const myDec = americanToDecimal(myOdds);
-    const closeProbVig = americanToProb(closeOdds);
-    if (isNaN(myDec) || isNaN(closeProbVig)) {
-      return { cents: 0, pct: 0 };
+    function americanToDecimal(a) {
+      const num = parseInt(a);
+      if (isNaN(num)) return NaN;
+      return num > 0 ? (num / 100) + 1 : (100 / -num) + 1;
     }
-    const fairCloseProb = closeProbVig / 1.0476;
-    const fairCloseDec = 1 / fairCloseProb;
-    const clvDec = myDec - fairCloseDec;
-    const clvPct = (fairCloseProb - (1 / myDec)) * 100;
-    return { cents: clvDec * 100, pct: clvPct };
-  }
 
-  function formatCLV(cents, pct) {
-    const sign = cents >= 0 ? '+' : '–';
-    const c = Math.abs(cents).toFixed(2);
-    const p = Math.abs(pct).toFixed(1);
-    return `${sign}${c}c (+${p}%)`.replace('+(–', '(–');
-  }
+    function americanToProb(a) {
+      const d = americanToDecimal(a);
+      return isNaN(d) ? NaN : 1 / d;
+    }
 
-  try {
+    function calculateUnits(oddsStr, result) {
+      const a = parseInt(oddsStr);
+      if (isNaN(a)) return 0;
+      const risk = a > 0 ? 100 / a : -a / 100;
+      return result === 'W' ? 1.0 : -risk;
+    }
+
+    function calculateCLV(myOdds, closeOdds) {
+      const myDec = americanToDecimal(myOdds);
+      const closeProbVig = americanToProb(closeOdds);
+      if (isNaN(myDec) || isNaN(closeProbVig)) {
+        return { cents: 0, pct: 0 };
+      }
+      const fairCloseProb = closeProbVig / 1.0476;
+      const fairCloseDec = 1 / fairCloseProb;
+      const clvDec = myDec - fairCloseDec;
+      const clvPct = (fairCloseProb - (1 / myDec)) * 100;
+      return { cents: clvDec * 100, pct: clvPct };
+    }
+
+    function formatCLV(cents, pct) {
+      const sign = cents >= 0 ? '+' : '–';
+      const c = Math.abs(cents).toFixed(2);
+      const p = Math.abs(pct).toFixed(1);
+      return `${sign}${c}c (+${p}%)`.replace('+(–', '(–');
+    }
+
+    // Sort picks newest first
     const sortedPicks = [...PICKS].sort((a, b) => new Date(b.date) - new Date(a.date));
     const tbody = document.getElementById('tableBody');
-    const cumulative = [];
+    const labels = [];
+    const values = [];
     let sumUnits = 0, totalClvCents = 0, wins = 0, losses = 0, totalRisk = 0;
 
     sortedPicks.forEach(pick => {
-      console.log("Processing pick:", pick);
-
       const myOdds = extractOdds(pick.play);
-      if (!myOdds) {
-        console.error("No odds found in play:", pick.play);
-        return;
-      }
+      if (!myOdds || !pick.close_odds) return;
 
       const a = parseInt(myOdds);
-      if (isNaN(a)) {
-        console.error("Invalid odds number:", myOdds);
-        return;
-      }
+      if (isNaN(a)) return;
 
       const risk = a > 0 ? 100 / a : -a / 100;
       const units = calculateUnits(myOdds, pick.result);
       sumUnits += units;
       totalRisk += risk;
-      cumulative.push({ x: pick.date, y: sumUnits });
+      labels.unshift(pick.date);
+      values.unshift(sumUnits);
 
       if (pick.result === 'W') wins++; else losses++;
 
@@ -263,7 +249,7 @@
     const totalPlays = wins + losses;
     const winPct = totalPlays > 0 ? ((wins / totalPlays) * 100).toFixed(1) : 0;
     const roi = totalRisk > 0 ? ((sumUnits / totalRisk) * 100) : 0;
-    const avgClv = totalPlays > 0 ? totalClvCents / totalPlays : 0;
+    const avgClv = totalPlays > 0 ? (totalClvCents / totalPlays) : 0;
 
     document.getElementById('totalPlays').textContent = `${totalPlays} (${wins}-${losses}, ${winPct}%)`;
     document.getElementById('netRisk').textContent = totalRisk.toFixed(2);
@@ -271,12 +257,14 @@
     document.getElementById('roi').textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
     document.getElementById('avgClv').textContent = (avgClv >= 0 ? '+' : '–') + Math.abs(avgClv).toFixed(2) + 'c';
 
+    // Simple chart without Luxon
     const ctx = document.getElementById('pnlChart').getContext('2d');
     new Chart(ctx, {
       type: 'line',
        {
+        labels: labels.reverse(),
         datasets: [{
-           cumulative.map(p => ({ x: new Date(p.x), y: p.y })),
+          data: values.reverse(),
           borderColor: '#4ade80',
           backgroundColor: 'rgba(74, 222, 128, 0.1)',
           borderWidth: 3,
@@ -289,20 +277,10 @@
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: 'rgba(15, 26, 15, 0.9)',
-            titleColor: '#4ade80',
-            bodyColor: '#e0f0e0',
-            borderColor: '#253a25',
-            borderWidth: 1,
-            padding: 12
-          }
+          legend: { display: false }
         },
         scales: {
           x: {
-            type: 'time',
-            time: { unit: 'day', displayFormats: { day: 'MMM d' } },
             grid: { color: 'rgba(255,255,255,0.05)' },
             ticks: { color: '#88a888' }
           },
@@ -313,10 +291,6 @@
         }
       }
     });
-  } catch (e) {
-    console.error("Script failed:", e);
-    document.body.innerHTML = "<div style='color:red; padding:20px;'>ERROR: " + e.message + "</div>";
-  }
-</script>
+  </script>
 </body>
 </html>
