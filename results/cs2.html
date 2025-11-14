@@ -3,127 +3,236 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Betting Results</title>
+  <title>Betting Analytics</title>
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.min.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #121212; color: #fff; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #333; padding: 8px 12px; text-align: center; }
-    th { background: #1e1e1e; }
-    .positive { color: #4caf50; }
-    .negative { color: #f44336; }
+    :root {
+      --bg: #0f0f0f;
+      --card-bg: #1a1a1a;
+      --text: #e0e0e0;
+      --text-muted: #a0a0a0;
+      --border: #333;
+      --green: #4ade80;
+      --red: #f87171;
+      --blue: #00ecc3;
+      --font: 'Segoe UI', system-ui, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      padding: 24px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    header {
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--blue), #00b3ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .chart-container {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    th, td {
+      padding: 14px 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    tr:last-child td { border-bottom: none; }
+    .positive { color: var(--green); }
+    .negative { color: var(--red); }
+    .clv-cell {
+      font-family: monospace;
+      font-size: 15px;
+    }
+    .units-cell {
+      font-weight: 600;
+    }
+    .play-cell { text-align: left; font-weight: 500; }
+    .date-cell { color: var(--text-muted); font-size: 14px; }
   </style>
 </head>
 <body>
-  <h1>My Betting Results</h1>
-  <canvas id="pnlChart" height="100"></canvas>
-  <table id="resultsTable">
-    <thead>
-      <tr>
-        <th>Date</th><th>Play</th><th>Result</th><th>Units</th>
-        <th>Score</th><th>Close</th><th>CLV</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="container">
+    <header>
+      <h1>Betting Performance Dashboard</h1>
+    </header>
+
+    <div class="chart-container">
+      <canvas id="pnlChart" height="120"></canvas>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Play</th>
+          <th>Result</th>
+          <th>Units</th>
+          <th>Score</th>
+          <th>Close</th>
+          <th>CLV</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
 
   <script>
-    // --- Helper functions ---
-    function extractOdds(playStr) {
-      const match = playStr.match(/\(([-+]?\d+)\)/);
-      return match ? match[1] : null;
+    // --- Parsing & Calculation ---
+    function extractOdds(play) {
+      const m = play.match(/\(([-+]?\d+)\)/);
+      return m ? m[1] : null;
+    }
+
+    function americanToDecimal(oddsStr) {
+      const a = parseInt(oddsStr);
+      return a > 0 ? (a / 100) + 1 : (100 / -a) + 1;
     }
 
     function americanToProb(oddsStr) {
-      const a = parseInt(oddsStr);
-      return a > 0 ? 100 / (a + 100) : (-a) / (-a + 100);
+      const d = americanToDecimal(oddsStr);
+      return 1 / d;
     }
 
     function calculateUnits(oddsStr, result) {
       const a = parseInt(oddsStr);
-      if (result === 'W') return 1.0;
-      return a > 0 ? -1.0 : -(a / 100); // if +162: risk 1 to win 1 → loss = -1; but you said: "betting +162 dog, risking 0.62 to win 1"
-      // Correction per your spec:
-    }
-
-    // ✅ CORRECT UNIT CALCULATION PER YOUR SPEC:
-    // "Betting +162 dog → risk 0.62 to win 1"
-    // "Betting -162 fav → risk 1.62 to win 1"
-    function calculateUnits(oddsStr, result) {
-      const a = parseInt(oddsStr);
-      const risk = a > 0 ? 100 / a : -a / 100; // risk per 1 unit won
+      const risk = a > 0 ? 100 / a : -a / 100;
       return result === 'W' ? 1.0 : -risk;
     }
 
     function calculateCLV(myOdds, closeOdds) {
       const myProb = americanToProb(myOdds);
       const closeProbVig = americanToProb(closeOdds);
-      const overround = 1.0476; // -110 market
-      const closeProbFair = closeProbVig / overround;
-      return (closeProbFair - myProb) * 100; // %
+      const fairCloseProb = closeProbVig / 1.0476; // -110 market
+      const clvProb = fairCloseProb - myProb; // positive = good
+      const clvCents = clvProb * 100; // in "cents" of edge
+      return { clvCents, clvPercent: clvProb * 100 };
     }
 
-    // --- Load and render ---
+    function formatCLV(clvCents, clvPercent) {
+      const sign = clvCents >= 0 ? '+' : '–';
+      const absCents = Math.abs(clvCents).toFixed(2);
+      const absPct = Math.abs(clvPercent).toFixed(1);
+      return `${sign}${absCents}c (+${absPct}%)`.replace('+(–', '(–');
+    }
+
+    // --- Render ---
     fetch('picks.json')
       .then(res => res.json())
       .then(picks => {
         // Sort: newest first
         picks.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        const tbody = document.querySelector('#resultsTable tbody');
+        const tbody = document.getElementById('resultsBody');
         const cumulative = [];
         let sum = 0;
 
         picks.forEach(pick => {
           const myOdds = extractOdds(pick.play);
-          if (!myOdds) {
-            console.warn('No odds found in play:', pick.play);
-            return;
-          }
+          if (!myOdds || !pick.close_odds) return;
 
           const units = calculateUnits(myOdds, pick.result);
           sum += units;
           cumulative.push({ x: pick.date, y: sum });
 
-          const clv = calculateCLV(myOdds, pick.close_odds);
-          const clvClass = clv >= 0 ? 'positive' : 'negative';
-          const unitsClass = units >= 0 ? 'positive' : 'negative';
+          const { clvCents, clvPercent } = calculateCLV(myOdds, pick.close_odds);
+          const clvFormatted = formatCLV(clvCents, clvPercent);
+          const unitsFormatted = (units >= 0 ? '+' : '') + units.toFixed(2);
 
-          const row = `
-            <tr>
-              <td>${pick.date}</td>
-              <td>${pick.play}</td>
-              <td>${pick.result}</td>
-              <td class="${unitsClass}">${units.toFixed(2)}</td>
-              <td>${pick.score}</td>
-              <td>${pick.close_odds}</td>
-              <td class="${clvClass}">${clv.toFixed(1)}%</td>
-            </tr>
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="date-cell">${pick.date}</td>
+            <td class="play-cell">${pick.play}</td>
+            <td>${pick.result}</td>
+            <td class="units-cell ${units >= 0 ? 'positive' : 'negative'}">${unitsFormatted}</td>
+            <td>${pick.score}</td>
+            <td>${pick.close_odds}</td>
+            <td class="clv-cell ${clvCents >= 0 ? 'positive' : 'negative'}">${clvFormatted}</td>
           `;
-          tbody.innerHTML += row;
+          tbody.appendChild(row);
         });
 
-        // Chart
-        new Chart(document.getElementById('pnlChart'), {
+        // Render chart
+        const ctx = document.getElementById('pnlChart').getContext('2d');
+        new Chart(ctx, {
           type: 'line',
           data: {
             datasets: [{
               label: 'Cumulative Units',
-              data: cumulative,
+               cumulative.map(p => ({ x: new Date(p.x), y: p.y })),
               borderColor: '#00ecc3',
-              tension: 0.2,
-              fill: false
+              backgroundColor: 'rgba(0, 236, 195, 0.1)',
+              borderWidth: 2.5,
+              pointRadius: 0,
+              fill: true,
+              tension: 0.3
             }]
           },
           options: {
             responsive: true,
-            scales: {
-              x: { type: 'time', time: { unit: 'day' } },
-              y: { grid: { color: '#333' } }
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                mode: 'index',
+                intersect: false,
+                backgroundColor: 'rgba(26, 26, 26, 0.9)',
+                titleColor: '#00ecc3',
+                bodyColor: '#e0e0e0',
+                borderColor: '#333',
+                borderWidth: 1,
+                padding: 10,
+                displayColors: false
+              }
             },
-            plugins: { legend: { labels: { color: '#fff' } } }
+            scales: {
+              x: {
+                type: 'time',
+                time: { unit: 'day', displayFormats: { day: 'MMM d' } },
+                grid: { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: '#a0a0a0' }
+              },
+              y: {
+                grid: { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: '#a0a0a0' }
+              }
+            },
+            interaction: { mode: 'nearest', axis: 'x' }
           }
         });
       });
