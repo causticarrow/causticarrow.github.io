@@ -443,12 +443,6 @@
         abbreviated = abbreviated.replace(new RegExp(full, 'g'), abbr);
       }
 
-      // Shorten Over/Under to o/u (works even with HTML tags in between)
-      abbreviated = abbreviated.replace(/\bOver\b/g, 'o');
-      abbreviated = abbreviated.replace(/\bUnder\b/g, 'u');
-      // Remove space after o/u
-      abbreviated = abbreviated.replace(/\b([ou])\s+/g, '$1');
-
       // Shorten pills: "Map X" to "MX", "Dota 2" to "D2"
       abbreviated = abbreviated.replace(/Map\s+(\d+)/g, 'M$1');
       abbreviated = abbreviated.replace(/Dota 2/g, 'D2');
