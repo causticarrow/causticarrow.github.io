@@ -683,7 +683,8 @@
         monthPicks.forEach(pick => {
           const myOdds = pick.play.match(/\(([-+]?\d+)\)/)?.[1] || '-110';
           const units = calculateUnits(myOdds, pick.result);
-          const risk = units < 0 ? -units : 1;
+          const odds = parseFloat(myOdds);
+          const risk = odds >= 0 ? 100 / odds : -odds / 100;
 
           monthUnits += units;
           totalUnits += units;
@@ -731,7 +732,7 @@
             <td class="col-play">${formattedPlay}</td>
             <td class="col-result ${pick.result === 'Win' ? 'positive' : 'negative'}">${resultText}</td>
             <td class="col-units ${units >= 0 ? 'positive' : 'negative'}">${unitsStr}</td>
-            <td class="col-score">${pick.score}</td>
+            <td class="col-score">${pick.score.replace(/\s*OT\s*$/, '')}</td>
             <td class="col-close">${closeDisplay}</td>
             <td class="col-clv ${cents >= 0 ? 'positive' : 'negative'}">${clvStr}</td>
             <td class="col-xroi ${xRoi >= 0 ? 'positive' : 'negative'}">${xRoiStr}</td>
