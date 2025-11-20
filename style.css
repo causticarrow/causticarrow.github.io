@@ -232,6 +232,13 @@ a:hover {
     margin-bottom: 10px;
     color: #8c99ad;
 }
+.main-content ul li .sub-note {
+    display: block;
+    color: #6a7485;
+    font-style: italic;
+    margin-top: 5px;
+    font-size: 0.95em;
+}
 .main-content,
 #chart-container,
 .summary-table,
