@@ -6,20 +6,8 @@
   <title>@RASPicks // 2021-24 CBASE</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    @font-face {
-      font-family: 'Fira Mono';
-      src: url('../FiraMono-Regular.ttf') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'Fira Mono';
-      src: url('../FiraMono-Medium.ttf') format('truetype');
-      font-weight: 500;
-      font-style: normal;
-    }
     body {
-      font-family: "Fira Mono", monospace;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
       background: #0d0d0d;
       color: #e6e6e6;
       padding: 32px;
@@ -96,6 +84,7 @@
     .col-score { width: 113px; text-align: center; }
     .col-close { width: 145px; text-align: center; }
     .col-clv { width: 145px; text-align: center; }
+    .col-xroi { width: 145px; text-align: center; }
 
     .hdr-date { width: 165px; text-align: center; }
     .hdr-play { width: 496px; text-align: left; }
@@ -104,6 +93,7 @@
     .hdr-score { width: 113px; text-align: center; }
     .hdr-close { width: 145px; text-align: center; }
     .hdr-clv { width: 145px; text-align: center; }
+    .hdr-xroi { width: 145px; text-align: center; }
 
     .positive { color: #4ade80; }
     .negative { color: #f87171; }
@@ -220,8 +210,8 @@
         <div class="stat-value" id="roi">+0.0%</div>
       </div>
       <div class="stat-box">
-        <div class="stat-label">Avg CLV</div>
-        <div class="stat-value" id="avgClv">+0.00%</div>
+        <div class="stat-label">No-Vig CLV</div>
+        <div class="stat-value" id="avgClv">+0.00c (+0.00%)</div>
       </div>
       <div class="stat-box">
         <div class="stat-label">Expected ROI</div>
@@ -334,6 +324,64 @@
       return (num >= 0 ? '+' : '-') + s + '%';
     }
 
+    function formatCLV(cents, pct) {
+      const cStr = formatGeneralNumber(Math.abs(cents));
+      const pStr = formatGeneralNumber(Math.abs(pct));
+      const cSign = cents >= 0 ? '+' : '-';
+      const pSign = pct >= 0 ? '+' : '-';
+      return `${cSign}${cStr}c (${pSign}${pStr}%)`;
+    }
+
+    // --- Math ---
+    function americanToDecimal(a) {
+      const n = parseInt(a);
+      return n > 0 ? (n / 100) + 1 : (100 / -n) + 1;
+    }
+
+    function probToAmerican(prob) {
+      return prob >= 0.5 ? -Math.round(100 * prob / (1 - prob)) : Math.round(100 * (1 - prob) / prob);
+    }
+
+    function solveForC(d1, d2) {
+      let c = 1.0;
+      for (let i = 0; i < 50; i++) {
+        const p1 = Math.pow(1 / d1, c);
+        const p2 = Math.pow(1 / d2, c);
+        const f = p1 + p2 - 1;
+        if (Math.abs(f) < 1e-10) break;
+        const df = p1 * Math.log(1 / d1) + p2 * Math.log(1 / d2);
+        if (Math.abs(df) < 1e-12) break;
+        c = c - f / df;
+      }
+      return c;
+    }
+
+    function getOtherSideCBASE(closeOdds) {
+      const close = parseInt(closeOdds);
+      const p_close = close > 0 ? 100 / (close + 100) : -close / (-close + 100);
+      const other_p = 1.0698;
+      const other_implied = other_p - p_close;
+      return other_implied >= 0.5 ? -Math.round(100 * other_implied / (1 - other_implied)) : Math.round(100 * (1 - other_implied) / other_implied);
+    }
+
+    function calculateFairProb(closeOdds) {
+      const d1 = americanToDecimal(closeOdds);
+      const d2 = americanToDecimal(getOtherSideCBASE(closeOdds));
+      const c = solveForC(d1, d2);
+      return Math.pow(1 / d1, c);
+    }
+
+    function calculateCLVAndXROI(myOdds, closeOdds) {
+      const myDec = americanToDecimal(myOdds);
+      const myProb = 1 / myDec;
+      const fairProb = calculateFairProb(closeOdds);
+      const fairAmerican = probToAmerican(fairProb);
+      const clvCents = parseInt(myOdds) - fairAmerican;
+      const clvPct = (fairProb - myProb) * 100;
+      const xRoi = (fairProb * myDec - 1) * 100;
+      return { cents: clvCents, pct: clvPct, xRoi: xRoi };
+    }
+
     // --- Units calculation ---
     function calculateUnits(closeOdds, result) {
       // Parse close odds, handling both formats (-110, +150, 125, etc.)
@@ -361,7 +409,7 @@
     // --- Render on load ---
     window.addEventListener('load', () => {
       const container = document.getElementById('tablesContainer');
-      let wins = 0, losses = 0, totalRisk = 0, totalUnits = 0, totalClv = 0, totalXROI = 0;
+      let wins = 0, losses = 0, totalRisk = 0, totalUnits = 0, totalClvCents = 0, totalClvPct = 0, totalXROI = 0;
 
       // Arrays for chart data
       const chartDates = [];
@@ -398,7 +446,7 @@
         return bDate - aDate;
       }).forEach(monthName => {
         const monthPicks = grouped[monthName];
-        let monthWins = 0, monthLosses = 0, monthRisk = 0, monthUnits = 0, monthClv = 0, monthXROI = 0;
+        let monthWins = 0, monthLosses = 0, monthRisk = 0, monthUnits = 0, monthClvCents = 0, monthClvPctSum = 0, monthXROI = 0;
 
         const table = document.createElement('table');
         table.innerHTML = `
@@ -410,7 +458,8 @@
               <th class="hdr-units">Units</th>
               <th class="hdr-score">Score</th>
               <th class="hdr-close">Close</th>
-              <th class="hdr-clv">CLV</th>
+              <th class="hdr-clv">No-Vig CLV</th>
+              <th class="hdr-xroi">Expected ROI</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -429,22 +478,18 @@
 
           if (pick.result === 'Win') { monthWins++; wins++; } else { monthLosses++; losses++; }
 
-          // Parse CLV
-          const clvValue = parseFloat(pick.clv.replace('%', ''));
-          monthClv += clvValue;
-          totalClv += clvValue;
-
-          // Calculate xROI from CLV
-          const myOddsNum = parseInt(myOdds);
-          const myProb = myOddsNum > 0 ? 100 / (myOddsNum + 100) : -myOddsNum / (-myOddsNum + 100);
-          const fairProb = myProb + (clvValue / 100);
-          const myDec = myOddsNum > 0 ? (myOddsNum / 100) + 1 : (100 / -myOddsNum) + 1;
-          const xRoi = (fairProb * myDec - 1) * 100;
+          // Calculate CLV and xROI for CBASE
+          const { cents, pct, xRoi } = calculateCLVAndXROI(myOdds, pick.close);
+          monthClvCents += cents;
+          monthClvPctSum += pct;
           monthXROI += xRoi;
+          totalClvCents += cents;
+          totalClvPct += pct;
           totalXROI += xRoi;
 
           const unitsStr = formatUnits(units);
-          const clvStr = pick.clv;
+          const clvStr = formatCLV(cents, pct);
+          const xRoiStr = formatSignedPercent(xRoi);
           const resultText = pick.result === 'Win' ? 'Win' : 'Loss';
           const closeDisplay = Math.round(parseFloat(pick.close)).toString();
 
@@ -469,7 +514,8 @@
             <td class="col-units ${units >= 0 ? 'positive' : 'negative'}">${unitsStr}</td>
             <td class="col-score">${pick.score}</td>
             <td class="col-close">${closeDisplay}</td>
-            <td class="col-clv ${clvValue >= 0 ? 'positive' : 'negative'}">${clvStr}</td>
+            <td class="col-clv ${cents >= 0 ? 'positive' : 'negative'}">${clvStr}</td>
+            <td class="col-xroi ${xRoi >= 0 ? 'positive' : 'negative'}">${xRoiStr}</td>
           `;
           tbody.appendChild(row);
         });
@@ -480,7 +526,7 @@
         const monthTotal = monthWins + monthLosses;
         const winPct = monthTotal ? ((monthWins / monthTotal) * 100) : 0;
         const roi = monthRisk ? ((monthUnits / monthRisk) * 100) : 0;
-        const avgClv = monthTotal ? monthClv / monthTotal : 0;
+        const avgClvPct = monthTotal ? monthClvPctSum / monthTotal : 0;
 
         const header = document.createElement('h2');
         header.className = 'month-title';
@@ -488,7 +534,7 @@
           `${monthName}: ${monthWins}-${monthLosses} (${formatGeneralNumber(winPct)}%), ` +
           `<span class="${monthUnits >= 0 ? 'positive' : 'negative'}">${formatUnits(monthUnits)}u</span>, ` +
           `<span class="${roi >= 0 ? 'positive' : 'negative'}">${formatSignedPercent(roi)} ROI</span>, ` +
-          `<span class="${avgClv >= 0 ? 'positive' : 'negative'}">${formatSignedPercent(avgClv)} CLV</span>`;
+          `<span class="${avgClvPct >= 0 ? 'positive' : 'negative'}">${formatSignedPercent(avgClvPct)} No-Vig CLV</span>`;
         container.insertBefore(header, table);
       });
 
@@ -496,7 +542,8 @@
       const totalPlays = wins + losses;
       const winPct = totalPlays ? ((wins / totalPlays) * 100) : 0;
       const roi = totalRisk ? ((totalUnits / totalRisk) * 100) : 0;
-      const avgClv = totalPlays ? totalClv / totalPlays : 0;
+      const avgClvCents = totalPlays ? totalClvCents / totalPlays : 0;
+      const avgClvPct = totalPlays ? totalClvPct / totalPlays : 0;
       const avgXROI = totalPlays ? totalXROI / totalPlays : 0;
 
       document.getElementById('totalPlays').textContent = `${totalPlays} (${wins}-${losses}, ${formatGeneralNumber(winPct)}%)`;
@@ -505,8 +552,8 @@
       document.getElementById('netProfit').className = totalUnits >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
       document.getElementById('roi').textContent = formatSignedPercent(roi);
       document.getElementById('roi').className = roi >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
-      document.getElementById('avgClv').textContent = formatSignedPercent(avgClv);
-      document.getElementById('avgClv').className = avgClv >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
+      document.getElementById('avgClv').textContent = formatCLV(avgClvCents, avgClvPct);
+      document.getElementById('avgClv').className = avgClvCents >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
       document.getElementById('avgXROI').textContent = formatSignedPercent(avgXROI);
       document.getElementById('avgXROI').className = avgXROI >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
 
