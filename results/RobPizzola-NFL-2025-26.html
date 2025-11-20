@@ -78,21 +78,21 @@
       background: #1a1a1a;
     }
     .col-date { width: 165px; text-align: center; }
-    .col-play { width: 496px; text-align: left; }
-    .col-result { width: 113px; text-align: center; }
-    .col-units { width: 113px; text-align: center; }
-    .col-score { width: 113px; text-align: center; }
-    .col-close { width: 145px; text-align: center; }
-    .col-clv { width: 145px; text-align: center; }
+    .col-play { width: 650px; text-align: left; }
+    .col-result { width: 85px; text-align: center; }
+    .col-units { width: 85px; text-align: center; }
+    .col-score { width: 85px; text-align: center; }
+    .col-close { width: 110px; text-align: center; }
+    .col-clv { width: 180px; text-align: center; }
     .col-xroi { width: 145px; text-align: center; }
 
     .hdr-date { width: 165px; text-align: center; }
-    .hdr-play { width: 496px; text-align: left; }
-    .hdr-result { width: 113px; text-align: center; }
-    .hdr-units { width: 113px; text-align: center; }
-    .hdr-score { width: 113px; text-align: center; }
-    .hdr-close { width: 145px; text-align: center; }
-    .hdr-clv { width: 145px; text-align: center; }
+    .hdr-play { width: 650px; text-align: left; }
+    .hdr-result { width: 85px; text-align: center; }
+    .hdr-units { width: 85px; text-align: center; }
+    .hdr-score { width: 85px; text-align: center; }
+    .hdr-close { width: 110px; text-align: center; }
+    .hdr-clv { width: 180px; text-align: center; }
     .hdr-xroi { width: 145px; text-align: center; }
 
     .positive { color: #4ade80; }
@@ -340,8 +340,23 @@
       const myDec = americanToDecimal(myOdds);
       const myProb = 1 / myDec;
       const fairProb = calculateFairProb(closeOdds, isTotal);
-      const fairAmerican = probToAmerican(fairProb);
-      const clvCents = Math.abs(parseInt(myOdds)) - Math.abs(fairAmerican);
+
+      // Calculate CLV cents using proper formula
+      let clvCents;
+      if (myProb > 0.5 && fairProb <= 0.5) {
+        const myOddsCalc = -100 * (myProb / (1 - myProb));
+        const fairOddsCalc = 100 * ((1 - fairProb) / fairProb);
+        clvCents = -((Math.abs(myOddsCalc) - 100) + (fairOddsCalc - 100));
+      } else if (myProb <= 0.5 && fairProb > 0.5) {
+        const myOddsCalc = 100 * ((1 - myProb) / myProb);
+        const fairOddsCalc = -100 * (fairProb / (1 - fairProb));
+        clvCents = (myOddsCalc - 100) + (Math.abs(fairOddsCalc) - 100);
+      } else {
+        const myOddsCalc = myProb > 0.5 ? -100 * (myProb / (1 - myProb)) : 100 * ((1 - myProb) / myProb);
+        const fairOddsCalc = fairProb > 0.5 ? -100 * (fairProb / (1 - fairProb)) : 100 * ((1 - fairProb) / fairProb);
+        clvCents = myOddsCalc - fairOddsCalc;
+      }
+
       const clvPct = (fairProb - myProb) * 100;
       const xRoi = (fairProb * myDec - 1) * 100;
       return { cents: clvCents, pct: clvPct, xRoi: xRoi };
