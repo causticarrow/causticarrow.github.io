@@ -705,9 +705,9 @@
             totalXROI += xRoi;
           }
 
-          const unitsStr = isPending ? '-' : formatUnits(units);
-          const clvStr = isPending ? '-' : formatCLVForTable(cents, pct);
-          const xRoiStr = isPending ? '-' : formatSignedPercent(xRoi);
+          const unitsStr = isPending ? '' : formatUnits(units);
+          const clvStr = formatCLVForTable(cents, pct);
+          const xRoiStr = formatSignedPercent(xRoi);
           const resultText = isPending ? 'Pending' : (pick.result === 'W' ? 'Win' : 'Loss');
           const closeNum = Math.round(parseFloat(pick.close_odds));
           const closeDisplay = closeNum >= 0 ? '+' + closeNum : closeNum.toString();
@@ -741,8 +741,8 @@
             <td class="col-units ${isPending ? '' : (units >= 0 ? 'positive' : 'negative')}">${unitsStr}</td>
             <td class="col-score">${pick.score}</td>
             <td class="col-close">${closeDisplay}</td>
-            <td class="col-clv ${isPending ? '' : (cents >= 0 ? 'positive' : 'negative')}">${clvStr}</td>
-            <td class="col-xroi ${isPending ? '' : (xRoi >= 0 ? 'positive' : 'negative')}">${xRoiStr}</td>
+            <td class="col-clv ${cents >= 0 ? 'positive' : 'negative'}">${clvStr}</td>
+            <td class="col-xroi ${xRoi >= 0 ? 'positive' : 'negative'}">${xRoiStr}</td>
           `;
           tbody.appendChild(row);
         });
