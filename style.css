@@ -1,17 +1,5 @@
-@font-face {
-    font-family: 'Fira Mono';
-    src: url('FiraMono-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Fira Mono';
-    src: url('FiraMono-Medium.ttf') format('truetype');
-    font-weight: 500;
-    font-style: normal;
-}
 body {
-    font-family: "Fira Mono", monospace;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
     font-size: 14px;
     background-color: #0d0d0d;
     color: #8c99ad;
@@ -148,7 +136,7 @@ a:hover {
     min-height: 100vh;
 }
 .sidebar {
-    width: 250px;
+    width: 300px;
     background-color: #0d0d0d;
     padding: 20px;
     border-right: 1px solid #22252a;
@@ -184,7 +172,7 @@ a:hover {
 }
 .search-bar {
     width: 100%;
-    max-width: 250px;
+    max-width: 300px;
     padding: 10px;
     margin-bottom: 20px;
     border: 1px solid #22252a;
@@ -198,9 +186,9 @@ a:hover {
     box-sizing: border-box;
 }
 .main-content {
-    width: calc(100% - 250px);
-    margin-left: 250px;
-    padding: 20px;
+    width: calc(100% - 300px);
+    margin-left: 300px;
+    padding: 32px;
     min-height: 100vh;
     box-sizing: border-box;
     text-align: center;
