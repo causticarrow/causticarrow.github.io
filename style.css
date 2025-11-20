@@ -1,7 +1,19 @@
+@font-face {
+    font-family: 'Fira Code';
+    src: url('FiraCode-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Fira Code';
+    src: url('FiraCode-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
 body {
-    font-family: "Sohne", "Segoe UI", sans-serif;
+    font-family: "Fira Code", monospace;
     font-size: 14px;
-    background-color: #09090b;
+    background-color: #0d0d0d;
     color: #8c99ad;
     margin: 0;
     padding: 0;
@@ -137,7 +149,7 @@ a:hover {
 }
 .sidebar {
     width: 250px;
-    background-color: #09090b;
+    background-color: #0d0d0d;
     padding: 20px;
     border-right: 1px solid #22252a;
     height: 100vh;
@@ -164,8 +176,8 @@ a:hover {
     padding-left: 0;
 }
 .sidebar a.active {
-    color: #198e64;
-    background-color: #0b3733;
+    color: #4ade80;
+    background-color: rgba(74, 222, 128, 0.1);
     margin-left: -10px;
     padding-left: 10px;
     border-radius: 4px;
@@ -176,7 +188,7 @@ a:hover {
     padding: 10px;
     margin-bottom: 20px;
     border: 1px solid #22252a;
-    background-color: #22252a;
+    background-color: #161616;
     color: #8c99ad;
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%238c99ad" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><line x1="17" y1="17" x2="22" y2="22"/></svg>');
     background-repeat: no-repeat;
