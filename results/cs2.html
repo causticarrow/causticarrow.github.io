@@ -113,6 +113,23 @@
       font-weight: 500;
     }
 
+    .game-pill {
+      display: inline-block;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-left: 8px;
+      font-weight: 500;
+    }
+    .game-pill.cs2 {
+      color: rgb(97, 175, 239);
+      background-color: rgb(48, 87, 119);
+    }
+    .game-pill.dota2 {
+      color: rgb(224, 108, 117);
+      background-color: rgb(112, 54, 58);
+    }
+
     .month-title {
       text-align: center;
       font-weight: 500;
@@ -245,7 +262,8 @@
         note: "",
         result: "W",
         score: "2-0",
-        close_odds: "-120"
+        close_odds: "-120",
+        game: "CS2"
       },
       {
         date: "2025-11-12",
@@ -253,7 +271,8 @@
         note: "",
         result: "L",
         score: "0-2",
-        close_odds: "+133"
+        close_odds: "+133",
+        game: "CS2"
       },
       {
         date: "2025-10-12",
@@ -261,7 +280,8 @@
         note: "Map 3",
         result: "L",
         score: "5-13",
-        close_odds: "+106"
+        close_odds: "+106",
+        game: "CS2"
       }
     ];
 
@@ -358,7 +378,7 @@
       const myProb = 1 / myDec;
       const fairProb = calculateFairProb(closeOdds);
       const fairAmerican = probToAmerican(fairProb);
-      const clvCents = parseInt(myOdds) - fairAmerican;
+      const clvCents = Math.abs(parseInt(myOdds)) - Math.abs(fairAmerican);
       const clvPct = (fairProb - myProb) * 100;
       const xRoi = (fairProb * myDec - 1) * 100;
       return { cents: clvCents, pct: clvPct, xRoi: xRoi };
@@ -465,6 +485,10 @@
           }
           if (pick.note) {
             formattedPlay += ` <span class="note-pill">${pick.note}</span>`;
+          }
+          if (pick.game) {
+            const gameClass = pick.game.toLowerCase().replace(' ', '');
+            formattedPlay += ` <span class="game-pill ${gameClass}">${pick.game}</span>`;
           }
 
           const row = document.createElement('tr');

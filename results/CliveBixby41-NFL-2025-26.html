@@ -336,7 +336,7 @@
       const myProb = 1 / myDec;
       const fairProb = calculateFairProb(closeOdds, isTotal);
       const fairAmerican = probToAmerican(fairProb);
-      const clvCents = parseInt(myOdds) - fairAmerican;
+      const clvCents = Math.abs(parseInt(myOdds)) - Math.abs(fairAmerican);
       const clvPct = (fairProb - myProb) * 100;
       const xRoi = (fairProb * myDec - 1) * 100;
       return { cents: clvCents, pct: clvPct, xRoi: xRoi };
