@@ -488,6 +488,8 @@
       // Shorten Over/Under to o/u (works even with HTML tags in between)
       abbreviated = abbreviated.replace(/\bOver\b/g, 'o');
       abbreviated = abbreviated.replace(/\bUnder\b/g, 'u');
+      // Remove space after o/u
+      abbreviated = abbreviated.replace(/\b([ou])\s+/g, '$1');
 
       return abbreviated;
     }
