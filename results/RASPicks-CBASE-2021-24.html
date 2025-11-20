@@ -498,9 +498,9 @@
         abbreviated = abbreviated.replace(new RegExp(full, 'g'), abbr);
       }
 
-      // Shorten Over/Under to o/u and remove following space
-      abbreviated = abbreviated.replace(/\bOver\s+/g, 'o');
-      abbreviated = abbreviated.replace(/\bUnder\s+/g, 'u');
+      // Shorten Over/Under to o/u (works even with HTML tags in between)
+      abbreviated = abbreviated.replace(/\bOver\b/g, 'o');
+      abbreviated = abbreviated.replace(/\bUnder\b/g, 'u');
 
       return abbreviated;
     }
