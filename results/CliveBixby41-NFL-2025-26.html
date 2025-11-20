@@ -244,15 +244,15 @@
       /* Hide columns on mobile */
       .col-units, .hdr-units,
       .col-score, .hdr-score,
-      .col-xroi, .hdr-xroi {
+      .col-xroi, .hdr-xroi,
+      .col-close, .hdr-close {
         display: none !important;
       }
 
-      .col-date, .hdr-date { width: 60px !important; }
-      .col-play, .hdr-play { width: 300px !important; }
-      .col-result, .hdr-result { width: 50px !important; }
-      .col-close, .hdr-close { width: 60px !important; }
-      .col-clv, .hdr-clv { width: 130px !important; }
+      .col-date, .hdr-date { width: 70px !important; }
+      .col-play, .hdr-play { width: 350px !important; }
+      .col-result, .hdr-result { width: 55px !important; }
+      .col-clv, .hdr-clv { width: 90px !important; }
 
       canvas#profitChart {
         max-height: 150px !important;
@@ -441,11 +441,9 @@
         abbreviated = abbreviated.replace(new RegExp(full, 'g'), abbr);
       }
 
-      // Shorten Over/Under to o/u
-      abbreviated = abbreviated.replace(/\bOver\b/g, 'o');
-      abbreviated = abbreviated.replace(/\bUnder\b/g, 'u');
-      // Remove space after o/u when followed by <span tag
-      abbreviated = abbreviated.replace(/\b([ou])\s+(<span)/g, '$1$2');
+      // Shorten Over/Under to o/u and remove following space
+      abbreviated = abbreviated.replace(/\bOver\s+/g, 'o');
+      abbreviated = abbreviated.replace(/\bUnder\s+/g, 'u');
 
       return abbreviated;
     }
