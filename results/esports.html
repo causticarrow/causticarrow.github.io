@@ -428,9 +428,8 @@
 
       let abbreviated = play;
 
-      // Remove "vs. TEAM" for handicap/PK bets
-      // Matches patterns like "PK (-120) vs. Team" or "+2.5 (-110) vs. Team" or "-1.5 (+150) vs. Team"
-      abbreviated = abbreviated.replace(/\s+(PK|[+-]\d+\.?\d*)\s+(\([^)]+\))?\s+vs\.\s+[^<]+(?=<|$)/g, ' $1 $2');
+      // Remove " vs. OPPONENT" (everything after " vs." until a pill tag or end)
+      abbreviated = abbreviated.replace(/\s+vs\.\s+([^<]+?)(?=\s*(?:<span|$))/g, '');
 
       // Esports team abbreviations (teams longer than 4 chars)
       const esportsTeams = {
@@ -443,6 +442,12 @@
       for (const [full, abbr] of Object.entries(esportsTeams)) {
         abbreviated = abbreviated.replace(new RegExp(full, 'g'), abbr);
       }
+
+      // Shorten Over/Under to o/u
+      abbreviated = abbreviated.replace(/\bOver\b/g, 'o');
+      abbreviated = abbreviated.replace(/\bUnder\b/g, 'u');
+      // Remove space after o/u when followed by <span tag
+      abbreviated = abbreviated.replace(/\b([ou])\s+(<span)/g, '$1$2');
 
       return abbreviated;
     }
