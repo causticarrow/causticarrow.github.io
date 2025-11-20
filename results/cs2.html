@@ -16,9 +16,9 @@
     .container {
       max-width: 1400px;
       margin: 0 auto;
-      margin-left: 250px;
+      margin-left: 300px;
       padding: 32px;
-      padding-left: 282px;
+      padding-left: 320px;
     }
     h1 {
       font-weight: 600;
@@ -127,7 +127,7 @@
       display: block;
     }
     .sidebar {
-      width: 250px;
+      width: 300px;
       background-color: #0d0d0d;
       padding: 20px;
       border-right: 1px solid #2a2a2a;
@@ -168,7 +168,7 @@
     }
     .search-bar {
       width: 100%;
-      max-width: 250px;
+      max-width: 300px;
       padding: 10px;
       margin-bottom: 20px;
       border: 1px solid #2a2a2a;
@@ -453,12 +453,17 @@
           const clvStr = formatCLV(cents, pct);
           const xRoiStr = formatSignedPercent(xRoi);
           const resultText = pick.result === 'W' ? 'Win' : 'Loss';
+          const closeDisplay = Math.round(parseFloat(pick.close_odds)).toString();
 
           // Format play
           let formattedPlay = pick.play;
-          const betMatch = pick.play.match(/(PK|[+-]\d+\.?\d*)/);
+          // Remove number prefixes like "347 " or "416 "
+          formattedPlay = formattedPlay.replace(/^\d+\s+/, '');
+          // Bold total numbers like "40.5" or "49" in totals
+          formattedPlay = formattedPlay.replace(/(Over|Under)\s+(\d+\.?\d*)/g, '$1 <span class="bet-type">$2</span>');
+          const betMatch = formattedPlay.match(/(PK|[+-]\d+\.?\d*)/);
           if (betMatch) {
-            formattedPlay = pick.play.replace(betMatch[0], `<span class="bet-type">${betMatch[0]}</span>`);
+            formattedPlay = formattedPlay.replace(betMatch[0], `<span class="bet-type">${betMatch[0]}</span>`);
           }
           if (pick.note) {
             formattedPlay += ` <span class="note-pill">${pick.note}</span>`;
@@ -471,7 +476,7 @@
             <td class="col-result ${pick.result === 'W' ? 'positive' : 'negative'}">${resultText}</td>
             <td class="col-units ${units >= 0 ? 'positive' : 'negative'}">${unitsStr}</td>
             <td class="col-score">${pick.score}</td>
-            <td class="col-close">${pick.close_odds}</td>
+            <td class="col-close">${closeDisplay}</td>
             <td class="col-clv ${cents >= 0 ? 'positive' : 'negative'}">${clvStr}</td>
             <td class="col-xroi ${xRoi >= 0 ? 'positive' : 'negative'}">${xRoiStr}</td>
           `;
