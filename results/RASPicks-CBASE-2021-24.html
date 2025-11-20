@@ -395,60 +395,103 @@
       return `${month}/${day}/${year}`;
     }
 
+    function shortenMonthName(monthName) {
+      // Only shorten on mobile
+      if (window.innerWidth > 768) return monthName;
+
+      const monthMap = {
+        'January': 'Jan',
+        'February': 'Feb',
+        'March': 'Mar',
+        'April': 'Apr',
+        'May': 'May',
+        'June': 'Jun',
+        'July': 'Jul',
+        'August': 'Aug',
+        'September': 'Sep',
+        'October': 'Oct',
+        'November': 'Nov',
+        'December': 'Dec'
+      };
+
+      return monthName.replace(/^(\w+)/, (match) => monthMap[match] || match);
+    }
+
     function abbreviatePlay(play) {
       // Only abbreviate on mobile
       if (window.innerWidth > 768) return play;
 
+      let abbreviated = play;
+
+      // Remove "vs. TEAM" for handicap/PK bets
+      // Matches patterns like "PK (-120) vs. Team" or "+2.5 (-110) vs. Team" or "-1.5 (+150) vs. Team"
+      abbreviated = abbreviated.replace(/\s+(PK|[+-]\d+\.?\d*)\s+(\([^)]+\))?\s+vs\.\s+[^<]+(?=<|$)/g, ' $1 $2');
+
       // College baseball team abbreviations
       const collegeTeams = {
-        'Vanderbilt': 'VAND',
-        'Tennessee': 'TENN',
-        'Oklahoma State': 'OKST',
-        'West Virginia': 'WVU',
-        'Grand Canyon': 'GCU',
-        'Evansville': 'EVAN',
-        'High Point': 'HPU',
-        'Dallas Baptist': 'DBU',
-        'Wake Forest': 'WAKE',
-        'Oral Roberts': 'ORU',
-        'Stanford': 'STAN',
-        'Southern Miss': 'USM',
-        'Alabama': 'BAMA',
-        'South Carolina': 'SCAR',
-        'East Carolina': 'ECU',
-        'Oregon': 'ORE',
-        'Eastern Illinois': 'EIU',
-        'Florida A&M': 'FAMU',
-        'Lipscomb': 'LIP',
-        'Clemson': 'CLEM',
-        'Ball State': 'BALL',
-        'Kentucky': 'UK',
-        'George Mason': 'GMU',
-        'Northeastern': 'NEU',
-        'Maryland': 'MD',
-        'Florida': 'FLA',
-        'Texas': 'TEX',
-        'Virginia': 'UVA',
-        'South Alabama': 'USA',
-        'Mississippi': 'MISS',
-        'Mississippi State': 'MSST',
+        'Alabama': 'ALA',
+        'Air Force': 'AFA',
         'Arkansas': 'ARK',
-        'Georgia': 'UGA',
         'Auburn': 'AUB',
-        'Missouri': 'MIZ',
+        'Ball State': 'BALL',
+        'Campbell': 'CAMP',
+        'Clemson': 'CLEM',
+        'Columbia': 'COLUM',
+        'Connecticut': 'UCONN',
+        'Coppin State': 'COPPIN',
+        'Dallas Baptist': 'DBU',
+        'East Carolina': 'ECU',
+        'Eastern Illinois': 'EIU',
+        'Evansville': 'UE',
+        'Fairfield': 'FAIR',
+        'Florida': 'FLA',
+        'Florida A&M': 'FAMU',
+        'George Mason': 'GMU',
+        'Georgia Southern': 'GS',
+        'Gonzaga': 'GONZ',
+        'Grand Canyon': 'GCU',
+        'High Point': 'HPU',
+        'Kennesaw State': 'KSU',
+        'Kentucky': 'UK',
+        'Lipscomb': 'LIP',
+        'LSU': 'LSU',
+        'Maryland': 'MD',
+        'Miami (Florida)': 'MIA',
+        'Miami Florida': 'MIA',
+        'Nevada': 'NEV',
+        'New Mexico State': 'NMSU',
         'North Carolina': 'UNC',
-        'Duke': 'DUKE',
-        'NC State': 'NCST',
-        'Virginia Tech': 'VT',
-        'Pittsburgh': 'PITT',
-        'Louisville': 'LOU',
-        'Notre Dame': 'ND',
-        'Boston College': 'BC',
-        'Florida State': 'FSU',
-        'Georgia Tech': 'GT'
+        'North Dakota State': 'NDSU',
+        'Northeastern': 'NU',
+        'Oklahoma State': 'OKST',
+        'Ole Miss': 'MISS',
+        'Oral Roberts': 'ORU',
+        'Oregon': 'ORE',
+        'Oregon State': 'OSU',
+        'SE Louisiana': 'SELA',
+        'SE Missouri State': 'SEMO',
+        'South Alabama': 'USA',
+        'South Carolina': 'USC',
+        'South Florida': 'USF',
+        'Southern': 'SOUTHERN',
+        'Southern Miss': 'USM',
+        'Stanford': 'STAN',
+        'Tennessee': 'TENN',
+        'Texas': 'TEX',
+        'Texas State': 'TXST',
+        'Texas Tech': 'TTU',
+        'TCU': 'TCU',
+        'UC Irvine': 'UCI',
+        'UC Santa Barbara': 'UCSB',
+        'UCLA': 'UCLA',
+        'UL Lafayette': 'LOU',
+        'Vanderbilt': 'VU',
+        'Virginia': 'UVA',
+        'Wake Forest': 'WAKE',
+        'West Virginia': 'WVU',
+        'Wright State': 'WRIGHT',
+        'Army': 'ARMY'
       };
-
-      let abbreviated = play;
 
       // Replace team names (longer names first to avoid partial matches)
       const sortedTeams = Object.entries(collegeTeams).sort((a, b) => b[0].length - a[0].length);
@@ -469,6 +512,16 @@
       return s;
     }
 
+    function formatWinPercent(num) {
+      // On mobile: no decimals for monthly header
+      if (window.innerWidth <= 768) {
+        return Math.round(num).toString();
+      }
+      let s = num.toFixed(2);
+      s = stripTrailingZeros(s);
+      return s;
+    }
+
     function formatUnits(num) {
       if (Math.abs(num - Math.round(num)) < 0.001) {
         return (num >= 0 ? '+' : '-') + Math.abs(num).toFixed(1);
@@ -477,6 +530,14 @@
         s = stripTrailingZeros(s);
         return (num >= 0 ? '+' : '-') + s;
       }
+    }
+
+    function formatUnitsForHeader(num) {
+      // On mobile: always 1 decimal for monthly header
+      if (window.innerWidth <= 768) {
+        return (num >= 0 ? '+' : '-') + Math.abs(num).toFixed(1);
+      }
+      return formatUnits(num);
     }
 
     function formatSignedNumber(num) {
@@ -489,6 +550,24 @@
       let s = Math.abs(num).toFixed(2);
       s = stripTrailingZeros(s);
       return (num >= 0 ? '+' : '-') + s + '%';
+    }
+
+    function formatROIForHeader(num) {
+      // On mobile: no decimals for monthly header
+      if (window.innerWidth <= 768) {
+        const rounded = Math.round(num);
+        return (rounded >= 0 ? '+' : '') + rounded + '%';
+      }
+      return formatSignedPercent(num);
+    }
+
+    function formatCLVPercentForHeader(num) {
+      // On mobile: 1 decimal for monthly header
+      if (window.innerWidth <= 768) {
+        const val = num.toFixed(1);
+        return (num >= 0 ? '+' : '') + val + '%';
+      }
+      return formatSignedPercent(num);
     }
 
     function formatCLV(cents, pct) {
@@ -718,11 +797,13 @@
 
         const header = document.createElement('h2');
         header.className = 'month-title';
+        const isMobile = window.innerWidth <= 768;
+        const clvLabel = isMobile ? 'NV CLV' : 'No-Vig CLV';
         header.innerHTML =
-          `${monthName}: ${monthWins}-${monthLosses} (${formatGeneralNumber(winPct)}%), ` +
-          `<span class="${monthUnits >= 0 ? 'positive' : 'negative'}">${formatUnits(monthUnits)}u</span>, ` +
-          `<span class="${roi >= 0 ? 'positive' : 'negative'}">${formatSignedPercent(roi)} ROI</span>, ` +
-          `<span class="${avgClvPct >= 0 ? 'positive' : 'negative'}">${formatSignedPercent(avgClvPct)} No-Vig CLV</span>`;
+          `${shortenMonthName(monthName)}: ${monthWins}-${monthLosses} (${formatWinPercent(winPct)}%), ` +
+          `<span class="${monthUnits >= 0 ? 'positive' : 'negative'}">${formatUnitsForHeader(monthUnits)}u</span>, ` +
+          `<span class="${roi >= 0 ? 'positive' : 'negative'}">${formatROIForHeader(roi)} ROI</span>, ` +
+          `<span class="${avgClvPct >= 0 ? 'positive' : 'negative'}">${formatCLVPercentForHeader(avgClvPct)} ${clvLabel}</span>`;
         container.insertBefore(header, table);
       });
 
