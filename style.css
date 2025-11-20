@@ -1,17 +1,17 @@
 @font-face {
-    font-family: 'Fira Code';
-    src: url('FiraCode-Regular.ttf') format('truetype');
+    font-family: 'Fira Mono';
+    src: url('FiraMono-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 @font-face {
-    font-family: 'Fira Code';
-    src: url('FiraCode-SemiBold.ttf') format('truetype');
-    font-weight: 600;
+    font-family: 'Fira Mono';
+    src: url('FiraMono-Medium.ttf') format('truetype');
+    font-weight: 500;
     font-style: normal;
 }
 body {
-    font-family: "Fira Code", monospace;
+    font-family: "Fira Mono", monospace;
     font-size: 14px;
     background-color: #0d0d0d;
     color: #8c99ad;
