@@ -316,7 +316,7 @@
     </ul>
   </aside>
   <div class="container">
-    <h1>causticarrow // esports</h1>
+    <h1>@causticarrow // esports</h1>
 
     <div class="stats">
       <div class="stat-box">
@@ -582,6 +582,7 @@
     }
 
     function calculateUnits(oddsStr, result) {
+      if (result === 'Pending') return 0;
       const a = parseInt(oddsStr);
       const risk = a > 0 ? 100 / a : -a / 100;
       return result === 'W' ? 1.0 : -risk;
@@ -683,26 +684,31 @@
           if (!myOdds) return;
 
           const units = calculateUnits(myOdds, pick.result);
-          const risk = parseInt(myOdds) > 0 ? 100 / parseInt(myOdds) : -parseInt(myOdds) / 100;
-          monthUnits += units;
-          totalUnits += units;
-          monthRisk += risk;
-          totalRisk += risk;
-
-          if (pick.result === 'W') { monthWins++; wins++; } else { monthLosses++; losses++; }
-
+          const isPending = pick.result === 'Pending';
           const { cents, pct, xRoi } = calculateCLVAndXROI(myOdds, pick.close_odds);
-          monthClvCents += cents;
-          monthClvPctSum += pct;
-          monthXROI += xRoi;
-          totalClvCents += cents;
-          totalClvPct += pct;
-          totalXROI += xRoi;
 
-          const unitsStr = formatUnits(units);
-          const clvStr = formatCLVForTable(cents, pct);
-          const xRoiStr = formatSignedPercent(xRoi);
-          const resultText = pick.result === 'W' ? 'Win' : 'Loss';
+          // Only count risk, units, wins/losses, and CLV for non-pending bets
+          if (!isPending) {
+            const risk = parseInt(myOdds) > 0 ? 100 / parseInt(myOdds) : -parseInt(myOdds) / 100;
+            monthUnits += units;
+            totalUnits += units;
+            monthRisk += risk;
+            totalRisk += risk;
+
+            if (pick.result === 'W') { monthWins++; wins++; } else { monthLosses++; losses++; }
+
+            monthClvCents += cents;
+            monthClvPctSum += pct;
+            monthXROI += xRoi;
+            totalClvCents += cents;
+            totalClvPct += pct;
+            totalXROI += xRoi;
+          }
+
+          const unitsStr = isPending ? '-' : formatUnits(units);
+          const clvStr = isPending ? '-' : formatCLVForTable(cents, pct);
+          const xRoiStr = isPending ? '-' : formatSignedPercent(xRoi);
+          const resultText = isPending ? 'Pending' : (pick.result === 'W' ? 'Win' : 'Loss');
           const closeNum = Math.round(parseFloat(pick.close_odds));
           const closeDisplay = closeNum >= 0 ? '+' + closeNum : closeNum.toString();
 
@@ -731,12 +737,12 @@
           row.innerHTML = `
             <td class="col-date">${formatDate(pick.date)}</td>
             <td class="col-play">${formattedPlay}</td>
-            <td class="col-result ${pick.result === 'W' ? 'positive' : 'negative'}">${resultText}</td>
-            <td class="col-units ${units >= 0 ? 'positive' : 'negative'}">${unitsStr}</td>
+            <td class="col-result ${isPending ? '' : (pick.result === 'W' ? 'positive' : 'negative')}">${resultText}</td>
+            <td class="col-units ${isPending ? '' : (units >= 0 ? 'positive' : 'negative')}">${unitsStr}</td>
             <td class="col-score">${pick.score}</td>
             <td class="col-close">${closeDisplay}</td>
-            <td class="col-clv ${cents >= 0 ? 'positive' : 'negative'}">${clvStr}</td>
-            <td class="col-xroi ${xRoi >= 0 ? 'positive' : 'negative'}">${xRoiStr}</td>
+            <td class="col-clv ${isPending ? '' : (cents >= 0 ? 'positive' : 'negative')}">${clvStr}</td>
+            <td class="col-xroi ${isPending ? '' : (xRoi >= 0 ? 'positive' : 'negative')}">${xRoiStr}</td>
           `;
           tbody.appendChild(row);
         });
