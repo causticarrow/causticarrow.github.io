@@ -76,22 +76,22 @@
       letter-spacing: 0.5px;
       background: #1a1a1a;
     }
-    .col-date { width: 165px; text-align: center; }
-    .col-play { width: 650px; text-align: left; }
-    .col-result { width: 85px; text-align: center; }
-    .col-units { width: 85px; text-align: center; }
-    .col-score { width: 85px; text-align: center; }
-    .col-close { width: 110px; text-align: center; }
-    .col-clv { width: 180px; text-align: center; }
+    .col-date { width: 100px; text-align: center; }
+    .col-play { width: 720px; text-align: left; }
+    .col-result { width: 65px; text-align: center; }
+    .col-units { width: 65px; text-align: center; }
+    .col-score { width: 65px; text-align: center; }
+    .col-close { width: 80px; text-align: center; }
+    .col-clv { width: 200px; text-align: center; }
     .col-xroi { width: 145px; text-align: center; }
 
-    .hdr-date { width: 165px; text-align: center; }
-    .hdr-play { width: 650px; text-align: left; }
-    .hdr-result { width: 85px; text-align: center; }
-    .hdr-units { width: 85px; text-align: center; }
-    .hdr-score { width: 85px; text-align: center; }
-    .hdr-close { width: 110px; text-align: center; }
-    .hdr-clv { width: 180px; text-align: center; }
+    .hdr-date { width: 100px; text-align: center; }
+    .hdr-play { width: 720px; text-align: left; }
+    .hdr-result { width: 65px; text-align: center; }
+    .hdr-units { width: 65px; text-align: center; }
+    .hdr-score { width: 65px; text-align: center; }
+    .hdr-close { width: 80px; text-align: center; }
+    .hdr-clv { width: 200px; text-align: center; }
     .hdr-xroi { width: 145px; text-align: center; }
 
     .positive { color: #4ade80; }
@@ -262,7 +262,7 @@
         note: "",
         result: "W",
         score: "2-0",
-        close_odds: "-120",
+        close_odds: "-119",
         game: "CS2"
       },
       {
@@ -291,6 +291,14 @@
         numStr = numStr.replace(/\.?0+$/, '');
       }
       return numStr;
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      const month = d.getMonth() + 1;
+      const day = d.getDate();
+      const year = d.getFullYear().toString().slice(-2);
+      return `${month}/${day}/${year}`;
     }
 
     function formatGeneralNumber(num) {
@@ -322,8 +330,10 @@
     }
 
     function formatCLV(cents, pct) {
-      const cStr = formatGeneralNumber(Math.abs(cents));
-      const pStr = formatGeneralNumber(Math.abs(pct));
+      let cStr = Math.abs(cents).toFixed(1);
+      cStr = stripTrailingZeros(cStr);
+      let pStr = Math.abs(pct).toFixed(1);
+      pStr = stripTrailingZeros(pStr);
       const cSign = cents >= 0 ? '+' : '-';
       const pSign = pct >= 0 ? '+' : '-';
       return `${cSign}${cStr}c (${pSign}${pStr}%)`;
@@ -508,7 +518,7 @@
 
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td class="col-date">${pick.date}</td>
+            <td class="col-date">${formatDate(pick.date)}</td>
             <td class="col-play">${formattedPlay}</td>
             <td class="col-result ${pick.result === 'W' ? 'positive' : 'negative'}">${resultText}</td>
             <td class="col-units ${units >= 0 ? 'positive' : 'negative'}">${unitsStr}</td>
