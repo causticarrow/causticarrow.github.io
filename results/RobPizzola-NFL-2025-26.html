@@ -406,8 +406,8 @@
 
       let abbreviated = play;
 
-      // Remove "vs. TEAM" for handicap/PK bets
-      abbreviated = abbreviated.replace(/\s+(PK|[+-]\d+\.?\d*)\s+(\([^)]+\))?\s+vs\.\s+[^<]+(?=<|$)/g, ' $1 $2');
+      // Remove " vs. OPPONENT" (everything after " vs." until a pill tag or end)
+      abbreviated = abbreviated.replace(/\s+vs\.\s+([^<]+?)(?=\s*(?:<span|$))/g, '');
 
       // NFL team abbreviations
       const nflTeams = {
@@ -453,6 +453,8 @@
       // Shorten Over/Under to o/u
       abbreviated = abbreviated.replace(/\bOver\b/g, 'o');
       abbreviated = abbreviated.replace(/\bUnder\b/g, 'u');
+      // Remove space after o/u when followed by <span tag
+      abbreviated = abbreviated.replace(/\b([ou])\s+(<span)/g, '$1$2');
 
       return abbreviated;
     }
