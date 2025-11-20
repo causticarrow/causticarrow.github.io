@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>causticarrow // 2025-26 NFL (@robpizzola)</title>
+  <title>@robpizzola // 2025-26 NFL</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -17,6 +17,9 @@
     .container {
       max-width: 1400px;
       margin: 0 auto;
+      margin-left: 250px;
+      padding: 32px;
+      padding-left: 282px;
     }
     h1 {
       font-weight: 600;
@@ -111,11 +114,83 @@
       border-radius: 8px;
       display: block;
     }
+    .sidebar {
+      width: 250px;
+      background-color: #0d0d0d;
+      padding: 20px;
+      border-right: 1px solid #2a2a2a;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      box-sizing: border-box;
+      z-index: 100;
+    }
+    .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar li {
+      margin-bottom: 10px;
+      padding-left: 10px;
+    }
+    .sidebar a {
+      color: #999;
+      display: block;
+      padding: 5px 0;
+      padding-left: 0;
+      text-decoration: none;
+    }
+    .sidebar a:hover {
+      color: #f0f0f0;
+    }
+    .sidebar a.active {
+      color: #4ade80;
+      background-color: rgba(74, 222, 128, 0.1);
+      margin-left: -10px;
+      padding-left: 10px;
+      border-radius: 4px;
+    }
+    .search-bar {
+      width: 100%;
+      max-width: 250px;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #2a2a2a;
+      background-color: #161616;
+      color: #999;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    .category-header {
+      margin-top: 20px;
+    }
+    .category-toggle {
+      display: block;
+      color: #f0f0f0;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
+  <aside class="sidebar">
+    <input type="text" class="search-bar" placeholder="Search" />
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="https://x.com/causticarrow">𝕏 (Twitter)</a></li>
+      <li class="category-header">
+        <span class="category-toggle">Results</span>
+        <ul class="category-content" id="results-list"></ul>
+      </li>
+    </ul>
+  </aside>
   <div class="container">
-    <h1>causticarrow // 2025-26 NFL (@robpizzola)</h1>
+    <h1>@robpizzola // 2025-26 NFL</h1>
 
     <div class="stats">
       <div class="stat-box">
@@ -415,14 +490,7 @@
           },
           scales: {
             x: {
-              grid: {
-                color: '#2a2a2a'
-              },
-              ticks: {
-                color: '#999',
-                maxRotation: 45,
-                minRotation: 45
-              }
+              display: false
             },
             y: {
               grid: {
@@ -439,6 +507,66 @@
         }
       });
     });
+
+// Sidebar auto-loader
+async function populateSidebar() {
+  const ul = document.getElementById("results-list");
+  ul.innerHTML = "";
+
+  try {
+    const response = await fetch("results.json");
+    const pages = await response.json();
+
+    const currentPage = window.location.pathname.split("/").pop();
+
+    pages.forEach((p) => {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = p.file;
+      a.textContent = p.label;
+
+      if (p.file === currentPage) {
+        a.classList.add("active");
+      }
+
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+  } catch (err) {
+    console.error("Could not load results.json", err);
+  }
+}
+
+// Search filter
+function filterSidebar() {
+  var input, filter, ul, li, i;
+  input = document.querySelector(".search-bar");
+  filter = input.value.toUpperCase();
+  ul = document.querySelector(".sidebar ul");
+  li = ul.getElementsByTagName("li");
+
+  for (i = 0; i < li.length; i++) {
+    var a = li[i].getElementsByTagName("a")[0];
+    if (a) {
+      var txtValue = li[i].textContent || li[i].innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        var shouldHide = true;
+        li[i].querySelectorAll("*").forEach((node) => {
+          if ((node.textContent || node.innerText).toUpperCase().indexOf(filter) > -1) {
+            shouldHide = false;
+          }
+        });
+        li[i].style.display = shouldHide ? "none" : "";
+      }
+    }
+  }
+}
+
+// Initialize sidebar
+populateSidebar();
+document.querySelector(".search-bar").addEventListener("input", filterSidebar);
   </script>
 </body>
 </html>
