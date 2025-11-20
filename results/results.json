@@ -1,8 +1,8 @@
 [
-  { "file": "cs2.html", "label": "CS2 (@causticarrow)" },
-  { "file": "RobPizzola-NFL-2025-26.html", "label": "2025-26 NFL (@robpizzola)" },
-  { "file": "CliveBixby41-NFL-2025-26.html", "label": "2025-26 NFL (@CliveBixby41)" },
-  { "file": "RobPizzola-NFL-2024-25.html", "label": "2024-25 NFL (@robpizzola)" },
-  { "file": "CliveBixby41-NFL-2024-25.html", "label": "2024-25 NFL (@CliveBixby41)" },
-  { "file": "RASPicks-CBASE-2021-24.html", "label": "2021-24 CBASE (@RASPicks)" }
+  { "file": "cs2.html", "label": "esports (@causticarrow)" },
+  { "file": "RobPizzola-NFL-2025-26.html", "label": "@robpizzola // 2025-26 NFL" },
+  { "file": "CliveBixby41-NFL-2025-26.html", "label": "@CliveBixby41 // 2025-26 NFL" },
+  { "file": "RobPizzola-NFL-2024-25.html", "label": "@robpizzola // 2024-25 NFL" },
+  { "file": "CliveBixby41-NFL-2024-25.html", "label": "@CliveBixby41 // 2024-25 NFL" },
+  { "file": "RASPicks-CBASE-2021-24.html", "label": "@RASPicks // 2021-24 CBASE" }
 ]
