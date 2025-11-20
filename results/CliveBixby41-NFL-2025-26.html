@@ -175,6 +175,87 @@
       cursor: pointer;
       margin-bottom: 10px;
     }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      body {
+        padding: 0;
+        font-size: 13px;
+      }
+
+      .container {
+        margin-left: 0;
+        padding: 15px;
+        max-width: 100%;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid #2a2a2a;
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 18px !important;
+        margin-bottom: 16px;
+        word-wrap: break-word;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+      }
+
+      .stat-box {
+        padding: 10px !important;
+      }
+
+      .stat-label {
+        font-size: 10px !important;
+      }
+
+      .stat-value {
+        font-size: 14px !important;
+      }
+
+      .month-title {
+        font-size: 12px !important;
+        padding: 8px 6px !important;
+        line-height: 1.4;
+        text-align: left !important;
+        word-wrap: break-word;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        font-size: 11px;
+      }
+
+      th, td {
+        padding: 6px 4px !important;
+        font-size: 10px !important;
+      }
+
+      .col-date, .hdr-date { width: 60px !important; }
+      .col-play, .hdr-play { width: 250px !important; }
+      .col-result, .hdr-result { width: 45px !important; }
+      .col-units, .hdr-units { width: 45px !important; }
+      .col-score, .hdr-score { width: 55px !important; }
+      .col-close, .hdr-close { width: 50px !important; }
+      .col-clv, .hdr-clv { width: 110px !important; }
+      .col-xroi, .hdr-xroi { width: 80px !important; }
+
+      #chart-container {
+        height: 200px !important;
+        padding: 10px !important;
+        margin-bottom: 20px;
+      }
+    }
   </style>
 </head>
 <body>
