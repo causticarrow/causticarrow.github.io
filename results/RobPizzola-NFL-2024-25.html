@@ -241,14 +241,18 @@
         font-size: 10px !important;
       }
 
+      /* Hide columns on mobile */
+      .col-units, .hdr-units,
+      .col-score, .hdr-score,
+      .col-xroi, .hdr-xroi {
+        display: none !important;
+      }
+
       .col-date, .hdr-date { width: 60px !important; }
-      .col-play, .hdr-play { width: 250px !important; }
-      .col-result, .hdr-result { width: 45px !important; }
-      .col-units, .hdr-units { width: 45px !important; }
-      .col-score, .hdr-score { width: 55px !important; }
-      .col-close, .hdr-close { width: 50px !important; }
-      .col-clv, .hdr-clv { width: 110px !important; }
-      .col-xroi, .hdr-xroi { width: 80px !important; }
+      .col-play, .hdr-play { width: 300px !important; }
+      .col-result, .hdr-result { width: 50px !important; }
+      .col-close, .hdr-close { width: 60px !important; }
+      .col-clv, .hdr-clv { width: 130px !important; }
 
       canvas#profitChart {
         max-height: 150px !important;
@@ -407,6 +411,60 @@
       const day = d.getDate();
       const year = d.getFullYear().toString().slice(-2);
       return `${month}/${day}/${year}`;
+    }
+
+    function abbreviatePlay(play) {
+      // Only abbreviate on mobile
+      if (window.innerWidth > 768) return play;
+
+      // NFL team abbreviations
+      const nflTeams = {
+        'LA Rams': 'LAR',
+        'Kansas City': 'KC',
+        'Buffalo': 'BUF',
+        'Detroit': 'DET',
+        'Seattle': 'SEA',
+        'Philadelphia': 'PHI',
+        'Green Bay': 'GB',
+        'Indianapolis': 'IND',
+        'Baltimore': 'BAL',
+        'New England': 'NE',
+        'LA Chargers': 'LAC',
+        'San Francisco': 'SF',
+        'Denver': 'DEN',
+        'Tampa Bay': 'TB',
+        'Jacksonville': 'JAC',
+        'Dallas': 'DAL',
+        'Minnesota': 'MIN',
+        'Chicago': 'CHI',
+        'Houston': 'HOU',
+        'Pittsburgh': 'PIT',
+        'Arizona': 'ARZ',
+        'Miami': 'MIA',
+        'NY Giants': 'NYG',
+        'Carolina': 'CAR',
+        'Las Vegas': 'LV',
+        'Atlanta': 'ATL',
+        'New Orleans': 'NO',
+        'Cleveland': 'CLE',
+        'Cincinnati': 'CIN',
+        'Washington': 'WAS',
+        'NY Jets': 'NYJ',
+        'Tennessee': 'TEN'
+      };
+
+      let abbreviated = play;
+
+      // Replace team names
+      for (const [full, abbr] of Object.entries(nflTeams)) {
+        abbreviated = abbreviated.replace(new RegExp(full, 'g'), abbr);
+      }
+
+      // Shorten Over/Under to o/u
+      abbreviated = abbreviated.replace(/\bOver\b/g, 'o');
+      abbreviated = abbreviated.replace(/\bUnder\b/g, 'u');
+
+      return abbreviated;
     }
 
     function formatGeneralNumber(num) {
@@ -637,6 +695,9 @@
           formattedPlay = formattedPlay.replace(/(Over|Under)/g, '<span class="bet-type">$1</span>');
           // Highlight PK
           formattedPlay = formattedPlay.replace(/\bPK\b/g, '<span class="bet-type">PK</span>');
+
+          // Apply abbreviations on mobile
+          formattedPlay = abbreviatePlay(formattedPlay);
 
           const row = document.createElement('tr');
           row.innerHTML = `
