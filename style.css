@@ -1,8 +1,8 @@
 body {
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-    font-size: 14px;
+    font-size: 15px;
     background-color: #0d0d0d;
-    color: #8c99ad;
+    color: #e6e6e6;
     margin: 0;
     padding: 0;
 }
@@ -139,7 +139,7 @@ a:hover {
     width: 300px;
     background-color: #0d0d0d;
     padding: 20px;
-    border-right: 1px solid #22252a;
+    border-right: 1px solid #2a2a2a;
     height: 100vh;
     position: fixed;
     top: 0;
@@ -147,6 +147,7 @@ a:hover {
     overflow-y: auto;
     overflow-x: hidden;
     box-sizing: border-box;
+    z-index: 100;
 }
 .sidebar ul {
     list-style-type: none;
@@ -158,10 +159,14 @@ a:hover {
     padding-left: 10px;
 }
 .sidebar a {
-    color: #8c99ad;
+    color: #999;
     display: block;
     padding: 5px 0;
     padding-left: 0;
+    text-decoration: none;
+}
+.sidebar a:hover {
+    color: #f0f0f0;
 }
 .sidebar a.active {
     color: #4ade80;
@@ -175,15 +180,14 @@ a:hover {
     max-width: 300px;
     padding: 10px;
     margin-bottom: 20px;
-    border: 1px solid #22252a;
+    border: 1px solid #2a2a2a;
     background-color: #161616;
-    color: #8c99ad;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%238c99ad" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><line x1="17" y1="17" x2="22" y2="22"/></svg>');
-    background-repeat: no-repeat;
-    background-position: 10px center;
-    padding-left: 30px;
-    text-indent: 10px;
+    color: #999;
+    border-radius: 6px;
     box-sizing: border-box;
+}
+.category-header {
+    margin-top: 20px;
 }
 .main-content {
     width: calc(100% - 300px);
@@ -202,13 +206,13 @@ a:hover {
 .main-content h1 {
     font-size: 2em;
     margin-bottom: 20px;
-    color: #8c99ad;
+    color: #f0f0f0;
 }
 .main-content p {
     font-size: 1em;
     line-height: 1.6;
     margin-bottom: 20px;
-    color: #8c99ad;
+    color: #e6e6e6;
     text-align: left;
     max-width: 600px;
 }
@@ -230,7 +234,7 @@ a:hover {
 
 .main-content ul li {
     margin-bottom: 10px;
-    color: #8c99ad;
+    color: #e6e6e6;
 }
 .main-content ul li .sub-note {
     display: block;
@@ -269,16 +273,18 @@ a:hover {
 }
 .category-header .category-toggle {
     display: block;
-    color: #ffffff;
+    color: #f0f0f0;
+    font-weight: 600;
     cursor: pointer;
-    margin-top: 30px !important;
-    margin-bottom: 10px !important;
+    margin-top: 20px;
+    margin-bottom: 10px;
 }
 .sidebar .category-header .category-toggle {
     display: block;
-    color: #ffffff;
+    color: #f0f0f0;
+    font-weight: 600;
     cursor: pointer;
-    margin-top: 30px;
+    margin-top: 20px;
     margin-bottom: 10px;
 }
 body,
