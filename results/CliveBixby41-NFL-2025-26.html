@@ -716,8 +716,8 @@
           formattedPlay = formattedPlay.replace(/^\d+\s+/, '');
           // Bold total numbers like "40.5" or "49" in totals
           formattedPlay = formattedPlay.replace(/(Over|Under)\s+(\d+\.?\d*)/g, '$1 <span class="bet-type">$2</span>');
-          // Highlight spread numbers like -2.5, +3.5
-          formattedPlay = formattedPlay.replace(/([+-]\d+\.?\d*)/g, '<span class="bet-type">$1</span>');
+          // Highlight spread numbers like -2.5, +3.5 (but not odds in parentheses)
+          formattedPlay = formattedPlay.replace(/(?<!\()([+-]\d+\.?\d*)/g, '<span class="bet-type">$1</span>');
           // Highlight Over/Under
           formattedPlay = formattedPlay.replace(/(Over|Under)/g, '<span class="bet-type">$1</span>');
           // Highlight PK
