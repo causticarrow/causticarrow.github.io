@@ -526,7 +526,8 @@
           const clvStr = formatCLV(cents, pct);
           const xRoiStr = formatSignedPercent(xRoi);
           const resultText = pick.result === 'Win' ? 'Win' : 'Loss';
-          const closeDisplay = Math.round(parseFloat(pick.close)).toString();
+          const closeNum = Math.round(parseFloat(pick.close));
+          const closeDisplay = closeNum >= 0 ? '+' + closeNum : closeNum.toString();
 
           // Format play - highlight spreads, totals, and team names
           let formattedPlay = pick.play;
@@ -661,7 +662,7 @@ async function populateSidebar() {
     const response = await fetch("results.json");
     const pages = await response.json();
 
-    const currentPage = window.location.pathname.split("/").pop();
+    const currentPage = window.location.pathname.split("/").pop().replace('.html', '');
 
     pages.forEach((p) => {
       const li = document.createElement("li");
