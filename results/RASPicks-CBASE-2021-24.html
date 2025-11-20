@@ -241,14 +241,18 @@
         font-size: 10px !important;
       }
 
+      /* Hide columns on mobile */
+      .col-units, .hdr-units,
+      .col-score, .hdr-score,
+      .col-xroi, .hdr-xroi {
+        display: none !important;
+      }
+
       .col-date, .hdr-date { width: 60px !important; }
-      .col-play, .hdr-play { width: 250px !important; }
-      .col-result, .hdr-result { width: 45px !important; }
-      .col-units, .hdr-units { width: 45px !important; }
-      .col-score, .hdr-score { width: 55px !important; }
-      .col-close, .hdr-close { width: 50px !important; }
-      .col-clv, .hdr-clv { width: 110px !important; }
-      .col-xroi, .hdr-xroi { width: 80px !important; }
+      .col-play, .hdr-play { width: 300px !important; }
+      .col-result, .hdr-result { width: 50px !important; }
+      .col-close, .hdr-close { width: 60px !important; }
+      .col-clv, .hdr-clv { width: 130px !important; }
 
       canvas#profitChart {
         max-height: 150px !important;
@@ -389,6 +393,74 @@
       const day = d.getDate();
       const year = d.getFullYear().toString().slice(-2);
       return `${month}/${day}/${year}`;
+    }
+
+    function abbreviatePlay(play) {
+      // Only abbreviate on mobile
+      if (window.innerWidth > 768) return play;
+
+      // College baseball team abbreviations
+      const collegeTeams = {
+        'Vanderbilt': 'VAND',
+        'Tennessee': 'TENN',
+        'Oklahoma State': 'OKST',
+        'West Virginia': 'WVU',
+        'Grand Canyon': 'GCU',
+        'Evansville': 'EVAN',
+        'High Point': 'HPU',
+        'Dallas Baptist': 'DBU',
+        'Wake Forest': 'WAKE',
+        'Oral Roberts': 'ORU',
+        'Stanford': 'STAN',
+        'Southern Miss': 'USM',
+        'Alabama': 'BAMA',
+        'South Carolina': 'SCAR',
+        'East Carolina': 'ECU',
+        'Oregon': 'ORE',
+        'Eastern Illinois': 'EIU',
+        'Florida A&M': 'FAMU',
+        'Lipscomb': 'LIP',
+        'Clemson': 'CLEM',
+        'Ball State': 'BALL',
+        'Kentucky': 'UK',
+        'George Mason': 'GMU',
+        'Northeastern': 'NEU',
+        'Maryland': 'MD',
+        'Florida': 'FLA',
+        'Texas': 'TEX',
+        'Virginia': 'UVA',
+        'South Alabama': 'USA',
+        'Mississippi': 'MISS',
+        'Mississippi State': 'MSST',
+        'Arkansas': 'ARK',
+        'Georgia': 'UGA',
+        'Auburn': 'AUB',
+        'Missouri': 'MIZ',
+        'North Carolina': 'UNC',
+        'Duke': 'DUKE',
+        'NC State': 'NCST',
+        'Virginia Tech': 'VT',
+        'Pittsburgh': 'PITT',
+        'Louisville': 'LOU',
+        'Notre Dame': 'ND',
+        'Boston College': 'BC',
+        'Florida State': 'FSU',
+        'Georgia Tech': 'GT'
+      };
+
+      let abbreviated = play;
+
+      // Replace team names (longer names first to avoid partial matches)
+      const sortedTeams = Object.entries(collegeTeams).sort((a, b) => b[0].length - a[0].length);
+      for (const [full, abbr] of sortedTeams) {
+        abbreviated = abbreviated.replace(new RegExp(full, 'g'), abbr);
+      }
+
+      // Shorten Over/Under to o/u
+      abbreviated = abbreviated.replace(/\bOver\b/g, 'o');
+      abbreviated = abbreviated.replace(/\bUnder\b/g, 'u');
+
+      return abbreviated;
     }
 
     function formatGeneralNumber(num) {
@@ -618,6 +690,9 @@
           formattedPlay = formattedPlay.replace(/(Over|Under)/g, '<span class="bet-type">$1</span>');
           // Highlight PK
           formattedPlay = formattedPlay.replace(/\bPK\b/g, '<span class="bet-type">PK</span>');
+
+          // Apply abbreviations on mobile
+          formattedPlay = abbreviatePlay(formattedPlay);
 
           const row = document.createElement('tr');
           row.innerHTML = `
