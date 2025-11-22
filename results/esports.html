@@ -626,7 +626,7 @@
     // --- Render on load ---
     window.addEventListener('load', () => {
       const container = document.getElementById('tablesContainer');
-      let wins = 0, losses = 0, totalRisk = 0, totalUnits = 0, totalClvCents = 0, totalClvPct = 0, totalXROI = 0, totalClvCount = 0;
+      let wins = 0, losses = 0, totalRisk = 0, totalUnits = 0, totalClvCents = 0, totalClvPct = 0, totalXROI = 0, totalClvCount = 0, totalXROICount = 0;
 
       // Arrays for chart data
       const chartDates = [];
@@ -665,7 +665,7 @@
         return bDate - aDate;
       }).forEach(monthName => {
         const monthPicks = grouped[monthName];
-        let monthWins = 0, monthLosses = 0, monthRisk = 0, monthUnits = 0, monthClvCents = 0, monthClvPctSum = 0, monthXROI = 0, monthClvCount = 0;
+        let monthWins = 0, monthLosses = 0, monthRisk = 0, monthUnits = 0, monthClvCents = 0, monthClvPctSum = 0, monthXROI = 0, monthClvCount = 0, monthXROICount = 0;
 
         const isMobileView = window.innerWidth <= 768;
         const clvHeaderLabel = isMobileView ? 'NV CLV' : 'No-Vig CLV';
@@ -694,15 +694,23 @@
 
           const units = calculateUnits(myOdds, pick.result);
           const isPending = pick.result === 'Pending';
-          const { cents, pct, xRoi } = calculateCLVAndXROI(myOdds, pick.close_odds);
+          const hasCloseOdds = pick.close_odds && pick.close_odds.trim() !== '';
 
-          // Always count CLV (including pending)
-          monthClvCents += cents;
-          monthClvPctSum += pct;
-          monthClvCount++;
-          totalClvCents += cents;
-          totalClvPct += pct;
-          totalClvCount++;
+          let cents = 0, pct = 0, xRoi = 0;
+          if (hasCloseOdds) {
+            const clvData = calculateCLVAndXROI(myOdds, pick.close_odds);
+            cents = clvData.cents;
+            pct = clvData.pct;
+            xRoi = clvData.xRoi;
+
+            // Only count CLV when close odds exist
+            monthClvCents += cents;
+            monthClvPctSum += pct;
+            monthClvCount++;
+            totalClvCents += cents;
+            totalClvPct += pct;
+            totalClvCount++;
+          }
 
           // Only count risk, units, wins/losses, and xROI for non-pending bets
           if (!isPending) {
@@ -714,16 +722,19 @@
 
             if (pick.result === 'W') { monthWins++; wins++; } else { monthLosses++; losses++; }
 
-            monthXROI += xRoi;
-            totalXROI += xRoi;
+            if (hasCloseOdds) {
+              monthXROI += xRoi;
+              monthXROICount++;
+              totalXROI += xRoi;
+              totalXROICount++;
+            }
           }
 
           const unitsStr = isPending ? '' : formatUnits(units);
-          const clvStr = formatCLVForTable(cents, pct);
-          const xRoiStr = formatSignedPercent(xRoi);
+          const clvStr = hasCloseOdds ? formatCLVForTable(cents, pct) : '';
+          const xRoiStr = hasCloseOdds ? formatSignedPercent(xRoi) : '';
           const resultText = isPending ? 'Pending' : (pick.result === 'W' ? 'Win' : 'Loss');
-          const closeNum = Math.round(parseFloat(pick.close_odds));
-          const closeDisplay = closeNum >= 0 ? '+' + closeNum : closeNum.toString();
+          const closeDisplay = hasCloseOdds ? (parseInt(pick.close_odds) >= 0 ? '+' + parseInt(pick.close_odds) : parseInt(pick.close_odds).toString()) : '';
 
           // Format play
           let formattedPlay = pick.play;
@@ -754,8 +765,8 @@
             <td class="col-units ${isPending ? '' : (units >= 0 ? 'positive' : 'negative')}">${unitsStr}</td>
             <td class="col-score">${pick.score}</td>
             <td class="col-close">${closeDisplay}</td>
-            <td class="col-clv ${cents >= 0 ? 'positive' : 'negative'}">${clvStr}</td>
-            <td class="col-xroi ${xRoi >= 0 ? 'positive' : 'negative'}">${xRoiStr}</td>
+            <td class="col-clv ${hasCloseOdds ? (cents >= 0 ? 'positive' : 'negative') : ''}">${clvStr}</td>
+            <td class="col-xroi ${hasCloseOdds ? (xRoi >= 0 ? 'positive' : 'negative') : ''}">${xRoiStr}</td>
           `;
           tbody.appendChild(row);
         });
@@ -786,7 +797,7 @@
       const roi = totalRisk ? ((totalUnits / totalRisk) * 100) : 0;
       const avgClvCents = totalClvCount ? totalClvCents / totalClvCount : 0;
       const avgClvPct = totalClvCount ? totalClvPct / totalClvCount : 0;
-      const avgXROI = totalPlays ? totalXROI / totalPlays : 0;
+      const avgXROI = totalXROICount ? totalXROI / totalXROICount : 0;
 
       document.getElementById('totalPlays').textContent = `${totalPlays} (${wins}-${losses}, ${formatGeneralNumber(winPct)}%)`;
       document.getElementById('netRisk').textContent = formatGeneralNumber(totalRisk);
