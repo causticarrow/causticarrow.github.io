@@ -210,15 +210,14 @@
       background: #161616;
       border: 1px solid #2a2a2a;
       border-radius: 8px;
-      padding: 10px 16px;
-      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-      font-size: 13px;
-      font-weight: 500;
+      padding: 10px 14px;
+      font-size: 18px;
       color: #e6e6e6;
       cursor: pointer;
       z-index: 1000;
       transition: all 0.2s;
       user-select: none;
+      line-height: 1;
     }
     .copy-box:hover {
       background: #1a1a1a;
@@ -350,7 +349,7 @@
       </li>
     </ul>
   </aside>
-  <div class="copy-box" id="copyBox" title="Click to copy record">Copy Record</div>
+  <div class="copy-box" id="copyBox" title="Click to copy record">📋</div>
   <div class="container">
     <h1>@causticarrow // esports</h1>
 
@@ -851,11 +850,11 @@
       const copyBox = document.getElementById('copyBox');
       copyBox.onclick = () => {
         navigator.clipboard.writeText(copyText).then(() => {
-          copyBox.textContent = 'Copied!';
+          copyBox.textContent = '✓';
           copyBox.style.borderColor = '#4ade80';
           copyBox.style.color = '#4ade80';
           setTimeout(() => {
-            copyBox.textContent = 'Copy Record';
+            copyBox.textContent = '📋';
             copyBox.style.borderColor = '#2a2a2a';
             copyBox.style.color = '#e6e6e6';
           }, 1000);
