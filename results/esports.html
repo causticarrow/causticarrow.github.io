@@ -468,12 +468,14 @@
       return numStr;
     }
 
+    function parseDate(dateStr) {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+
     function formatDate(dateStr) {
-      const d = new Date(dateStr);
-      const month = d.getMonth() + 1;
-      const day = d.getDate();
-      const year = d.getFullYear().toString().slice(-2);
-      return `${month}/${day}/${year}`;
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return `${month}/${day}/${year.toString().slice(-2)}`;
     }
 
     function shortenMonthName(monthName) {
@@ -691,7 +693,7 @@
       const chartCumulativeUnits = [];
 
       // Build chart data (chronological order, oldest first)
-      const chronologicalPicks = [...PICKS].sort((a, b) => new Date(a.date) - new Date(b.date));
+      const chronologicalPicks = [...PICKS].sort((a, b) => parseDate(a.date) - parseDate(b.date));
       let cumulativeUnits = 0;
       chartDates.push('Start');
       chartCumulativeUnits.push(0);
@@ -707,10 +709,10 @@
       });
 
       // Sort picks for table display (newest first)
-      const sortedPicks = [...PICKS].sort((a, b) => new Date(b.date) - new Date(a.date));
+      const sortedPicks = [...PICKS].sort((a, b) => parseDate(b.date) - parseDate(a.date));
       const grouped = {};
       sortedPicks.forEach(pick => {
-        const d = new Date(pick.date);
+        const d = parseDate(pick.date);
         const displayKey = `${d.toLocaleString('default', { month: 'long' })} ${d.getFullYear()}`;
         if (!grouped[displayKey]) grouped[displayKey] = [];
         grouped[displayKey].push(pick);
@@ -718,8 +720,8 @@
 
       // Process each month
       Object.keys(grouped).sort((a, b) => {
-        const aDate = new Date(grouped[a][0].date);
-        const bDate = new Date(grouped[b][0].date);
+        const aDate = parseDate(grouped[a][0].date);
+        const bDate = parseDate(grouped[b][0].date);
         return bDate - aDate;
       }).forEach(monthName => {
         const monthPicks = grouped[monthName];
