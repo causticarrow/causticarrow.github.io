@@ -698,7 +698,7 @@
       const picksWithIndex = PICKS.map((pick, index) => ({ ...pick, originalIndex: index }));
       const chronologicalPicks = picksWithIndex.sort((a, b) => {
         const dateCompare = parseDate(a.date) - parseDate(b.date);
-        // If dates are equal, sort by index descending (since PICKS is newest-first)
+        // If dates are equal, higher index = older (since PICKS is newest-first), so put it first
         return dateCompare !== 0 ? dateCompare : b.originalIndex - a.originalIndex;
       });
       let cumulativeUnits = 0;
