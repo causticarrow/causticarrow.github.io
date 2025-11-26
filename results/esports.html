@@ -210,20 +210,24 @@
       background: #161616;
       border: 1px solid #2a2a2a;
       border-radius: 8px;
-      padding: 12px 16px;
-      font-family: 'Courier New', monospace;
+      padding: 10px 16px;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
       font-size: 13px;
+      font-weight: 500;
       color: #e6e6e6;
       cursor: pointer;
       z-index: 1000;
-      transition: background 0.2s;
+      transition: all 0.2s;
+      user-select: none;
     }
     .copy-box:hover {
       background: #1a1a1a;
       border-color: #4ade80;
+      color: #4ade80;
     }
     .copy-box:active {
       background: #0d0d0d;
+      transform: scale(0.98);
     }
 
     /* Mobile Responsive Styles */
@@ -326,9 +330,9 @@
       .copy-box {
         position: static;
         margin: 15px;
-        font-size: 11px !important;
-        padding: 10px !important;
-        word-break: break-all;
+        font-size: 12px !important;
+        padding: 10px 16px !important;
+        text-align: center;
       }
     }
   </style>
@@ -346,7 +350,7 @@
       </li>
     </ul>
   </aside>
-  <div class="copy-box" id="copyBox" title="Click to copy">Loading...</div>
+  <div class="copy-box" id="copyBox" title="Click to copy record">Copy Record</div>
   <div class="container">
     <h1>@causticarrow // esports</h1>
 
@@ -845,15 +849,15 @@
       // Update copy box
       const copyText = `record: ${wins}-${losses}, ${formatSignedNumber(totalUnits)}u, ${formatSignedPercent(avgClvPct)} no-vig clv // [archive](https://causticarrow.com/results/esports)`;
       const copyBox = document.getElementById('copyBox');
-      copyBox.textContent = copyText;
       copyBox.onclick = () => {
         navigator.clipboard.writeText(copyText).then(() => {
-          const originalText = copyBox.textContent;
           copyBox.textContent = 'Copied!';
           copyBox.style.borderColor = '#4ade80';
+          copyBox.style.color = '#4ade80';
           setTimeout(() => {
-            copyBox.textContent = originalText;
+            copyBox.textContent = 'Copy Record';
             copyBox.style.borderColor = '#2a2a2a';
+            copyBox.style.color = '#e6e6e6';
           }, 1000);
         });
       };
