@@ -406,20 +406,20 @@
       },
       {
         date: "2025-11-24",
-        play: "Rare Atom PK (+219) vs. Imperial",
-        note: "Map 1",
-        result: "L",
-        score: "11-13",
-        close_odds: "+184",
-        game: "CS2"
-      },
-      {
-        date: "2025-11-24",
         play: "M80 PK (+126) vs. B8",
         note: "Map 1",
         result: "W",
         score: "13-11",
         close_odds: "+113",
+        game: "CS2"
+      },
+      {
+        date: "2025-11-24",
+        play: "Rare Atom PK (+219) vs. Imperial",
+        note: "Map 1",
+        result: "L",
+        score: "11-13",
+        close_odds: "+184",
         game: "CS2"
       },
       {
@@ -693,7 +693,13 @@
       const chartCumulativeUnits = [];
 
       // Build chart data (chronological order, oldest first)
-      const chronologicalPicks = [...PICKS].sort((a, b) => parseDate(a.date) - parseDate(b.date));
+      // Add indices to maintain order for same-date picks
+      const picksWithIndex = PICKS.map((pick, index) => ({ ...pick, originalIndex: index }));
+      const chronologicalPicks = picksWithIndex.sort((a, b) => {
+        const dateCompare = parseDate(a.date) - parseDate(b.date);
+        // If dates are equal, sort by index descending (since PICKS is newest-first)
+        return dateCompare !== 0 ? dateCompare : b.originalIndex - a.originalIndex;
+      });
       let cumulativeUnits = 0;
       chartDates.push('Start');
       chartCumulativeUnits.push(0);
