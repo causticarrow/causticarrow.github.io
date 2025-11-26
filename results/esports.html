@@ -203,6 +203,28 @@
       cursor: pointer;
       margin-bottom: 10px;
     }
+    .copy-box {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: #e6e6e6;
+      cursor: pointer;
+      z-index: 1000;
+      transition: background 0.2s;
+    }
+    .copy-box:hover {
+      background: #1a1a1a;
+      border-color: #4ade80;
+    }
+    .copy-box:active {
+      background: #0d0d0d;
+    }
 
     /* Mobile Responsive Styles */
     @media (max-width: 768px) {
@@ -299,6 +321,15 @@
         padding: 2px 5px !important;
         margin-left: 4px !important;
       }
+
+      /* Copy box on mobile */
+      .copy-box {
+        position: static;
+        margin: 15px;
+        font-size: 11px !important;
+        padding: 10px !important;
+        word-break: break-all;
+      }
     }
   </style>
 </head>
@@ -315,6 +346,7 @@
       </li>
     </ul>
   </aside>
+  <div class="copy-box" id="copyBox" title="Click to copy">Loading...</div>
   <div class="container">
     <h1>@causticarrow // esports</h1>
 
@@ -827,6 +859,22 @@
       document.getElementById('avgClv').className = avgClvCents >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
       document.getElementById('avgXROI').textContent = formatSignedPercent(avgXROI);
       document.getElementById('avgXROI').className = avgXROI >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
+
+      // Update copy box
+      const copyText = `record: ${wins}-${losses}, ${formatSignedNumber(totalUnits)}u, ${formatSignedPercent(avgClvPct)} no-vig clv // [archive](https://causticarrow.com/results/esports)`;
+      const copyBox = document.getElementById('copyBox');
+      copyBox.textContent = copyText;
+      copyBox.onclick = () => {
+        navigator.clipboard.writeText(copyText).then(() => {
+          const originalText = copyBox.textContent;
+          copyBox.textContent = 'Copied!';
+          copyBox.style.borderColor = '#4ade80';
+          setTimeout(() => {
+            copyBox.textContent = originalText;
+            copyBox.style.borderColor = '#2a2a2a';
+          }, 1000);
+        });
+      };
 
       // Render chart
       const ctx = document.getElementById('profitChart').getContext('2d');
