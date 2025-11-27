@@ -631,7 +631,7 @@
       }
 
       const oddsString = parlayText.substring(startPos + 1, endPos);
-      const legs = oddsString.split('|');
+      const legs = oddsString.split('/');
 
       if (legs.length < 2) {
         return null;
@@ -902,9 +902,9 @@
 
           // Now add HTML formatting
           if (isParlay && !isMobile) {
-            // Use the same approach that works for non-parlays
+            // Replace / FIRST, then odds numbers
+            formattedPlay = formattedPlay.replace(/\//g, '<span class="vs-separator">/</span>');
             formattedPlay = formattedPlay.replace(/(?<![">])([+-]\d+)(?![^<]*<\/span>)/g, '<span class="bet-type">$1</span>');
-            formattedPlay = formattedPlay.replace(/\|/g, '<span class="vs-separator">|</span>');
           } else if (!isParlay) {
             // Color vs. with purple first
             if (!isMobile) {
