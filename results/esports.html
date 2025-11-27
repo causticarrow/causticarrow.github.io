@@ -902,10 +902,28 @@
 
           // Now add HTML formatting
           if (isParlay && !isMobile) {
-            // Bold only the odds numbers in parlay legs (integers only)
-            formattedPlay = formattedPlay.replace(/([-+]\d+)/g, '<span class="bet-type">$1</span>');
-            // Color / with purple
-            formattedPlay = formattedPlay.replace(/\//g, '<span class="vs-separator">/</span>');
+            // For parlays, build HTML without string replacement
+            const parts = [];
+            const text = formattedPlay;
+            let lastIndex = 0;
+            const oddsRegex = /([-+]\d+)/g;
+            let match;
+
+            while ((match = oddsRegex.exec(text)) !== null) {
+              // Add text before the match
+              if (match.index > lastIndex) {
+                parts.push(text.substring(lastIndex, match.index));
+              }
+              // Add the odds wrapped in span
+              parts.push('<span class="bet-type">' + match[0] + '</span>');
+              lastIndex = match.index + match[0].length;
+            }
+            // Add remaining text
+            if (lastIndex < text.length) {
+              parts.push(text.substring(lastIndex));
+            }
+
+            formattedPlay = parts.join('').replace(/\//g, '<span class="vs-separator">/</span>');
           } else if (!isParlay) {
             // Color vs. with purple first
             if (!isMobile) {
