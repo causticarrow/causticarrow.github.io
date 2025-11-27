@@ -885,8 +885,8 @@
 
           // Handle parlay formatting - keep the leg details visible
           if (isParlay) {
-            // Bold the parlay text and parentheses content
-            formattedPlay = formattedPlay.replace(/Parlay\s+(\([^)]+\))/, 'Parlay <span class="bet-type">$1</span>');
+            // Bold only the odds numbers in parlay legs
+            formattedPlay = formattedPlay.replace(/([-+]\d+)/g, '<span class="bet-type">$1</span>');
           } else {
             // Bold total numbers like "40.5" or "49" in totals
             formattedPlay = formattedPlay.replace(/(Over|Under)\s+(\d+\.?\d*)/g, '$1 <span class="bet-type">$2</span>');
