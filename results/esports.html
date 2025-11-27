@@ -929,7 +929,7 @@
           const row = document.createElement('tr');
           row.innerHTML = `
             <td class="col-date">${formatDate(pick.date)}</td>
-            <td class="col-play">${formattedPlay}</td>
+            <td class="col-play"></td>
             <td class="col-result ${isPending ? '' : (pick.result === 'W' ? 'positive' : 'negative')}">${resultText}</td>
             <td class="col-units ${isPending ? '' : (units >= 0 ? 'positive' : 'negative')}">${unitsStr}</td>
             <td class="col-score">${pick.score}</td>
@@ -937,6 +937,7 @@
             <td class="col-clv ${hasCloseOdds ? (cents >= 0 ? 'positive' : 'negative') : ''}">${clvStr}</td>
             <td class="col-xroi ${hasCloseOdds ? (xRoi >= 0 ? 'positive' : 'negative') : ''}">${xRoiStr}</td>
           `;
+          row.querySelector('.col-play').innerHTML = formattedPlay;
           tbody.appendChild(row);
         });
 
