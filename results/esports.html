@@ -883,11 +883,10 @@
           // Remove number prefixes like "347 " or "416 "
           formattedPlay = formattedPlay.replace(/^\d+\s+/, '');
 
-          // Handle parlay formatting
+          // Handle parlay formatting - keep the leg details visible
           if (isParlay) {
-            const parlayOdds = parseInt(myOdds);
-            const oddsDisplay = parlayOdds >= 0 ? '+' + parlayOdds : parlayOdds.toString();
-            formattedPlay = `Parlay <span class="bet-type">(${oddsDisplay})</span>`;
+            // Bold the parlay text and parentheses content
+            formattedPlay = formattedPlay.replace(/Parlay\s+(\([^)]+\))/, 'Parlay <span class="bet-type">$1</span>');
           } else {
             // Bold total numbers like "40.5" or "49" in totals
             formattedPlay = formattedPlay.replace(/(Over|Under)\s+(\d+\.?\d*)/g, '$1 <span class="bet-type">$2</span>');
