@@ -100,7 +100,11 @@
 
     .bet-type {
       font-weight: 600;
-      color: #f0f0f0;
+      color: rgb(209, 154, 102);
+    }
+
+    .vs-separator {
+      color: rgb(198, 120, 221);
     }
 
     .note-pill {
@@ -888,13 +892,17 @@
             // Bold only the odds numbers in parlay legs
             formattedPlay = formattedPlay.replace(/([-+]\d+)/g, '<span class="bet-type">$1</span>');
           } else {
-            // Bold total numbers like "40.5" or "49" in totals
+            // Bold bet types (PK, spreads, totals) and odds
             formattedPlay = formattedPlay.replace(/(Over|Under)\s+(\d+\.?\d*)/g, '$1 <span class="bet-type">$2</span>');
-            const betMatch = formattedPlay.match(/(PK|[+-]\d+\.?\d*)/);
-            if (betMatch) {
-              formattedPlay = formattedPlay.replace(betMatch[0], `<span class="bet-type">${betMatch[0]}</span>`);
-            }
+            // Bold PK
+            formattedPlay = formattedPlay.replace(/\bPK\b/g, '<span class="bet-type">PK</span>');
+            // Bold spreads and odds (numbers with +/-)
+            formattedPlay = formattedPlay.replace(/([+-]\d+\.?\d*)/g, '<span class="bet-type">$1</span>');
           }
+
+          // Color vs. and / with purple
+          formattedPlay = formattedPlay.replace(/\s+vs\.\s+/g, ' <span class="vs-separator">vs.</span> ');
+          formattedPlay = formattedPlay.replace(/\//g, '<span class="vs-separator">/</span>');
           if (pick.note) {
             formattedPlay += ` <span class="note-pill">${pick.note}</span>`;
           }
