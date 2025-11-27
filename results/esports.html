@@ -929,8 +929,9 @@
 
           // Now add HTML formatting
           if (isParlay && !isMobile) {
-            // TEMPORARILY DISABLED - just show raw parlay text for debugging
-            // formattedPlay stays as-is
+            // Bold odds numbers, color slashes
+            formattedPlay = formattedPlay.replace(/([-+]\d+)/g, '<span class="bet-type">$1</span>');
+            formattedPlay = formattedPlay.replace(/\//g, '<span class="vs-separator">/</span>');
           } else if (!isParlay) {
             // Color vs. with purple first
             if (!isMobile) {
