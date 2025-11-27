@@ -886,6 +886,8 @@
           let formattedPlay = pick.play;
           // Remove number prefixes like "347 " or "416 "
           formattedPlay = formattedPlay.replace(/^\d+\s+/, '');
+          // Strip any existing span tags from the data
+          formattedPlay = formattedPlay.replace(/<\/?span[^>]*>/g, '');
 
           // Apply abbreviations on mobile FIRST (before HTML formatting)
           const isMobile = window.innerWidth <= 768;
@@ -901,13 +903,9 @@
           // Now add HTML formatting
           if (isParlay && !isMobile) {
             // Bold only the odds numbers in parlay legs (integers only)
-            formattedPlay = formattedPlay.replace(/([-+]\d+)/g, (match) => {
-              return '\u003Cspan class="bet-type"\u003E' + match + '\u003C/span\u003E';
-            });
+            formattedPlay = formattedPlay.replace(/([-+]\d+)/g, '<span class="bet-type">$1</span>');
             // Color / with purple
-            formattedPlay = formattedPlay.replace(/\//g, (match) => {
-              return '\u003Cspan class="vs-separator"\u003E' + match + '\u003C/span\u003E';
-            });
+            formattedPlay = formattedPlay.replace(/\//g, '<span class="vs-separator">/</span>');
           } else if (!isParlay) {
             // Color vs. with purple first
             if (!isMobile) {
