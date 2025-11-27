@@ -902,9 +902,14 @@
 
           // Now add HTML formatting
           if (isParlay && !isMobile) {
-            // Bold odds numbers, color slashes
-            formattedPlay = formattedPlay.replace(/([-+]\d+)/g, '<span class="bet-type">$1</span>');
-            formattedPlay = formattedPlay.replace(/\//g, '<span class="vs-separator">/</span>');
+            // Bold odds numbers using split/join to avoid replace issues
+            const parts = formattedPlay.split(/([-+]\d+)/);
+            formattedPlay = parts.map((part, i) => {
+              if (i % 2 === 1) return '<span class="bet-type">' + part + '</span>';
+              return part;
+            }).join('');
+            // Color slashes
+            formattedPlay = formattedPlay.split('/').join('<span class="vs-separator">/</span>');
           } else if (!isParlay) {
             // Color vs. with purple first
             if (!isMobile) {
