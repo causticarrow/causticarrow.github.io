@@ -927,7 +927,7 @@
 
           // Now add HTML formatting
           if (isParlay && !isMobile) {
-            // Bold only the odds numbers in parlay legs
+            // Bold only the odds numbers in parlay legs (integers only)
             formattedPlay = formattedPlay.replace(/([-+]\d+)/g, '<span class="bet-type">$1</span>');
             // Color / with purple
             formattedPlay = formattedPlay.replace(/\//g, '<span class="vs-separator">/</span>');
