@@ -914,22 +914,36 @@
           // Remove number prefixes like "347 " or "416 "
           formattedPlay = formattedPlay.replace(/^\d+\s+/, '');
 
-          // Handle parlay formatting - keep the leg details visible
-          if (isParlay) {
-            // Bold only the odds numbers in parlay legs
-            formattedPlay = formattedPlay.replace(/([-+]\d+)/g, '<span class="bet-type">$1</span>');
-          } else {
-            // Bold bet types (PK, spreads, totals) and odds
-            formattedPlay = formattedPlay.replace(/(Over|Under)\s+(\d+\.?\d*)/g, '$1 <span class="bet-type">$2</span>');
-            // Bold PK
-            formattedPlay = formattedPlay.replace(/\bPK\b/g, '<span class="bet-type">PK</span>');
-            // Bold spreads and odds (numbers with +/-)
-            formattedPlay = formattedPlay.replace(/([+-]\d+\.?\d*)/g, '<span class="bet-type">$1</span>');
+          // Apply abbreviations on mobile FIRST (before HTML formatting)
+          const isMobile = window.innerWidth <= 768;
+          if (isMobile) {
+            if (isParlay) {
+              formattedPlay = 'Parlay';
+            } else {
+              // Remove " vs. OPPONENT" on mobile
+              formattedPlay = formattedPlay.replace(/\s+vs\.\s+[^(]+(?=\s*$)/g, '');
+            }
           }
 
-          // Color vs. and / with purple
-          formattedPlay = formattedPlay.replace(/\s+vs\.\s+/g, ' <span class="vs-separator">vs.</span> ');
-          formattedPlay = formattedPlay.replace(/\//g, '<span class="vs-separator">/</span>');
+          // Now add HTML formatting
+          if (isParlay && !isMobile) {
+            // Bold only the odds numbers in parlay legs
+            formattedPlay = formattedPlay.replace(/([-+]\d+)/g, '<span class="bet-type">$1</span>');
+            // Color / with purple
+            formattedPlay = formattedPlay.replace(/\//g, '<span class="vs-separator">/</span>');
+          } else if (!isParlay) {
+            // Color vs. with purple first
+            if (!isMobile) {
+              formattedPlay = formattedPlay.replace(/\s+vs\.\s+/g, ' <span class="vs-separator">vs.</span> ');
+            }
+            // Bold PK and odds together if they appear as "PK (odds)"
+            formattedPlay = formattedPlay.replace(/\b(PK)\s+(\([+-]\d+\.?\d*\))/g, '<span class="bet-type">$1 $2</span>');
+            // Bold Over/Under totals
+            formattedPlay = formattedPlay.replace(/(Over|Under)\s+(\d+\.?\d*)/g, '<span class="bet-type">$1 $2</span>');
+            // Bold any remaining standalone odds or spreads
+            formattedPlay = formattedPlay.replace(/(?<![">])([+-]\d+\.?\d*)(?![^<]*<\/span>)/g, '<span class="bet-type">$1</span>');
+          }
+
           if (pick.note) {
             formattedPlay += ` <span class="note-pill">${pick.note}</span>`;
           }
@@ -937,9 +951,6 @@
             const gameClass = pick.game.toLowerCase().replace(' ', '');
             formattedPlay += ` <span class="game-pill ${gameClass}">${pick.game}</span>`;
           }
-
-          // Apply abbreviations on mobile
-          formattedPlay = abbreviatePlay(formattedPlay);
 
           const row = document.createElement('tr');
           row.innerHTML = `
