@@ -971,18 +971,20 @@
               formattedPlay = formattedPlay.replace(/\s+vs\.\s+[^(]+(?=\s*$)/g, '');
             }
           }
-
-          // Now add HTML formatting
 if (isParlay && !isMobile) {
-  // Step 1: Wrap odds in .bet-type
-  formattedPlay = formattedPlay.replace(/([+-]\d+)/g, '<span class="bet-type">$1</span>');
-  // Step 2: Replace / with purple separator
-  formattedPlay = formattedPlay.replace(/\//g, '<span class="vs-separator">/</span>');
-  // Step 3: Wrap ONLY the outer ( and ) in .bet-type
-  formattedPlay = formattedPlay.replace(/\(/g, '<span class="bet-type">(</span>');
-  formattedPlay = formattedPlay.replace(/\)/g, '<span class="bet-type">)</span>');
-}
-  );
+  formattedPlay = formattedPlay.replace(/Parlay\s*(\([^)]*\))/, (match, parenGroup) => {
+    // Work only inside the parentheses: e.g., "(MOUZ -250/XG -400)"
+    let inner = parenGroup
+      .replace(/([+-]\d+)/g, '<span class="bet-type">$1</span>')           // color odds
+      .replace(/\//g, '<span class="vs-separator">/</span>');              // color /
+
+    // Now manually wrap the leading '(' and trailing ')' only
+    inner = '<span class="bet-type">(</span>' +
+            inner.slice(1, -1) +  // strip original ( and )
+            '<span class="bet-type">)</span>';
+
+    return 'Parlay ' + inner;
+  });
 } else if (!isParlay) {
             // Color vs. with purple first
             if (!isMobile) {
