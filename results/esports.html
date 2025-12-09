@@ -972,18 +972,17 @@
             }
           }
 if (isParlay && !isMobile) {
-  formattedPlay = formattedPlay.replace(/Parlay\s*(\([^)]*\))/, (match, parenGroup) => {
-    // Work only inside the parentheses: e.g., "(MOUZ -250/XG -400)"
-    let inner = parenGroup
-      .replace(/([+-]\d+)/g, '<span class="bet-type">$1</span>')           // color odds
-      .replace(/\//g, '<span class="vs-separator">/</span>');              // color /
-
-    // Now manually wrap the leading '(' and trailing ')' only
-    inner = '<span class="bet-type">(</span>' +
-            inner.slice(1, -1) +  // strip original ( and )
-            '<span class="bet-type">)</span>';
-
-    return 'Parlay ' + inner;
+  formattedPlay = formattedPlay.replace(/Parlay\s*\(([^)]*)\)/, (match, inner) => {
+    // inner = "MOUZ -250/XG -400"  (no parentheses)
+    
+    // 1. Color the odds
+    let processed = inner.replace(/([+-]\d+)/g, '<span class="bet-type">$1</span>');
+    
+    // 2. Color the slash
+    processed = processed.replace(/\//g, '<span class="vs-separator">/</span>');
+    
+    // 3. Reconstruct with orange parentheses
+    return 'Parlay <span class="bet-type">(</span>' + processed + '<span class="bet-type">)</span>';
   });
 } else if (!isParlay) {
             // Color vs. with purple first
