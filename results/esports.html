@@ -972,18 +972,24 @@
             }
           }
 if (isParlay && !isMobile) {
-  formattedPlay = formattedPlay.replace(/Parlay\s*\(([^)]*)\)/, (match, inner) => {
-    // inner = "MOUZ -250/XG -400"  (no parentheses)
-    
-    // 1. Color the odds
-    let processed = inner.replace(/([+-]\d+)/g, '<span class="bet-type">$1</span>');
-    
-    // 2. Color the slash
-    processed = processed.replace(/\//g, '<span class="vs-separator">/</span>');
-    
-    // 3. Reconstruct with orange parentheses
-    return 'Parlay <span class="bet-type">(</span>' + processed + '<span class="bet-type">)</span>';
-  });
+  // Step 1: Temporarily replace "/" with a unique placeholder (safe for HTML)
+  let tempPlay = formattedPlay.replace(/\//g, '##SLASH##');
+  
+  // Step 2: Now safely wrap odds (no / to confuse anything)
+  tempPlay = tempPlay.replace(/([+-]\d+)/g, '<span class="bet-type">$1</span>');
+  
+  // Step 3: Wrap the outer parentheses
+  temp_play_with_parens = tempPlay.replace(
+    /Parlay\s*(\([^)]*\))/,
+    (match, group) => {
+      // group looks like "(MOUZ <span...>-250</span>##SLASH##XG <span...>-400</span>)"
+      const inner = group.slice(1, -1); // remove ( and )
+      return 'Parlay <span class="bet-type">(</span>' + inner + '<span class="bet-type">)</span>';
+    }
+  );
+  
+  // Step 4: NOW safely restore / as purple span
+  formattedPlay = temp_play_with_parens.replace(/##SLASH##/g, '<span class="vs-separator">/</span>');
 } else if (!isParlay) {
             // Color vs. with purple first
             if (!isMobile) {
