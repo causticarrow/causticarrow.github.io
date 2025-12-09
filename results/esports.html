@@ -973,11 +973,20 @@
           }
 
           // Now add HTML formatting
-          if (isParlay && !isMobile) {
-            // Replace / FIRST, then odds numbers
-            formattedPlay = formattedPlay.replace(/\//g, '<span class="vs-separator">/</span>');
-            formattedPlay = formattedPlay.replace(/(?<![">])([+-]\d+)(?![^<]*<\/span>)/g, '<span class="bet-type">$1</span>');
-          } else if (!isParlay) {
+if (isParlay && !isMobile) {
+  // Extract content inside parentheses
+  formattedPlay = formattedPlay.replace(
+    /Parlay\s*(\([^)]+\))/,
+    (match, parenContent) => {
+      // Process the inside: color odds and /, leave teams white
+      let inner = parenContent
+        .replace(/\//g, '<span class="vs-separator">/</span>')
+        .replace(/([+-]\d+)/g, '<span class="bet-type">$1</span>');
+      // Now wrap the entire parentheses (including ( and )) in bet-type
+      return 'Parlay <span class="bet-type">' + inner + '</span>';
+    }
+  );
+} else if (!isParlay) {
             // Color vs. with purple first
             if (!isMobile) {
               formattedPlay = formattedPlay.replace(/\s+vs\.\s+/g, ' <span class="vs-separator">vs.</span> ');
