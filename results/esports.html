@@ -982,12 +982,14 @@
             if (!isMobile) {
               formattedPlay = formattedPlay.replace(/\s+vs\.\s+/g, ' <span class="vs-separator">vs.</span> ');
             }
-            // Bold PK and odds together if they appear as "PK (odds)"
-            formattedPlay = formattedPlay.replace(/\b(PK)\s+(\([+-]\d+\.?\d*\))/g, '<span class="bet-type">$1 $2</span>');
-            // Bold Over/Under totals
-            formattedPlay = formattedPlay.replace(/(Over|Under)\s+(\d+\.?\d*)/g, '<span class="bet-type">$1 $2</span>');
-            // Bold any remaining standalone odds or spreads
-            formattedPlay = formattedPlay.replace(/(?<![">])([+-]\d+\.?\d*)(?![^<]*<\/span>)/g, '<span class="bet-type">$1</span>');
+// Bold PK + odds together
+formattedPlay = formattedPlay.replace(/\b(PK)\s+(\([+-]\d+\.?\d*\))/g, '<span class="bet-type">$1 $2</span>');
+// Bold Over/Under totals
+formattedPlay = formattedPlay.replace(/(Over|Under)\s+(\d+\.?\d*)/g, '<span class="bet-type">$1 $2</span>');
+// Bold odds in parentheses (e.g., (-115))
+formattedPlay = formattedPlay.replace(/(\([+-]\d+\.?\d*\))/g, '<span class="bet-type">$1</span>');
+// Bold any remaining standalone odds or spreads (e.g., +1.5, -2.5)
+formattedPlay = formattedPlay.replace(/(?<![">])([+-]\d+\.?\d*)(?![^<]*<\/span>)/g, '<span class="bet-type">$1</span>');
           }
 
           if (pick.note) {
