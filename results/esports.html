@@ -504,16 +504,7 @@
 		{
           date: "2025-12-10",
           play: "Parlay (Falcons -310/Tundra -427)",
-          note: "",
-          result: "Pending",
-          score: "",
-          close_odds: "",
-          game: "Dota 2",
-        },
-		{
-          date: "2025-12-10",
-          play: "Parlay (Falcons -310/Tundra -427)",
-          note: "",
+          note: "-1.5",
           result: "Pending",
           score: "",
           close_odds: "",
@@ -576,7 +567,7 @@
         {
           date: "2025-11-27",
           play: "Parlay (MOUZ -250/XG -400)",
-          note: "",
+          note: "PK",
           result: "L",
           score: "1-1",
           close_odds: "-151",
@@ -1194,9 +1185,9 @@
                   /(\([+-]\d+\.?\d*\))/g,
                   '<span class="bet-type">$1</span>'
                 );
-                formattedPlay = formattedPlay.replace(
-                  /(?<![">])([+-]\d+\.?\d*)(?![^<]*<\/span>)/g,
-                  '<span class="bet-type">$1</span>'
+				formattedPlay = formattedPlay.replace(
+					/(?<![">a-zA-Z0-9])([+-]\d+\.?\d*)(?![^<]*<\/span>)/g, 
+					'<span class="bet-type">$1</span>'
                 );
               }
 
