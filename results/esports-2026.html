@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>causticarrow // esports</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        background: #0d0d0d;
+        color: #e6e6e6;
+        padding: 32px;
+        margin: 0;
+        font-size: 15px;
+      }
+      .container {
+        max-width: 1400px;
+        margin-left: 300px;
+        padding: 32px;
+      }
+      h1 {
+        font-weight: 600;
+        font-size: 30px;
+        color: #f0f0f0;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #2a2a2a;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(120px, auto));
+        gap: 16px;
+        margin-bottom: 32px;
+      }
+      .stat-box {
+        background: #161616;
+        padding: 16px;
+        border-radius: 10px;
+        text-align: right;
+      }
+      .stat-label {
+        font-size: 13px;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-align: right;
+      }
+      .stat-value {
+        font-size: 22px;
+        font-weight: 600;
+        margin-top: 6px;
+        color: #f0f0f0;
+        text-align: right;
+      }
+      .stat-positive {
+        color: #4ade80 !important;
+      }
+      .stat-negative {
+        color: #f87171 !important;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #161616;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        margin-bottom: 16px;
+      }
+      th,
+      td {
+        padding: 12px 16px;
+        font-weight: normal;
+      }
+      th {
+        font-weight: 600;
+        color: #aaa;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: #1a1a1a;
+      }
+      .col-date {
+        width: 100px;
+        text-align: center;
+      }
+      .col-play {
+        width: 720px;
+        text-align: left;
+      }
+      .col-result {
+        width: 65px;
+        text-align: center;
+      }
+      .col-units {
+        width: 65px;
+        text-align: center;
+      }
+      .col-score {
+        width: 65px;
+        text-align: center;
+      }
+
+      .hdr-date {
+        width: 100px;
+        text-align: center;
+      }
+      .hdr-play {
+        width: 720px;
+        text-align: left;
+      }
+      .hdr-result {
+        width: 65px;
+        text-align: center;
+      }
+      .hdr-units {
+        width: 65px;
+        text-align: center;
+      }
+      .hdr-score {
+        width: 65px;
+        text-align: center;
+      }
+
+      .positive {
+        color: #4ade80;
+      }
+      .negative {
+        color: #f87171;
+      }
+
+      .bet-type {
+        font-weight: 600;
+        color: rgb(209, 154, 102);
+      }
+
+      .vs-separator {
+        color: rgb(198, 120, 221);
+      }
+
+      .note-pill {
+        display: inline-block;
+        background: #2a2a2a;
+        color: #aaa;
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        margin-left: 8px;
+        font-weight: 500;
+      }
+
+      .game-pill {
+        display: inline-block;
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        margin-left: 8px;
+        font-weight: 500;
+      }
+      .game-pill.cs2 {
+        color: rgb(97, 175, 239);
+        background-color: rgb(48, 87, 119);
+      }
+      .game-pill.dota2 {
+        color: rgb(224, 108, 117);
+        background-color: rgb(112, 54, 58);
+      }
+
+      .month-title {
+        text-align: center;
+        font-weight: 500;
+        font-size: 16px;
+        color: #f0f0f0;
+        margin: 24px 0 12px;
+        padding: 8px 16px;
+        background: #1a1a1a;
+        border-radius: 8px;
+        display: block;
+      }
+      .sidebar {
+        width: 300px;
+        background-color: #0d0d0d;
+        padding: 20px;
+        border-right: 1px solid #2a2a2a;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        box-sizing: border-box;
+        z-index: 100;
+      }
+      .sidebar ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+      .sidebar li {
+        margin-bottom: 10px;
+        padding-left: 10px;
+      }
+      .sidebar a {
+        color: #999;
+        display: block;
+        padding: 5px 0;
+        padding-left: 0;
+        text-decoration: none;
+      }
+      .sidebar a:hover {
+        color: #f0f0f0;
+      }
+      .sidebar a.active {
+        color: #4ade80;
+        background-color: rgba(74, 222, 128, 0.1);
+        margin-left: -10px;
+        padding-left: 10px;
+        border-radius: 4px;
+      }
+      .search-bar {
+        width: 100%;
+        max-width: 300px;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #2a2a2a;
+        background-color: #161616;
+        color: #999;
+        border-radius: 6px;
+        box-sizing: border-box;
+      }
+      .category-header {
+        margin-top: 20px;
+      }
+      .category-toggle {
+        display: block;
+        color: #f0f0f0;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+      .copy-box {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #161616;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 18px;
+        color: #e6e6e6;
+        cursor: pointer;
+        z-index: 1000;
+        transition: all 0.2s;
+        user-select: none;
+        line-height: 1;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .copy-box:hover {
+        background: #1a1a1a;
+        border-color: #4ade80;
+        color: #4ade80;
+      }
+      .copy-box:active {
+        background: #0d0d0d;
+        transform: scale(0.98);
+      }
+
+      /* Mobile Responsive Styles */
+      @media (max-width: 768px) {
+        body {
+          padding: 0;
+          font-size: 13px;
+        }
+
+        .container {
+          margin-left: 0;
+          padding: 15px;
+          max-width: 100%;
+        }
+
+        .sidebar {
+          width: 100%;
+          height: auto;
+          position: static;
+          border-right: none;
+          border-bottom: 1px solid #2a2a2a;
+          padding: 15px;
+        }
+
+        h1 {
+          font-size: 18px !important;
+          margin-bottom: 16px;
+          word-wrap: break-word;
+        }
+
+        .stats {
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 10px !important;
+        }
+
+        .stat-box {
+          padding: 10px !important;
+        }
+
+        .stat-label {
+          font-size: 10px !important;
+        }
+
+        .stat-value {
+          font-size: 14px !important;
+        }
+
+        .month-title {
+          font-size: 12px !important;
+          padding: 8px 6px !important;
+          line-height: 1.4;
+          text-align: center !important;
+          word-wrap: break-word;
+        }
+
+        table {
+          display: block;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          font-size: 11px;
+        }
+
+        th,
+        td {
+          padding: 6px 4px !important;
+          font-size: 10px !important;
+        }
+
+        /* Hide columns on mobile */
+        .col-units,
+        .hdr-units,
+        .col-score,
+        .hdr-score {
+          display: none !important;
+        }
+
+        .col-date,
+        .hdr-date {
+          width: 70px !important;
+        }
+        .col-play,
+        .hdr-play {
+          width: 350px !important;
+        }
+        .col-result,
+        .hdr-result {
+          width: 55px !important;
+        }
+
+        canvas#profitChart {
+          max-height: 150px !important;
+        }
+
+        /* Chart container */
+        .stats + div[style*="height: 300px"] {
+          height: 200px !important;
+          padding: 10px !important;
+          margin-bottom: 20px !important;
+        }
+
+        /* Smaller pills on mobile */
+        .note-pill,
+        .game-pill {
+          font-size: 9px !important;
+          padding: 2px 5px !important;
+          margin-left: 4px !important;
+        }
+
+        /* Copy box on mobile */
+        .copy-box {
+          position: static;
+          margin: 15px;
+          font-size: 12px !important;
+          padding: 10px 16px !important;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <input type="text" class="search-bar" placeholder="Search" />
+      <ul>
+        <li><a href="../index">Home</a></li>
+        <li><a href="https://x.com/causticarrow">𝕏 (Twitter)</a></li>
+        <li><a href="https://discord.gg/hammer">Discord</a></li>
+        <li class="category-header">
+          <span class="category-toggle">Results</span>
+          <ul class="category-content" id="results-list"></ul>
+        </li>
+      </ul>
+    </aside>
+    <div class="copy-box" id="copyBox">📋</div>
+    <div class="container">
+      <h1>@causticarrow // esports</h1>
+
+      <div class="stats">
+        <div class="stat-box">
+          <div class="stat-label">Total Plays</div>
+          <div class="stat-value" id="totalPlays">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Net Risk</div>
+          <div class="stat-value" id="netRisk">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Net Profit</div>
+          <div class="stat-value" id="netProfit">+0.0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">ROI</div>
+          <div class="stat-value" id="roi">+0.0%</div>
+        </div>
+      </div>
+
+      <div
+        style="
+          width: 100%;
+          height: 300px;
+          margin-bottom: 32px;
+          background: #161616;
+          border-radius: 12px;
+          padding: 20px;
+          box-sizing: border-box;
+        "
+      >
+        <canvas id="profitChart"></canvas>
+      </div>
+
+      <div id="tablesContainer"></div>
+    </div>
+
+    <script>
+      const PICKS = [
+        {
+          date: "2026-01-17",
+          play: "HOTU PK (+151) vs. Gentle Mates",
+          note: "",
+          result: "W",
+          score: "2-0",
+          game: "CS2",
+        },
+        {
+          date: "2026-01-17",
+          play: "Astralis PK (+140) vs. PARIVISION",
+          note: "",
+          result: "L",
+          score: "0-2",
+          game: "CS2",
+        },
+        {
+          date: "2026-01-17",
+          play: "HEROIC PK (+127) vs. paiN",
+          note: "",
+          result: "W",
+          score: "2-0",
+          game: "CS2",
+        },
+        {
+          date: "2026-01-17",
+          play: "Liquid PK (+117) vs. Ninjas in Pyjamas",
+          note: "",
+          result: "W",
+          score: "2-1",
+          game: "CS2",
+        },
+        {
+          date: "2026-01-14",
+          play: "Monte +1.5 (+153) vs. Natus Vincere",
+          note: "",
+          result: "W",
+          score: "2-1",
+          game: "CS2",
+        },
+        {
+          date: "2026-01-14",
+          play: "GamerLegion PK (+106) vs. Passion UA",
+          note: "",
+          result: "W",
+          score: "2-1",
+          game: "CS2",
+        },
+        {
+          date: "2026-01-13",
+          play: "OG PK (+180) vs. FUT",
+          note: "",
+          result: "L",
+          score: "0-2",
+          game: "CS2",
+        },
+      ];
+
+      function stripTrailingZeros(numStr) {
+        if (numStr.includes(".")) {
+          numStr = numStr.replace(/\.?0+$/, "");
+        }
+        return numStr;
+      }
+
+      function parseDate(dateStr) {
+        const [year, month, day] = dateStr.split("-").map(Number);
+        return new Date(year, month - 1, day);
+      }
+
+      function formatDate(dateStr) {
+        const [year, month, day] = dateStr.split("-").map(Number);
+        return `${month}/${day}/${year.toString().slice(-2)}`;
+      }
+
+      function shortenMonthName(monthName) {
+        if (window.innerWidth > 768) return monthName;
+
+        const monthMap = {
+          January: "Jan",
+          February: "Feb",
+          March: "Mar",
+          April: "Apr",
+          May: "May",
+          June: "Jun",
+          July: "Jul",
+          August: "Aug",
+          September: "Sep",
+          October: "Oct",
+          November: "Nov",
+          December: "Dec",
+        };
+
+        return monthName.replace(/^(\w+)/, (match) => monthMap[match] || match);
+      }
+
+      function abbreviatePlay(play) {
+        if (window.innerWidth > 768) return play;
+
+        if (play.startsWith("Parlay (")) {
+          return "Parlay";
+        }
+
+        let abbreviated = play;
+
+        abbreviated = abbreviated.replace(
+          /\s+vs\.\s+([^<]+?)(?=\s*(?:<span|$))/g,
+          ""
+        );
+
+        const esportsTeams = {
+			  Falcons: "FLCN",
+			  Yandex: "TY",
+			  "Natus Vincere": "NAVI",
+			  Xtreme: "XG",
+			  "Yakult Brothers": "YB",
+			  Tidebound: "TT",
+			  Execration: "XctN",
+			  Tearlaments: "TT",
+			  BetBoom: "BB",
+			  PARIVISION: "PV",
+			  "Nigma Galaxy": "NGX",
+			  Nemesis: "NMSS",
+			  Cloud9: "C9",
+			  "Gaimin Gladiators": "GG",
+			  Vitality: "VITA",
+			  "The MongolZ": "MGLZ",
+			  "Passion US": "P.UA",
+			  "Virtus.pro": "VP",
+			  "Ninjas in Pyjamas": "NiP",
+			  "Lynn Vision": "LV",
+			  GamerLegion: "GL",
+			  FlyQuest: "FQ",
+        };
+
+        for (const [full, abbr] of Object.entries(esportsTeams)) {
+          abbreviated = abbreviated.replace(new RegExp(full, "g"), abbr);
+        }
+
+        abbreviated = abbreviated.replace(/Map\s+(\d+)/g, "M$1");
+        abbreviated = abbreviated.replace(/Dota 2/g, "D2");
+
+        return abbreviated;
+      }
+
+      function formatGeneralNumber(num) {
+        let s = num.toFixed(2);
+        s = stripTrailingZeros(s);
+        return s;
+      }
+
+      function formatWinPercent(num) {
+        if (window.innerWidth <= 768) {
+          return Math.round(num).toString();
+        }
+        let s = num.toFixed(2);
+        s = stripTrailingZeros(s);
+        return s;
+      }
+
+      function formatUnits(num) {
+        if (Math.abs(num - Math.round(num)) < 0.001) {
+          return (num >= 0 ? "+" : "-") + Math.abs(num).toFixed(1);
+        } else {
+          let s = Math.abs(num).toFixed(2);
+          s = stripTrailingZeros(s);
+          return (num >= 0 ? "+" : "-") + s;
+        }
+      }
+
+      function formatUnitsForHeader(num) {
+        if (window.innerWidth <= 768) {
+          return (num >= 0 ? "+" : "-") + Math.abs(num).toFixed(1);
+        }
+        return formatUnits(num);
+      }
+
+      function formatSignedNumber(num) {
+        let s = Math.abs(num).toFixed(2);
+        s = stripTrailingZeros(s);
+        return (num >= 0 ? "+" : "-") + s;
+      }
+
+      function formatSignedPercent(num) {
+        let s = Math.abs(num).toFixed(2);
+        s = stripTrailingZeros(s);
+        return (num >= 0 ? "+" : "-") + s + "%";
+      }
+
+      function formatROIForHeader(num) {
+        if (window.innerWidth <= 768) {
+          const rounded = Math.round(num);
+          return (rounded >= 0 ? "+" : "") + rounded + "%";
+        }
+        return formatSignedPercent(num);
+      }
+
+      function calculateParlayOdds(parlayText) {
+        const startPos = parlayText.indexOf("(");
+        const endPos = parlayText.indexOf(")");
+
+        if (startPos === -1 || endPos === -1) {
+          return null;
+        }
+
+        const oddsString = parlayText.substring(startPos + 1, endPos);
+        const legs = oddsString.split("/");
+
+        if (legs.length < 2) {
+          return null;
+        }
+
+        let decimalOdds = 1;
+
+        for (let leg of legs) {
+          leg = leg.trim();
+
+          const lastSpace = leg.lastIndexOf(" ");
+          if (lastSpace > -1) {
+            leg = leg.substring(lastSpace).trim();
+          }
+
+          const legOddsValue = parseFloat(leg);
+
+          if (!isNaN(legOddsValue)) {
+            if (legOddsValue > 0) {
+              decimalOdds *= 1 + legOddsValue / 100;
+            } else {
+              decimalOdds *= 1 + 100 / Math.abs(legOddsValue);
+            }
+          }
+        }
+
+        let result;
+        if (decimalOdds >= 2) {
+          result = (decimalOdds - 1) * 100;
+        } else {
+          result = -100 / (decimalOdds - 1);
+        }
+
+        result = Math.round(result);
+
+        if (Math.abs(result) % 2 !== 0 && Math.abs(result) % 10 !== 5) {
+          if (result > 0) {
+            result = result + 1;
+          } else {
+            result = result - 1;
+          }
+        }
+
+        return result;
+      }
+
+      function calculateUnits(oddsStr, result) {
+        if (result === "Pending") return 0;
+        const a = parseInt(oddsStr);
+        const risk = a > 0 ? 100 / a : -a / 100;
+        return result === "W" ? 1.0 : -risk;
+      }
+
+      window.addEventListener("load", () => {
+        const container = document.getElementById("tablesContainer");
+        let wins = 0,
+          losses = 0,
+          totalRisk = 0,
+          totalUnits = 0;
+
+        const chartDates = [];
+        const chartCumulativeUnits = [];
+
+        const picksWithIndex = PICKS.map((pick, index) => ({
+          ...pick,
+          originalIndex: index,
+        }));
+        const chronologicalPicks = picksWithIndex.sort((a, b) => {
+          const dateCompare = parseDate(a.date) - parseDate(b.date);
+          return dateCompare !== 0
+            ? dateCompare
+            : b.originalIndex - a.originalIndex;
+        });
+        let cumulativeUnits = 0;
+        chartDates.push("Start");
+        chartCumulativeUnits.push(0);
+
+        chronologicalPicks.forEach((pick) => {
+          let myOdds;
+          if (pick.play.startsWith("Parlay (")) {
+            myOdds = calculateParlayOdds(pick.play);
+            if (myOdds) myOdds = myOdds.toString();
+          } else {
+            myOdds = pick.play.match(/\(([-+]?\d+)\)/)?.[1];
+          }
+          if (myOdds) {
+            const units = calculateUnits(myOdds, pick.result);
+            cumulativeUnits += units;
+            chartDates.push(pick.date);
+            chartCumulativeUnits.push(cumulativeUnits);
+          }
+        });
+
+        const sortedPicks = [...PICKS].sort(
+          (a, b) => parseDate(b.date) - parseDate(a.date)
+        );
+        const grouped = {};
+        sortedPicks.forEach((pick) => {
+          const d = parseDate(pick.date);
+          const displayKey = `${d.toLocaleString("default", {
+            month: "long",
+          })} ${d.getFullYear()}`;
+          if (!grouped[displayKey]) grouped[displayKey] = [];
+          grouped[displayKey].push(pick);
+        });
+
+        Object.keys(grouped)
+          .sort((a, b) => {
+            const aDate = parseDate(grouped[a][0].date);
+            const bDate = parseDate(grouped[b][0].date);
+            return bDate - aDate;
+          })
+          .forEach((monthName) => {
+            const monthPicks = grouped[monthName];
+            let monthWins = 0,
+              monthLosses = 0,
+              monthRisk = 0,
+              monthUnits = 0;
+
+            const table = document.createElement("table");
+            table.innerHTML = `
+          <thead>
+            <tr>
+              <th class="hdr-date">Date</th>
+              <th class="hdr-play">Play</th>
+              <th class="hdr-result">Result</th>
+              <th class="hdr-units">Units</th>
+              <th class="hdr-score">Score</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        `;
+            const tbody = table.querySelector("tbody");
+
+            monthPicks.forEach((pick) => {
+              let myOdds;
+              const isParlay = pick.play.startsWith("Parlay (");
+              if (isParlay) {
+                myOdds = calculateParlayOdds(pick.play);
+                if (myOdds) myOdds = myOdds.toString();
+              } else {
+                myOdds = pick.play.match(/\(([-+]?\d+)\)/)?.[1];
+              }
+              if (!myOdds) return;
+
+              const units = calculateUnits(myOdds, pick.result);
+              const isPending = pick.result === "Pending";
+
+              if (!isPending) {
+                const risk =
+                  parseInt(myOdds) > 0
+                    ? 100 / parseInt(myOdds)
+                    : -parseInt(myOdds) / 100;
+                monthUnits += units;
+                totalUnits += units;
+                monthRisk += risk;
+                totalRisk += risk;
+
+                if (pick.result === "W") {
+                  monthWins++;
+                  wins++;
+                } else {
+                  monthLosses++;
+                  losses++;
+                }
+              }
+
+              const unitsStr = isPending ? "" : formatUnits(units);
+              const resultText = isPending
+                ? "Pending"
+                : pick.result === "W"
+                ? "Win"
+                : "Loss";
+
+              let formattedPlay = pick.play;
+              formattedPlay = formattedPlay.replace(/^\d+\s+/, "");
+              formattedPlay = formattedPlay.replace(/<\/?span[^>]*>/g, "");
+
+              const isMobile = window.innerWidth <= 768;
+              if (isMobile) {
+                if (isParlay) {
+                  formattedPlay = "Parlay";
+                } else {
+                  formattedPlay = formattedPlay.replace(
+                    /\s+vs\.\s+[^(]+(?=\s*$)/g,
+                    ""
+                  );
+                }
+              }
+              if (isParlay && !isMobile) {
+                let tempPlay = formattedPlay.replace(/\//g, "##SLASH##");
+
+                tempPlay = tempPlay.replace(
+                  /([+-]\d+)/g,
+                  '<span class="bet-type">$1</span>'
+                );
+
+                temp_play_with_parens = tempPlay.replace(
+                  /Parlay\s*(\([^)]*\))/,
+                  (match, group) => {
+                    const inner = group.slice(1, -1); // remove ( and )
+                    return (
+                      'Parlay <span class="bet-type">(</span>' +
+                      inner +
+                      '<span class="bet-type">)</span>'
+                    );
+                  }
+                );
+
+                formattedPlay = temp_play_with_parens.replace(
+                  /##SLASH##/g,
+                  '<span class="vs-separator">/</span>'
+                );
+              } else if (!isParlay) {
+                if (!isMobile) {
+                  formattedPlay = formattedPlay.replace(
+                    /\s+vs\.\s+/g,
+                    ' <span class="vs-separator">vs.</span> '
+                  );
+                }
+                formattedPlay = formattedPlay.replace(
+                  /\b(PK)\s+(\([+-]\d+\.?\d*\))/g,
+                  '<span class="bet-type">$1 $2</span>'
+                );
+                formattedPlay = formattedPlay.replace(
+                  /(Over|Under)\s+(\d+\.?\d*)/g,
+                  '<span class="bet-type">$1 $2</span>'
+                );
+                formattedPlay = formattedPlay.replace(
+                  /(\([+-]\d+\.?\d*\))/g,
+                  '<span class="bet-type">$1</span>'
+                );
+				formattedPlay = formattedPlay.replace(
+					/(?<![">a-zA-Z0-9])([+-]\d+\.?\d*)(?![^<]*<\/span>)/g, 
+					'<span class="bet-type">$1</span>'
+                );
+              }
+
+              if (pick.note) {
+                formattedPlay += ` <span class="note-pill">${pick.note}</span>`;
+              }
+              if (pick.game) {
+                const gameClass = pick.game.toLowerCase().replace(" ", "");
+                formattedPlay += ` <span class="game-pill ${gameClass}">${pick.game}</span>`;
+              }
+
+              const row = document.createElement("tr");
+              row.innerHTML = `
+            <td class="col-date">${formatDate(pick.date)}</td>
+            <td class="col-play"></td>
+            <td class="col-result ${
+              isPending ? "" : pick.result === "W" ? "positive" : "negative"
+            }">${resultText}</td>
+            <td class="col-units ${
+              isPending ? "" : units >= 0 ? "positive" : "negative"
+            }">${unitsStr}</td>
+            <td class="col-score">${pick.score}</td>
+          `;
+              row.querySelector(".col-play").innerHTML = formattedPlay;
+              tbody.appendChild(row);
+            });
+
+            container.appendChild(table);
+
+            const monthTotal = monthWins + monthLosses;
+            const winPct = monthTotal ? (monthWins / monthTotal) * 100 : 0;
+            const roi = monthRisk ? (monthUnits / monthRisk) * 100 : 0;
+
+            const header = document.createElement("h2");
+            header.className = "month-title";
+            header.innerHTML =
+              `${shortenMonthName(
+                monthName
+              )}: ${monthWins}-${monthLosses} (${formatWinPercent(
+                winPct
+              )}%), ` +
+              `<span class="${
+                monthUnits >= 0 ? "positive" : "negative"
+              }">${formatUnitsForHeader(monthUnits)}u</span>, ` +
+              `<span class="${
+                roi >= 0 ? "positive" : "negative"
+              }">${formatROIForHeader(roi)} ROI</span>`;
+            container.insertBefore(header, table);
+          });
+
+        const totalPlays = wins + losses;
+        const winPct = totalPlays ? (wins / totalPlays) * 100 : 0;
+        const roi = totalRisk ? (totalUnits / totalRisk) * 100 : 0;
+
+        document.getElementById(
+          "totalPlays"
+        ).textContent = `${totalPlays} (${wins}-${losses}, ${formatGeneralNumber(
+          winPct
+        )}%)`;
+        document.getElementById("netRisk").textContent =
+          formatGeneralNumber(totalRisk);
+        document.getElementById("netProfit").textContent =
+          formatSignedNumber(totalUnits);
+        document.getElementById("netProfit").className =
+          totalUnits >= 0
+            ? "stat-value stat-positive"
+            : "stat-value stat-negative";
+        document.getElementById("roi").textContent = formatSignedPercent(roi);
+        document.getElementById("roi").className =
+          roi >= 0 ? "stat-value stat-positive" : "stat-value stat-negative";
+
+        const copyText = `record: ${wins}-${losses}, ${formatSignedNumber(
+          totalUnits
+        )}u // [archive](https://causticarrow.com/results/esports)`;
+        const copyBox = document.getElementById("copyBox");
+        copyBox.onclick = () => {
+          navigator.clipboard.writeText(copyText).then(() => {
+            copyBox.textContent = "✓";
+            copyBox.style.borderColor = "#4ade80";
+            copyBox.style.color = "#4ade80";
+            setTimeout(() => {
+              copyBox.textContent = "📋";
+              copyBox.style.borderColor = "#2a2a2a";
+              copyBox.style.color = "#e6e6e6";
+            }, 1000);
+          });
+        };
+
+        const ctx = document.getElementById("profitChart").getContext("2d");
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: chartDates,
+            datasets: [
+              {
+                label: "Cumulative Profit (Units)",
+                data: chartCumulativeUnits,
+                borderColor: "#4ade80",
+                backgroundColor: "rgba(74, 222, 128, 0.1)",
+                borderWidth: 2,
+                fill: true,
+                tension: 0.1,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                backgroundColor: "#1a1a1a",
+                titleColor: "#f0f0f0",
+                bodyColor: "#e6e6e6",
+                borderColor: "#2a2a2a",
+                borderWidth: 1,
+                padding: 12,
+                displayColors: false,
+                callbacks: {
+                  label: function (context) {
+                    return (
+                      "Profit: " + formatSignedNumber(context.parsed.y) + "u"
+                    );
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                display: false,
+              },
+              y: {
+                grid: {
+                  color: "#2a2a2a",
+                },
+                ticks: {
+                  color: "#999",
+                  callback: function (value) {
+                    return (value >= 0 ? "+" : "") + value.toFixed(1) + "u";
+                  },
+                },
+              },
+            },
+          },
+        });
+      });
+
+      async function populateSidebar() {
+        const ul = document.getElementById("results-list");
+        ul.innerHTML = "";
+
+        try {
+          const response = await fetch("results.json");
+          const pages = await response.json();
+
+          const currentPage = window.location.pathname
+            .split("/")
+            .pop()
+            .replace(".html", "");
+
+          pages.forEach((p) => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = p.file;
+            a.textContent = p.label;
+
+            if (p.file === currentPage) {
+              a.classList.add("active");
+            }
+
+            li.appendChild(a);
+            ul.appendChild(li);
+          });
+        } catch (err) {
+          console.error("Could not load results.json", err);
+        }
+      }
+
+      function filterSidebar() {
+        var input, filter, ul, li, i;
+        input = document.querySelector(".search-bar");
+        filter = input.value.toUpperCase();
+        ul = document.querySelector(".sidebar ul");
+        li = ul.getElementsByTagName("li");
+
+        for (i = 0; i < li.length; i++) {
+          var a = li[i].getElementsByTagName("a")[0];
+          if (a) {
+            var txtValue = li[i].textContent || li[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              li[i].style.display = "";
+            } else {
+              var shouldHide = true;
+              li[i].querySelectorAll("*").forEach((node) => {
+                if (
+                  (node.textContent || node.innerText)
+                    .toUpperCase()
+                    .indexOf(filter) > -1
+                ) {
+                  shouldHide = false;
+                }
+              });
+              li[i].style.display = shouldHide ? "none" : "";
+            }
+          }
+        }
+      }
+
+      populateSidebar();
+      document
+        .querySelector(".search-bar")
+        .addEventListener("input", filterSidebar);
+    </script>
+  </body>
+</html>
