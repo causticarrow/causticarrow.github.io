@@ -44,7 +44,8 @@
     th, td { padding: 12px 16px; font-weight: normal; }
     th { font-weight: 600; color: var(--text-dim); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; background: var(--bg-header); }
     .col-date, .hdr-date { width: 100px; text-align: center; }
-    .col-play, .hdr-play { width: 720px; text-align: left; }
+    .col-game { width: 50px; text-align: center; }
+    .col-play, .hdr-play { width: 670px; text-align: left; }
     .col-result, .hdr-result, .col-units, .hdr-units, .col-score, .hdr-score { width: 65px; text-align: center; }
     .positive { color: var(--positive); }
     .negative { color: var(--negative); }
@@ -54,6 +55,12 @@
     .game-pill { display: inline-block; font-size: 12px; padding: 4px 8px; border-radius: 6px; margin-left: 8px; font-weight: 500; }
     .game-pill.cs2 { color: var(--cs2-text); background-color: var(--cs2-bg); }
     .game-pill.dota2 { color: var(--dota2-text); background-color: var(--dota2-bg); }
+    .extra-pill { display: inline-block; font-size: 12px; padding: 4px 8px; border-radius: 6px; margin-left: 8px; font-weight: 500; color: rgb(192, 150, 230); background-color: rgb(96, 75, 115); }
+    .play-type-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; margin-bottom: 32px; }
+    .play-type-table th, .play-type-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    .play-type-table th { color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; background: var(--bg-header); }
+    .play-type-table tr:last-child td { border-bottom: none; }
+    .play-type-table td:not(:first-child), .play-type-table th:not(:first-child) { text-align: center; }
     .month-title { text-align: center; font-weight: 500; font-size: 16px; color: var(--text-light); margin: 24px 0 12px; padding: 8px 16px; background: var(--bg-header); border-radius: 8px; display: block; }
     .sidebar { width: 300px; background-color: var(--bg); padding: 20px; border-right: 1px solid var(--border); height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; overflow-x: hidden; box-sizing: border-box; z-index: 100; }
     .sidebar ul { list-style-type: none; padding: 0; margin: 0; }
@@ -85,11 +92,13 @@
       th, td { padding: 6px 4px !important; font-size: 10px !important; }
       .col-units, .hdr-units, .col-score, .hdr-score { display: none !important; }
       .col-date, .hdr-date { width: 70px !important; }
-      .col-play, .hdr-play { width: 350px !important; }
+      .col-game { width: 40px !important; }
+      .col-play, .hdr-play { width: 310px !important; }
       .col-result, .hdr-result { width: 55px !important; }
       canvas#profitChart { max-height: 150px !important; }
       .stats + div[style*="height: 300px"] { height: 200px !important; padding: 10px !important; margin-bottom: 20px !important; }
-      .note-pill, .game-pill { font-size: 9px !important; padding: 2px 5px !important; margin-left: 4px !important; }
+      .note-pill, .game-pill, .extra-pill { font-size: 9px !important; padding: 2px 5px !important; margin-left: 4px !important; }
+      .play-type-table th, .play-type-table td { padding: 8px 6px !important; font-size: 11px !important; }
       .copy-box { position: static; margin: 15px; font-size: 12px !important; padding: 10px 16px !important; text-align: center; }
     }
   </style>
@@ -105,7 +114,7 @@
       { date: "2026-01-28", play: "Liquid PK (-105) vs. NiP", note: "", result: "W", score: "2-0", game: "CS2" },
       { date: "2026-01-23", play: "PARIVISION +1.5 (-110) vs. Spirit", note: "", result: "W", score: "2-1", game: "CS2" },
       { date: "2026-01-22", play: "FURIA -1.5 (-110) vs. HEROIC", note: "", result: "L", score: "2-1", game: "CS2" },
-      { date: "2026-01-21", play: "HOTU PK (+150) vs. Gentle Mates", note: "", result: "W", score: "2-0", game: "CS2" },
+      { date: "2026-01-21", play: "HOTU PK (+150) vs. Gentle Mates", note: "", result: "W", score: "2-0", game: "CS2", extra: true },
       { date: "2026-01-18", play: "Astralis PK (+140) vs. PARIVISION", note: "", result: "L", score: "0-2", game: "CS2" },
       { date: "2026-01-17", play: "HEROIC PK (+125) vs. paiN", note: "", result: "W", score: "2-0", game: "CS2" },
       { date: "2026-01-17", play: "Liquid PK (+115) vs. Ninjas in Pyjamas", note: "", result: "W", score: "2-1", game: "CS2" },
@@ -140,6 +149,7 @@
     <div style="width:100%;height:300px;margin-bottom:32px;background:#161616;border-radius:12px;padding:20px;box-sizing:border-box">
       <canvas id="profitChart"></canvas>
     </div>
+    <div id="playTypeSection"></div>
     <div id="tablesContainer"></div>
   </div>
 
@@ -195,11 +205,19 @@
       return r;
     }
 
-    function calcUnits(odds, result) {
+    function calcUnits(odds, result, isExtra = false) {
       if (result === "Pending") return 0;
       const a = parseInt(odds);
-      const risk = a > 0 ? 100 / a : -a / 100;
-      return result === "W" ? 1.0 : -risk;
+      const winAmount = isExtra ? 0.5 : 1.0;
+      const riskFor1u = a > 0 ? 100 / a : -a / 100;
+      const risk = isExtra ? riskFor1u * 0.5 : riskFor1u;
+      return result === "W" ? winAmount : -risk;
+    }
+
+    function calcRisk(odds, isExtra = false) {
+      const a = parseInt(odds);
+      const riskFor1u = a > 0 ? 100 / a : -a / 100;
+      return isExtra ? riskFor1u * 0.5 : riskFor1u;
     }
 
     window.addEventListener("load", () => {
@@ -216,7 +234,7 @@
       chrono.forEach(pick => {
         const odds = pick.play.startsWith("Parlay (") ? calcParlayOdds(pick.play)?.toString() : pick.play.match(/\(([-+]?\d+)\)/)?.[1];
         if (odds) {
-          cumUnits += calcUnits(odds, pick.result);
+          cumUnits += calcUnits(odds, pick.result, pick.extra);
           chartDates.push(pick.date);
           chartCumulativeUnits.push(cumUnits);
         }
@@ -239,7 +257,7 @@
         let mWins = 0, mLosses = 0, mRisk = 0, mUnits = 0;
 
         const table = document.createElement("table");
-        table.innerHTML = `<thead><tr><th class="hdr-date">Date</th><th class="hdr-play">Play</th><th class="hdr-result">Result</th><th class="hdr-units">Units</th><th class="hdr-score">Score</th></tr></thead><tbody></tbody>`;
+        table.innerHTML = `<thead><tr><th class="hdr-date">Date</th><th class="col-game"></th><th class="hdr-play">Play</th><th class="hdr-result">Result</th><th class="hdr-units">Units</th><th class="hdr-score">Score</th></tr></thead><tbody></tbody>`;
         const tbody = table.querySelector("tbody");
 
         monthPicks.forEach(pick => {
@@ -247,11 +265,12 @@
           const odds = isParlay ? calcParlayOdds(pick.play)?.toString() : pick.play.match(/\(([-+]?\d+)\)/)?.[1];
           if (!odds) return;
 
-          const units = calcUnits(odds, pick.result);
+          const isExtra = pick.extra === true;
+          const units = calcUnits(odds, pick.result, isExtra);
           const isPending = pick.result === "Pending";
 
           if (!isPending) {
-            const risk = parseInt(odds) > 0 ? 100 / parseInt(odds) : -parseInt(odds) / 100;
+            const risk = calcRisk(odds, isExtra);
             mUnits += units; totalUnits += units;
             mRisk += risk; totalRisk += risk;
             pick.result === "W" ? (mWins++, wins++) : (mLosses++, losses++);
@@ -274,10 +293,12 @@
           }
 
           if (pick.note) fp += ` <span class="note-pill">${pick.note}</span>`;
-          if (pick.game) fp += ` <span class="game-pill ${pick.game.toLowerCase().replace(" ", "")}">${pick.game}</span>`;
+          if (isExtra) fp += ` <span class="extra-pill">Extra</span>`;
+
+          const gameCell = pick.game ? `<span class="game-pill ${pick.game.toLowerCase().replace(" ", "")}">${pick.game}</span>` : "";
 
           const row = document.createElement("tr");
-          row.innerHTML = `<td class="col-date">${formatDate(pick.date)}</td><td class="col-play"></td><td class="col-result ${isPending ? "" : pick.result === "W" ? "positive" : "negative"}">${isPending ? "Pending" : pick.result === "W" ? "Win" : "Loss"}</td><td class="col-units ${isPending ? "" : units >= 0 ? "positive" : "negative"}">${isPending ? "" : fmtUnits(units)}</td><td class="col-score">${pick.score}</td>`;
+          row.innerHTML = `<td class="col-date">${formatDate(pick.date)}</td><td class="col-game">${gameCell}</td><td class="col-play"></td><td class="col-result ${isPending ? "" : pick.result === "W" ? "positive" : "negative"}">${isPending ? "Pending" : pick.result === "W" ? "Win" : "Loss"}</td><td class="col-units ${isPending ? "" : units >= 0 ? "positive" : "negative"}">${isPending ? "" : fmtUnits(units)}</td><td class="col-score">${pick.score}</td>`;
           row.querySelector(".col-play").innerHTML = fp;
           tbody.appendChild(row);
         });
@@ -314,9 +335,9 @@
         const isParlay = p.play.startsWith("Parlay (");
         const odds = isParlay ? calcParlayOdds(p.play)?.toString() : p.play.match(/\(([-+]?\d+)\)/)?.[1];
         if (odds && p.result !== "Pending") {
-          const a = parseInt(odds);
-          const risk = a > 0 ? 100 / a : -a / 100;
-          const units = p.result === "W" ? 1.0 : -risk;
+          const isExtra = p.extra === true;
+          const risk = calcRisk(odds, isExtra);
+          const units = calcUnits(odds, p.result, isExtra);
           monthlyData[m].risk += risk;
           monthlyData[m].units += units;
         }
@@ -335,6 +356,59 @@
         }
         monthlyStatsEl.appendChild(box);
       });
+
+      // Play type stats
+      const playTypes = {
+        Sides: { wins: 0, losses: 0, pushes: 0, units: 0, risk: 0 },
+        Totals: { wins: 0, losses: 0, pushes: 0, units: 0, risk: 0 },
+        Extras: { wins: 0, losses: 0, pushes: 0, units: 0, risk: 0 }
+      };
+
+      PICKS.forEach(p => {
+        if (p.result === "Pending") return;
+        const isParlay = p.play.startsWith("Parlay (");
+        const odds = isParlay ? calcParlayOdds(p.play)?.toString() : p.play.match(/\(([-+]?\d+)\)/)?.[1];
+        if (!odds) return;
+
+        const isExtra = p.extra === true;
+        const isSide = /\bPK\b|[+-]\d+\.5/.test(p.play);
+        const isTotal = / Over | Under /.test(p.play);
+
+        let type = null;
+        if (isExtra) type = "Extras";
+        else if (isSide) type = "Sides";
+        else if (isTotal) type = "Totals";
+
+        if (type) {
+          const units = calcUnits(odds, p.result, isExtra);
+          const risk = calcRisk(odds, isExtra);
+          playTypes[type].risk += risk;
+          playTypes[type].units += units;
+          if (p.result === "W") playTypes[type].wins++;
+          else if (p.result === "P") playTypes[type].pushes++;
+          else playTypes[type].losses++;
+        }
+      });
+
+      const playTypeSectionEl = document.getElementById("playTypeSection");
+      const activeTypes = Object.entries(playTypes).filter(([_, d]) => d.wins + d.losses + d.pushes > 0);
+      
+      if (activeTypes.length > 0) {
+        const table = document.createElement("table");
+        table.className = "play-type-table";
+        table.innerHTML = `<thead><tr><th>Play type</th><th>Record</th><th>Units</th><th>ROI</th></tr></thead><tbody></tbody>`;
+        const tbody = table.querySelector("tbody");
+        
+        activeTypes.forEach(([name, d]) => {
+          const roi = d.risk ? (d.units / d.risk * 100) : 0;
+          const record = d.pushes > 0 ? `${d.wins}-${d.losses}-${d.pushes}` : `${d.wins}-${d.losses}`;
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${name}</td><td>${record}</td><td class="${d.units >= 0 ? "positive" : "negative"}">${fmtSigned(d.units)}</td><td class="${roi >= 0 ? "positive" : "negative"}">${fmtSignedPct(roi)}</td>`;
+          tbody.appendChild(row);
+        });
+        
+        playTypeSectionEl.appendChild(table);
+      }
 
       const copyText = `ytd record: ${wins}-${losses}, ${fmtSigned(totalUnits)}u // [archive](https://causticarrow.com/results/esports-2026)`;
       const copyBox = document.getElementById("copyBox");
