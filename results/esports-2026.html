@@ -592,7 +592,7 @@
                 color: ctx => ctx.tick.value === 0 ? 'transparent' : '#2a2a2a',
                 drawTicks: false 
               },
-              ticks: { color: "#999", callback: v => (v >= 0 ? "+" : "") + v.toFixed(1) + "u", padding: 10 },
+              ticks: { color: "#999", callback: v => v === 0 ? "0.0u" : (v > 0 ? "+" : "") + v.toFixed(1) + "u", padding: 10 },
               border: { display: false }
             }
           }
