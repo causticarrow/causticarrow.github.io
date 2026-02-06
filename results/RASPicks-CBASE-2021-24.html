@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@RASPicks // 2021-24 CBASE</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: "Roboto", system-ui, -apple-system, sans-serif;
+      background: #0d0d0d;
+      color: #e6e6e6;
+      padding: 32px;
+      margin: 0;
+      font-size: 15px;
+    }
+    .container {
+      max-width: 1400px;
+      margin-left: 300px;
+      padding: 32px;
+    }
+    h1 {
+      font-weight: 600;
+      font-size: 30px;
+      color: #f0f0f0;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, auto));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-box {
+      background: #161616;
+      padding: 16px;
+      border-radius: 10px;
+      text-align: right;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: right;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 600;
+      margin-top: 6px;
+      color: #f0f0f0;
+      text-align: right;
+    }
+    .stat-positive { color: #4ade80 !important; }
+    .stat-negative { color: #f87171 !important; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #161616;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      margin-bottom: 16px;
+    }
+    th, td {
+      padding: 12px 16px;
+      font-weight: normal;
+    }
+    th {
+      font-weight: 600;
+      color: #aaa;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #1a1a1a;
+    }
+    .col-date { width: 100px; text-align: center; }
+    .col-play { width: 720px; text-align: left; }
+    .col-result { width: 65px; text-align: center; }
+    .col-units { width: 65px; text-align: center; }
+    .col-score { width: 65px; text-align: center; }
+    .col-close { width: 80px; text-align: center; }
+    .col-clv { width: 200px; text-align: center; }
+    .col-xroi { width: 145px; text-align: center; }
+
+    .hdr-date { width: 100px; text-align: center; }
+    .hdr-play { width: 720px; text-align: left; }
+    .hdr-result { width: 65px; text-align: center; }
+    .hdr-units { width: 65px; text-align: center; }
+    .hdr-score { width: 65px; text-align: center; }
+    .hdr-close { width: 80px; text-align: center; }
+    .hdr-clv { width: 200px; text-align: center; }
+    .hdr-xroi { width: 145px; text-align: center; }
+
+    .positive { color: #4ade80; }
+    .negative { color: #f87171; }
+
+    .bet-type {
+      font-weight: 600;
+      color: #f0f0f0;
+    }
+
+    .month-title {
+      text-align: center;
+      font-weight: 500;
+      font-size: 16px;
+      color: #f0f0f0;
+      margin: 24px 0 12px;
+      padding: 8px 16px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      display: block;
+    }
+    .sidebar {
+      width: 300px;
+      background-color: #0d0d0d;
+      padding: 20px;
+      border-right: 1px solid #2a2a2a;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      box-sizing: border-box;
+      z-index: 100;
+    }
+    .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar li {
+      margin-bottom: 10px;
+      padding-left: 10px;
+    }
+    .sidebar a {
+      color: #999;
+      display: block;
+      padding: 5px 0;
+      padding-left: 0;
+      text-decoration: none;
+    }
+    .sidebar a:hover {
+      color: #f0f0f0;
+    }
+    .sidebar a.active {
+      color: #4ade80;
+      background-color: rgba(74, 222, 128, 0.1);
+      margin-left: -10px;
+      padding-left: 10px;
+      border-radius: 4px;
+    }
+    .search-bar {
+      width: 100%;
+      max-width: 300px;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #2a2a2a;
+      background-color: #161616;
+      color: #999;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    .category-header {
+      margin-top: 20px;
+    }
+    .category-toggle {
+      display: block;
+      color: #f0f0f0;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      body {
+        padding: 0;
+        font-size: 13px;
+      }
+
+      .container {
+        margin-left: 0;
+        padding: 15px;
+        max-width: 100%;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid #2a2a2a;
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 18px !important;
+        margin-bottom: 16px;
+        word-wrap: break-word;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+      }
+
+      .stat-box {
+        padding: 10px !important;
+      }
+
+      .stat-label {
+        font-size: 10px !important;
+      }
+
+      .stat-value {
+        font-size: 14px !important;
+      }
+
+      .month-title {
+        font-size: 12px !important;
+        padding: 8px 6px !important;
+        line-height: 1.4;
+        text-align: center !important;
+        word-wrap: break-word;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        font-size: 11px;
+      }
+
+      th, td {
+        padding: 6px 4px !important;
+        font-size: 10px !important;
+      }
+
+      /* Hide columns on mobile */
+      .col-units, .hdr-units,
+      .col-score, .hdr-score,
+      .col-xroi, .hdr-xroi,
+      .col-close, .hdr-close {
+        display: none !important;
+      }
+
+      .col-date, .hdr-date { width: 70px !important; }
+      .col-play, .hdr-play { width: 350px !important; }
+      .col-result, .hdr-result { width: 55px !important; }
+      .col-clv, .hdr-clv { width: 90px !important; }
+
+      canvas#profitChart {
+        max-height: 150px !important;
+      }
+
+      /* Chart container */
+      .stats + div[style*="height: 300px"] {
+        height: 200px !important;
+        padding: 10px !important;
+        margin-bottom: 20px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <input type="text" class="search-bar" placeholder="Search" />
+    <ul>
+      <li><a href="../index">Home</a></li>
+      <li><a href="https://x.com/causticarrow">𝕏 (Twitter)</a></li>
+      <li><a href="https://discord.gg/hammer">Discord</a></li>
+      <li class="category-header">
+        <span class="category-toggle">Results</span>
+        <ul class="category-content" id="results-list"></ul>
+      </li>
+    </ul>
+  </aside>
+  <div class="container">
+    <h1>@RASPicks // 2021-24 CBASE</h1>
+
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-label">Total Plays</div>
+        <div class="stat-value" id="totalPlays">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Net Risk</div>
+        <div class="stat-value" id="netRisk">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Net Profit</div>
+        <div class="stat-value" id="netProfit">+0.0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">ROI</div>
+        <div class="stat-value" id="roi">+0.0%</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">No-Vig CLV</div>
+        <div class="stat-value" id="avgClv">+0.00c (+0.00%)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Expected ROI</div>
+        <div class="stat-value" id="avgXROI">+0.0%</div>
+      </div>
+    </div>
+
+    <div style="width: 100%; height: 300px; margin-bottom: 32px; background: #161616; border-radius: 12px; padding: 20px; box-sizing: border-box;">
+      <canvas id="profitChart"></canvas>
+    </div>
+
+    <div id="tablesContainer"></div>
+  </div>
+
+  <script>
+    // --- DATA ---
+    const PICKS = [
+{date: "2024-06-07", sport: "CBASE", play: "3183 Evansville +4.5 vs. Tennessee", result: "Loss", score: "6-11", close: "-125"},
+{date: "2024-06-01", sport: "CBASE", play: "3337 Grand Canyon/West Virginia Over 11.5 (-115)", result: "Loss", score: "2-5 (7)", close: "-185"},
+{date: "2024-06-01", sport: "CBASE", play: "3326 Oklahoma State/Florida Under 14 (-115)", result: "Win", score: "7-1 (8)", close: "-220"},
+{date: "2024-06-01", sport: "CBASE", play: "3264 Vanderbilt/High Point Under 13.5 (-120)", result: "Loss", score: "9-10 (19)", close: "-210"},
+{date: "2024-05-31", sport: "CBASE", play: "3244 West Virginia/Dallas Baptist Under 10.5 (-115)", result: "Win", score: "4-1 (5)", close: "-165"},
+{date: "2023-06-22", sport: "CBASE", play: "3435 Wake Forest +1.5 (-125) vs. LSU", result: "Loss", score: "0-2", close: "-145"},
+{date: "2023-06-16", sport: "CBASE", play: "3402 Oral Roberts/TCU Under 13 (-115)", result: "Win", score: "6-5 (11)", close: "-130"},
+{date: "2023-06-11", sport: "CBASE", play: "3453 Stanford PK (-125) vs. Texas", result: "Win", score: "8-3", close: "-160"},
+{date: "2023-06-10", sport: "CBASE", play: "3416 Texas/Stanford Under 13 (-120)", result: "Win", score: "7-5 (12)", close: "-175"},
+{date: "2023-06-10", sport: "CBASE", play: "3413 Tennessee/Southern Miss Over 9.5 (-105)", result: "Loss", score: "3-5 (8)", close: "-155"},
+{date: "2023-06-10", sport: "CBASE", play: "3410 Alabama/Wake Forest Under 11 (-120)", result: "Win", score: "4-5 (9)", close: "-180"},
+{date: "2023-06-09", sport: "CBASE", play: "3406 Florida PK (-145) vs. South Carolina", result: "Win", score: "5-4", close: "-190"},
+{date: "2023-06-04", sport: "CBASE", play: "3770 East Carolina/Virginia Under 13 (-115)", result: "Win", score: "3-8 (11)", close: "-170"},
+{date: "2023-06-03", sport: "CBASE", play: "3540 Vanderbilt -1.5 (+105) vs. Oregon", result: "Loss", score: "7-8", close: "-165"},
+{date: "2023-06-02", sport: "CBASE", play: "3452 Eastern Illinois/Vanderbilt Under 13.5 (-125)", result: "Loss", score: "2-12 (14)", close: "-305"},
+{date: "2023-06-02", sport: "CBASE", play: "3436 Florida -5.5 (-120) vs. Florida A&M", result: "Loss", score: "3-0", close: "-170"},
+{date: "2023-06-02", sport: "CBASE", play: "3430 Lipscomb/Clemson Under 12.5 (-120)", result: "Loss", score: "5-12 (17)", close: "-265"},
+{date: "2023-06-02", sport: "CBASE", play: "3421 Ball State/Kentucky Over 10 (-115)", result: "Loss", score: "0-4 (4)", close: "-340"},
+{date: "2023-06-02", sport: "CBASE", play: "3404 George Mason/Wake Forest Under 13.5 (-120)", result: "Win", score: "0-12 (12)", close: "-250"},
+{date: "2023-06-02", sport: "CBASE", play: "3401 Northeastern/Maryland Over 13.5 (-120)", result: "Loss", score: "2-7 (9)", close: "-200"},
+{date: "2022-06-11", sport: "CBASE", play: "3524 Auburn/Oregon State Under 10.5 (-115)", result: "Loss", score: "7-5 (12)", close: "-160"},
+{date: "2022-06-11", sport: "CBASE", play: "3512 Arkansas/North Carolina Under 11", result: "Win", score: "4-1 (5)", close: "-170"},
+{date: "2022-06-05", sport: "CBASE", play: "3610 Southern Miss -1.5 (-140) vs. Kennesaw State", result: "Loss", score: "4-3", close: "-185"},
+{date: "2022-06-05", sport: "CBASE", play: "3609 Kennesaw State/Southern Miss Over 11.5 (-115)", result: "Loss", score: "3-4 (7)", close: "-245"},
+{date: "2022-06-05", sport: "CBASE", play: "3589 Stanford PK vs. UC Santa Barbara (-165)", result: "Win", score: "8-4", close: "-225"},
+{date: "2022-06-05", sport: "CBASE", play: "3573 UL Lafayette/TCU Over 11.5", result: "Loss", score: "1-6 (7)", close: "-755"},
+{date: "2022-06-05", sport: "CBASE", play: "3561 Georgia Southern/Texas Tech Over 11 (-115)", result: "Loss", score: "1-3 (4)", close: "-445"},
+{date: "2022-06-04", sport: "CBASE", play: "3537 UCLA/SE Louisiana Over 10.5 (-120)", result: "Win", score: "16-2 (18)", close: "-190"},
+{date: "2022-06-04", sport: "CBASE", play: "3537 UCLA -2.5 (-125) vs. SE Louisiana", result: "Win", score: "16-2", close: "-165"},
+{date: "2022-06-04", sport: "CBASE", play: "3533 Kennesaw State/Army Over 11.5 (-120)", result: "Win", score: "9-8 (17)", close: "-175"},
+{date: "2022-06-04", sport: "CBASE", play: "3528 Oklahoma State PK (-145) vs. Arkansas", result: "Loss", score: "12-20", close: "-195"},
+{date: "2022-06-04", sport: "CBASE", play: "3528 Arkansas/Oklahoma State Under 11.5", result: "Loss", score: "20-12 (32)", close: "-185"},
+{date: "2022-06-04", sport: "CBASE", play: "3520 Maryland/Connecticut Under 14.5 (-115)", result: "Loss", score: "5-10 (15)", close: "-225"},
+{date: "2022-06-04", sport: "CBASE", play: "3516 Texas State/Stanford Under 13 (-115)", result: "Win", score: "5-2 (7)", close: "-185"},
+{date: "2022-06-04", sport: "CBASE", play: "3509 Gonzaga/Wright State Over 12.5 (-105)", result: "Win", score: "11-9 (20)", close: "-260"},
+{date: "2022-06-04", sport: "CBASE", play: "3489 Dallas Baptist PK (-145) vs. Air Force", result: "Loss", score: "1-5", close: "-185"},
+{date: "2022-06-04", sport: "CBASE", play: "3484 Tennessee/Campbell Under 13.5 (-115)", result: "Loss", score: "8-7 (15)", close: "-185"},
+{date: "2022-06-03", sport: "CBASE", play: "3462 New Mexico State/Oregon State Under 12 (-120)", result: "Win", score: "4-5 (9)", close: "-215"},
+{date: "2022-06-03", sport: "CBASE", play: "3440 Connecticut/Wake Forest Under 12.5", result: "Loss", score: "8-7 (15)", close: "-165"},
+{date: "2022-06-03", sport: "CBASE", play: "3423 Gonzaga PK (-220) vs. Columbia", result: "Loss", score: "2-8", close: "-310"},
+{date: "2022-06-03", sport: "CBASE", play: "3413 Coppin State +9.5 vs. East Carolina", result: "Loss", score: "1-17", close: "-155"},
+{date: "2021-06-20", sport: "CBASE", play: "3406 Virginia/Tennesse Under 9 (-125)", result: "Win", score: "6-0 (6)", close: "-215"},
+{date: "2021-06-12", sport: "CBASE", play: "3426 Ole Miss/Arizona Under 13.5 (120)", result: "Loss", score: "12-3 (15)", close: "-175"},
+{date: "2021-06-12", sport: "CBASE", play: "3426 Ole Miss PK (+135) vs. Arizona", result: "Win", score: "12-3", close: "-140"},
+{date: "2021-06-12", sport: "CBASE", play: "3423 Texas Tech PK (-140) vs. Stanford", result: "Loss", score: "0-9", close: "-170"},
+{date: "2021-06-11", sport: "CBASE", play: "3404 East Carolina/Vanderbilt Under 10 (-105)", result: "Win", score: "0-2 (2)", close: "-170"},
+{date: "2021-06-07", sport: "CBASE", play: "3683 Southern Miss PK (+175) vs. Ole Miss", result: "Loss", score: "9-12", close: "135"},
+{date: "2021-06-06", sport: "CBASE", play: "3639 South Alabama/South Florida Over 9 (-120)", result: "Loss", score: "4-0 (4)", close: "-175"},
+{date: "2021-06-06", sport: "CBASE", play: "3627 Maryland/East Carolina Over 11 (-120)", result: "Win", score: "6-9 (15)", close: "-200"},
+{date: "2021-06-06", sport: "CBASE", play: "3615 UCLA/Texas Tech Over 11.5 (-115)", result: "Loss", score: "2-8 (10)", close: "-170"},
+{date: "2021-06-06", sport: "CBASE", play: "3610 UC Irvine/North Dakota State Under 11 (+110)", result: "Loss", score: "18-3 (21)", close: "-190"},
+{date: "2021-06-05", sport: "CBASE", play: "3516 Fairfield -4.5 (-105) vs. Southern", result: "Loss", score: "6-2", close: "-165"},
+{date: "2021-06-05", sport: "CBASE", play: "3499 Oklahoma State/Grand Canyon Over 10 (-125)", result: "Loss", score: "5-3 (8)", close: "-195"},
+{date: "2021-06-05", sport: "CBASE", play: "3489 Stanford/UC Irvine Over 8.5 (-105)", result: "Win", score: "12-4 (16)", close: "-190"},
+{date: "2021-06-04", sport: "CBASE", play: "3439 South Alabama/Miami Florida Over 8.5 (-125)", result: "Loss", score: "0-1 (1)", close: "-170"},
+{date: "2021-06-04", sport: "CBASE", play: "3424 SE Missouri State/Ole Miss Under 12.5 (-120)", result: "Win", score: "3-6 (9)", close: "-170"},
+{date: "2021-06-04", sport: "CBASE", play: "3412 Nevada/UC Irvine Under 12.5", result: "Win", score: "0-7 (7)", close: "-145"}
+    ];
+
+    // --- Formatting ---
+    function stripTrailingZeros(numStr) {
+      if (numStr.includes('.')) {
+        numStr = numStr.replace(/\.?0+$/, '');
+      }
+      return numStr;
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      const month = d.getMonth() + 1;
+      const day = d.getDate();
+      const year = d.getFullYear().toString().slice(-2);
+      return `${month}/${day}/${year}`;
+    }
+
+    function shortenMonthName(monthName) {
+      // Only shorten on mobile
+      if (window.innerWidth > 768) return monthName;
+
+      const monthMap = {
+        'January': 'Jan',
+        'February': 'Feb',
+        'March': 'Mar',
+        'April': 'Apr',
+        'May': 'May',
+        'June': 'Jun',
+        'July': 'Jul',
+        'August': 'Aug',
+        'September': 'Sep',
+        'October': 'Oct',
+        'November': 'Nov',
+        'December': 'Dec'
+      };
+
+      return monthName.replace(/^(\w+)/, (match) => monthMap[match] || match);
+    }
+
+    function abbreviatePlay(play) {
+      // Only abbreviate on mobile
+      if (window.innerWidth > 768) return play;
+
+      let abbreviated = play;
+
+      // Remove " vs. OPPONENT" (everything after " vs." until a pill tag or end)
+      abbreviated = abbreviated.replace(/\s+vs\.\s+([^<]+?)(?=\s*(?:<span|$))/g, '');
+
+      // College baseball team abbreviations
+      const collegeTeams = {
+        'Alabama': 'ALA',
+        'Air Force': 'AFA',
+        'Arkansas': 'ARK',
+        'Auburn': 'AUB',
+        'Ball State': 'BALL',
+        'Campbell': 'CAMP',
+        'Clemson': 'CLEM',
+        'Columbia': 'COLUM',
+        'Connecticut': 'UCONN',
+        'Coppin State': 'COPPIN',
+        'Dallas Baptist': 'DBU',
+        'East Carolina': 'ECU',
+        'Eastern Illinois': 'EIU',
+        'Evansville': 'UE',
+        'Fairfield': 'FAIR',
+        'Florida': 'FLA',
+        'Florida A&M': 'FAMU',
+        'George Mason': 'GMU',
+        'Georgia Southern': 'GS',
+        'Gonzaga': 'GONZ',
+        'Grand Canyon': 'GCU',
+        'High Point': 'HPU',
+        'Kennesaw State': 'KSU',
+        'Kentucky': 'UK',
+        'Lipscomb': 'LIP',
+        'LSU': 'LSU',
+        'Maryland': 'MD',
+        'Miami (Florida)': 'MIA',
+        'Miami Florida': 'MIA',
+        'Nevada': 'NEV',
+        'New Mexico State': 'NMSU',
+        'North Carolina': 'UNC',
+        'North Dakota State': 'NDSU',
+        'Northeastern': 'NU',
+        'Oklahoma State': 'OKST',
+        'Ole Miss': 'MISS',
+        'Oral Roberts': 'ORU',
+        'Oregon': 'ORE',
+        'Oregon State': 'OSU',
+        'SE Louisiana': 'SELA',
+        'SE Missouri State': 'SEMO',
+        'South Alabama': 'USA',
+        'South Carolina': 'USC',
+        'South Florida': 'USF',
+        'Southern': 'SOUTHERN',
+        'Southern Miss': 'USM',
+        'Stanford': 'STAN',
+        'Tennessee': 'TENN',
+        'Texas': 'TEX',
+        'Texas State': 'TXST',
+        'Texas Tech': 'TTU',
+        'TCU': 'TCU',
+        'UC Irvine': 'UCI',
+        'UC Santa Barbara': 'UCSB',
+        'UCLA': 'UCLA',
+        'UL Lafayette': 'LOU',
+        'Vanderbilt': 'VU',
+        'Virginia': 'UVA',
+        'Wake Forest': 'WAKE',
+        'West Virginia': 'WVU',
+        'Wright State': 'WRIGHT',
+        'Army': 'ARMY'
+      };
+
+      // Replace team names (longer names first to avoid partial matches)
+      const sortedTeams = Object.entries(collegeTeams).sort((a, b) => b[0].length - a[0].length);
+      for (const [full, abbr] of sortedTeams) {
+        abbreviated = abbreviated.replace(new RegExp(full, 'g'), abbr);
+      }
+
+      return abbreviated;
+    }
+
+    function formatGeneralNumber(num) {
+      let s = num.toFixed(2);
+      s = stripTrailingZeros(s);
+      return s;
+    }
+
+    function formatWinPercent(num) {
+      // On mobile: no decimals for monthly header
+      if (window.innerWidth <= 768) {
+        return Math.round(num).toString();
+      }
+      let s = num.toFixed(2);
+      s = stripTrailingZeros(s);
+      return s;
+    }
+
+    function formatUnits(num) {
+      if (Math.abs(num - Math.round(num)) < 0.001) {
+        return (num >= 0 ? '+' : '-') + Math.abs(num).toFixed(1);
+      } else {
+        let s = Math.abs(num).toFixed(2);
+        s = stripTrailingZeros(s);
+        return (num >= 0 ? '+' : '-') + s;
+      }
+    }
+
+    function formatUnitsForHeader(num) {
+      // On mobile: always 1 decimal for monthly header
+      if (window.innerWidth <= 768) {
+        return (num >= 0 ? '+' : '-') + Math.abs(num).toFixed(1);
+      }
+      return formatUnits(num);
+    }
+
+    function formatSignedNumber(num) {
+      let s = Math.abs(num).toFixed(2);
+      s = stripTrailingZeros(s);
+      return (num >= 0 ? '+' : '-') + s;
+    }
+
+    function formatSignedPercent(num) {
+      let s = Math.abs(num).toFixed(2);
+      s = stripTrailingZeros(s);
+      return (num >= 0 ? '+' : '-') + s + '%';
+    }
+
+    function formatROIForHeader(num) {
+      // On mobile: no decimals for monthly header
+      if (window.innerWidth <= 768) {
+        const rounded = Math.round(num);
+        return (rounded >= 0 ? '+' : '') + rounded + '%';
+      }
+      return formatSignedPercent(num);
+    }
+
+    function formatCLVPercentForHeader(num) {
+      // On mobile: 1 decimal for monthly header
+      if (window.innerWidth <= 768) {
+        const val = num.toFixed(1);
+        return (num >= 0 ? '+' : '') + val + '%';
+      }
+      return formatSignedPercent(num);
+    }
+
+    function formatCLV(cents, pct) {
+      let cStr = Math.abs(cents).toFixed(1);
+      cStr = stripTrailingZeros(cStr);
+      let pStr = Math.abs(pct).toFixed(1);
+      pStr = stripTrailingZeros(pStr);
+      const cSign = cents >= 0 ? '+' : '-';
+      const pSign = pct >= 0 ? '+' : '-';
+      return `${cSign}${cStr}c (${pSign}${pStr}%)`;
+    }
+
+    function formatCLVForTable(cents, pct) {
+      // On mobile: show only % with 1 decimal
+      if (window.innerWidth <= 768) {
+        const val = pct.toFixed(1);
+        return (pct >= 0 ? '+' : '') + val + '%';
+      }
+      // Desktop: show full format
+      return formatCLV(cents, pct);
+    }
+
+    // --- Math ---
+    function americanToDecimal(a) {
+      const n = parseInt(a);
+      return n > 0 ? (n / 100) + 1 : (100 / -n) + 1;
+    }
+
+    function probToAmerican(prob) {
+      return prob >= 0.5 ? -Math.round(100 * prob / (1 - prob)) : Math.round(100 * (1 - prob) / prob);
+    }
+
+    function solveForC(d1, d2) {
+      let c = 1.0;
+      for (let i = 0; i < 50; i++) {
+        const p1 = Math.pow(1 / d1, c);
+        const p2 = Math.pow(1 / d2, c);
+        const f = p1 + p2 - 1;
+        if (Math.abs(f) < 1e-10) break;
+        const df = p1 * Math.log(1 / d1) + p2 * Math.log(1 / d2);
+        if (Math.abs(df) < 1e-12) break;
+        c = c - f / df;
+      }
+      return c;
+    }
+
+    function getOtherSideCBASE(closeOdds) {
+      const close = parseInt(closeOdds);
+      const p_close = close > 0 ? 100 / (close + 100) : -close / (-close + 100);
+      const other_p = 1.0698;
+      const other_implied = other_p - p_close;
+      return other_implied >= 0.5 ? -Math.round(100 * other_implied / (1 - other_implied)) : Math.round(100 * (1 - other_implied) / other_implied);
+    }
+
+    function calculateFairProb(closeOdds) {
+      const d1 = americanToDecimal(closeOdds);
+      const d2 = americanToDecimal(getOtherSideCBASE(closeOdds));
+      const c = solveForC(d1, d2);
+      return Math.pow(1 / d1, c);
+    }
+
+    function calculateCLVAndXROI(myOdds, closeOdds) {
+      const myDec = americanToDecimal(myOdds);
+      const myProb = 1 / myDec;
+      const fairProb = calculateFairProb(closeOdds);
+
+      // Calculate CLV cents using proper formula
+      let clvCents;
+      if (myProb > 0.5 && fairProb <= 0.5) {
+        const myOddsCalc = -100 * (myProb / (1 - myProb));
+        const fairOddsCalc = 100 * ((1 - fairProb) / fairProb);
+        clvCents = -((Math.abs(myOddsCalc) - 100) + (fairOddsCalc - 100));
+      } else if (myProb <= 0.5 && fairProb > 0.5) {
+        const myOddsCalc = 100 * ((1 - myProb) / myProb);
+        const fairOddsCalc = -100 * (fairProb / (1 - fairProb));
+        clvCents = (myOddsCalc - 100) + (Math.abs(fairOddsCalc) - 100);
+      } else {
+        const myOddsCalc = myProb > 0.5 ? -100 * (myProb / (1 - myProb)) : 100 * ((1 - myProb) / myProb);
+        const fairOddsCalc = fairProb > 0.5 ? -100 * (fairProb / (1 - fairProb)) : 100 * ((1 - fairProb) / fairProb);
+        clvCents = myOddsCalc - fairOddsCalc;
+      }
+
+      const clvPct = (fairProb - myProb) * 100;
+      const xRoi = (fairProb * myDec - 1) * 100;
+      return { cents: clvCents, pct: clvPct, xRoi: xRoi };
+    }
+
+    // --- Units calculation ---
+    function calculateUnits(closeOdds, result) {
+      // Parse close odds, handling both formats (-110, +150, 125, etc.)
+      let odds = parseFloat(closeOdds);
+
+      // If positive odds don't have a +, assume positive if > 100
+      if (odds > 100 && !closeOdds.includes('-')) {
+        odds = odds;
+      }
+
+      if (result === 'Win') {
+        return 1.0;
+      } else {
+        // Calculate risk based on odds
+        if (odds >= 0) {
+          // Positive odds: risk less to win 1 unit
+          return -(100 / odds);
+        } else {
+          // Negative odds: risk more to win 1 unit
+          return -(-odds / 100);
+        }
+      }
+    }
+
+    // --- Render on load ---
+    window.addEventListener('load', () => {
+      const container = document.getElementById('tablesContainer');
+      let wins = 0, losses = 0, totalRisk = 0, totalUnits = 0, totalClvCents = 0, totalClvPct = 0, totalXROI = 0;
+
+      // Arrays for chart data
+      const chartDates = [];
+      const chartCumulativeUnits = [];
+
+      // Build chart data (chronological order, oldest first)
+      const chronologicalPicks = [...PICKS].sort((a, b) => new Date(a.date) - new Date(b.date));
+      let cumulativeUnits = 0;
+      chartDates.push('Start');
+      chartCumulativeUnits.push(0);
+
+      chronologicalPicks.forEach(pick => {
+        const myOdds = pick.play.match(/\(([-+]?\d+)\)/)?.[1] || '-110';
+        const units = calculateUnits(myOdds, pick.result);
+        cumulativeUnits += units;
+        chartDates.push(pick.date);
+        chartCumulativeUnits.push(cumulativeUnits);
+      });
+
+      // Sort picks for table display (newest first)
+      const sortedPicks = [...PICKS].sort((a, b) => new Date(b.date) - new Date(a.date));
+      const grouped = {};
+      sortedPicks.forEach(pick => {
+        const d = new Date(pick.date);
+        const displayKey = `${d.toLocaleString('default', { month: 'long' })} ${d.getFullYear()}`;
+        if (!grouped[displayKey]) grouped[displayKey] = [];
+        grouped[displayKey].push(pick);
+      });
+
+      // Process each month
+      Object.keys(grouped).sort((a, b) => {
+        const aDate = new Date(grouped[a][0].date);
+        const bDate = new Date(grouped[b][0].date);
+        return bDate - aDate;
+      }).forEach(monthName => {
+        const monthPicks = grouped[monthName];
+        let monthWins = 0, monthLosses = 0, monthRisk = 0, monthUnits = 0, monthClvCents = 0, monthClvPctSum = 0, monthXROI = 0;
+
+        const isMobileView = window.innerWidth <= 768;
+        const clvHeaderLabel = isMobileView ? 'NV CLV' : 'No-Vig CLV';
+
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th class="hdr-date">Date</th>
+              <th class="hdr-play">Play</th>
+              <th class="hdr-result">Result</th>
+              <th class="hdr-units">Units</th>
+              <th class="hdr-score">Score</th>
+              <th class="hdr-close">Close</th>
+              <th class="hdr-clv">${clvHeaderLabel}</th>
+              <th class="hdr-xroi">Expected ROI</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        `;
+        const tbody = table.querySelector('tbody');
+
+        monthPicks.forEach(pick => {
+          const myOdds = pick.play.match(/\(([-+]?\d+)\)/)?.[1] || '-110';
+          const units = calculateUnits(myOdds, pick.result);
+          const odds = parseFloat(myOdds);
+          const risk = odds >= 0 ? 100 / odds : -odds / 100;
+
+          monthUnits += units;
+          totalUnits += units;
+          monthRisk += risk;
+          totalRisk += risk;
+
+          if (pick.result === 'Win') { monthWins++; wins++; } else { monthLosses++; losses++; }
+
+          // Calculate CLV and xROI for CBASE
+          const { cents, pct, xRoi } = calculateCLVAndXROI(myOdds, pick.close);
+          monthClvCents += cents;
+          monthClvPctSum += pct;
+          monthXROI += xRoi;
+          totalClvCents += cents;
+          totalClvPct += pct;
+          totalXROI += xRoi;
+
+          const unitsStr = formatUnits(units);
+          const clvStr = formatCLVForTable(cents, pct);
+          const xRoiStr = formatSignedPercent(xRoi);
+          const resultText = pick.result === 'Win' ? 'Win' : 'Loss';
+          const closeNum = Math.round(parseFloat(pick.close));
+          const closeDisplay = closeNum >= 0 ? '+' + closeNum : closeNum.toString();
+
+          // Format play - highlight spreads, totals, and team names
+          let formattedPlay = pick.play;
+          // Remove number prefixes like "347 " or "416 "
+          formattedPlay = formattedPlay.replace(/^\d+\s+/, '');
+          // Bold total numbers like "40.5" or "49" in totals
+          formattedPlay = formattedPlay.replace(/(Over|Under)\s+(\d+\.?\d*)/g, '$1 <span class="bet-type">$2</span>');
+          // Highlight spread numbers like -2.5, +3.5 (but not odds in parentheses)
+          formattedPlay = formattedPlay.replace(/(?<!\()([+-]\d+\.?\d*)/g, '<span class="bet-type">$1</span>');
+          // Highlight Over/Under
+          formattedPlay = formattedPlay.replace(/(Over|Under)/g, '<span class="bet-type">$1</span>');
+          // Highlight PK
+          formattedPlay = formattedPlay.replace(/\bPK\b/g, '<span class="bet-type">PK</span>');
+
+          // Apply abbreviations on mobile
+          formattedPlay = abbreviatePlay(formattedPlay);
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="col-date">${formatDate(pick.date)}</td>
+            <td class="col-play">${formattedPlay}</td>
+            <td class="col-result ${pick.result === 'Win' ? 'positive' : 'negative'}">${resultText}</td>
+            <td class="col-units ${units >= 0 ? 'positive' : 'negative'}">${unitsStr}</td>
+            <td class="col-score">${pick.score.replace(/\s*\(.*?\)/, '').replace(/\s*OT\s*$/, '')}</td>
+            <td class="col-close">${closeDisplay}</td>
+            <td class="col-clv ${cents >= 0 ? 'positive' : 'negative'}">${clvStr}</td>
+            <td class="col-xroi ${xRoi >= 0 ? 'positive' : 'negative'}">${xRoiStr}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        container.appendChild(table);
+
+        // Monthly header
+        const monthTotal = monthWins + monthLosses;
+        const winPct = monthTotal ? ((monthWins / monthTotal) * 100) : 0;
+        const roi = monthRisk ? ((monthUnits / monthRisk) * 100) : 0;
+        const avgClvPct = monthTotal ? monthClvPctSum / monthTotal : 0;
+
+        const header = document.createElement('h2');
+        header.className = 'month-title';
+        const isMobile = window.innerWidth <= 768;
+        const clvLabel = isMobile ? 'NV CLV' : 'No-Vig CLV';
+        header.innerHTML =
+          `${shortenMonthName(monthName)}: ${monthWins}-${monthLosses} (${formatWinPercent(winPct)}%), ` +
+          `<span class="${monthUnits >= 0 ? 'positive' : 'negative'}">${formatUnitsForHeader(monthUnits)}u</span>, ` +
+          `<span class="${roi >= 0 ? 'positive' : 'negative'}">${formatROIForHeader(roi)} ROI</span>, ` +
+          `<span class="${avgClvPct >= 0 ? 'positive' : 'negative'}">${formatCLVPercentForHeader(avgClvPct)} ${clvLabel}</span>`;
+        container.insertBefore(header, table);
+      });
+
+      // Update top stats
+      const totalPlays = wins + losses;
+      const winPct = totalPlays ? ((wins / totalPlays) * 100) : 0;
+      const roi = totalRisk ? ((totalUnits / totalRisk) * 100) : 0;
+      const avgClvCents = totalPlays ? totalClvCents / totalPlays : 0;
+      const avgClvPct = totalPlays ? totalClvPct / totalPlays : 0;
+      const avgXROI = totalPlays ? totalXROI / totalPlays : 0;
+
+      document.getElementById('totalPlays').textContent = `${totalPlays} (${wins}-${losses}, ${formatGeneralNumber(winPct)}%)`;
+      document.getElementById('netRisk').textContent = formatGeneralNumber(totalRisk);
+      document.getElementById('netProfit').textContent = formatSignedNumber(totalUnits);
+      document.getElementById('netProfit').className = totalUnits >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
+      document.getElementById('roi').textContent = formatSignedPercent(roi);
+      document.getElementById('roi').className = roi >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
+      document.getElementById('avgClv').textContent = formatCLV(avgClvCents, avgClvPct);
+      document.getElementById('avgClv').className = avgClvCents >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
+      document.getElementById('avgXROI').textContent = formatSignedPercent(avgXROI);
+      document.getElementById('avgXROI').className = avgXROI >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
+
+      // Render chart
+      const ctx = document.getElementById('profitChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: chartDates,
+          datasets: [{
+            label: 'Cumulative Profit (Units)',
+            data: chartCumulativeUnits,
+            borderColor: '#4ade80',
+            backgroundColor: 'rgba(74, 222, 128, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.1,
+            pointRadius: 3,
+            pointHoverRadius: 5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: '#1a1a1a',
+              titleColor: '#f0f0f0',
+              bodyColor: '#e6e6e6',
+              borderColor: '#2a2a2a',
+              borderWidth: 1,
+              padding: 12,
+              displayColors: false,
+              callbacks: {
+                label: function(context) {
+                  return 'Profit: ' + formatSignedNumber(context.parsed.y) + 'u';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              display: false
+            },
+            y: {
+              grid: {
+                color: '#2a2a2a'
+              },
+              ticks: {
+                color: '#999',
+                callback: function(value) {
+                  return (value >= 0 ? '+' : '') + value.toFixed(1) + 'u';
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+
+// Sidebar auto-loader
+async function populateSidebar() {
+  const ul = document.getElementById("results-list");
+  ul.innerHTML = "";
+
+  try {
+    const response = await fetch("results.json");
+    const pages = await response.json();
+
+    const currentPage = window.location.pathname.split("/").pop().replace('.html', '');
+
+    pages.forEach((p) => {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = p.file;
+      a.textContent = p.label;
+
+      if (p.file === currentPage) {
+        a.classList.add("active");
+      }
+
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+  } catch (err) {
+    console.error("Could not load results.json", err);
+  }
+}
+
+// Search filter
+function filterSidebar() {
+  var input, filter, ul, li, i;
+  input = document.querySelector(".search-bar");
+  filter = input.value.toUpperCase();
+  ul = document.querySelector(".sidebar ul");
+  li = ul.getElementsByTagName("li");
+
+  for (i = 0; i < li.length; i++) {
+    var a = li[i].getElementsByTagName("a")[0];
+    if (a) {
+      var txtValue = li[i].textContent || li[i].innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        var shouldHide = true;
+        li[i].querySelectorAll("*").forEach((node) => {
+          if ((node.textContent || node.innerText).toUpperCase().indexOf(filter) > -1) {
+            shouldHide = false;
+          }
+        });
+        li[i].style.display = shouldHide ? "none" : "";
+      }
+    }
+  }
+}
+
+// Initialize sidebar
+populateSidebar();
+document.querySelector(".search-bar").addEventListener("input", filterSidebar);
+  </script>
+</body>
+</html>

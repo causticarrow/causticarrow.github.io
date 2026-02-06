@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>causticarrow.com</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <aside class="sidebar">
+        <input type="text" class="search-bar" placeholder="Search" />
+        <ul>
+          <li><a href="index" class="active">Home</a></li>
+          <li><a href="https://x.com/causticarrow">𝕏 (Twitter)</a></li>
+          <li><a href="https://discord.gg/hammer">Discord</a></li>
+          <li class="category-header">
+            <span class="category-toggle">Results</span>
+            <ul class="category-content" id="results-list"></ul>
+          </li>
+        </ul>
+      </aside>
+      <main class="main-content">
+        <img src="/causticarrow.jpg" alt="logo" class="logo" />
+        <h1>causticarrow.com</h1>
+        <p>Recordkeeping:</p>
+        <ul>
+          <li>
+            All plays will be graded against a widely available line with a no-vig closing line.
+            <span class="sub-note">The closing line will be from Circa, Pinnacle, or S411, whichever offers the highest limits at close.</span>
+          </li>
+          <li>Futures, live plays and props will not be tracked; only main market and team totals.</li>
+          <li>
+            Each play will be to win 1 unit; there will be no unit inflation.
+            <span class="sub-note">This includes plays with plus money, which will also be to win 1 unit.</span>
+          </li>
+        </ul>
+        <p style="font-size: 1.5em; text-align: center;">
+          <a href="https://x.com/causticarrow">𝕏 (Twitter)</a><br />
+          <a href="https://discord.gg/hammer">Discord</a>
+        </p>
+      </main>
+    </div>
+
+    <script>
+      // -------------------------
+      // Sidebar auto-loader
+      // -------------------------
+      async function populateSidebar() {
+        const ul = document.getElementById("results-list");
+        ul.innerHTML = "";
+
+        try {
+          const response = await fetch("results/results.json");
+          const pages = await response.json();
+
+          const currentPage = window.location.pathname.split("/").pop();
+
+          pages.forEach((p) => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = "results/" + p.file;
+            a.textContent = p.label;
+
+            // Highlight current page if match
+            if (("results/" + p.file) === currentPage) {
+              a.classList.add("active");
+            }
+
+            li.appendChild(a);
+            ul.appendChild(li);
+          });
+        } catch (err) {
+          console.error("Could not load results/results.json", err);
+        }
+      }
+
+      // -------------------------
+      // Search filter
+      // -------------------------
+      function filterSidebar() {
+        var input, filter, ul, li, i;
+        input = document.querySelector(".search-bar");
+        filter = input.value.toUpperCase();
+        ul = document.querySelector(".sidebar ul");
+        li = ul.getElementsByTagName("li");
+
+        for (i = 0; i < li.length; i++) {
+          var a = li[i].getElementsByTagName("a")[0];
+          if (a) {
+            var txtValue = li[i].textContent || li[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              li[i].style.display = "";
+            } else {
+              var shouldHide = true;
+              li[i].querySelectorAll("*").forEach((node) => {
+                if (
+                  (node.textContent || node.innerText)
+                    .toUpperCase()
+                    .indexOf(filter) > -1
+                ) {
+                  shouldHide = false;
+                }
+              });
+              li[i].style.display = shouldHide ? "none" : "";
+            }
+          }
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        populateSidebar();
+        document
+          .querySelector(".search-bar")
+          .addEventListener("input", filterSidebar);
+      });
+    </script>
+  </body>
+</html>
