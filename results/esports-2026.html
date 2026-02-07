@@ -442,6 +442,7 @@
       roiEl.className = `stat-value ${getStatClass(roi)}`;
 
       // --- Extra Stats ---
+      let avgClvPctGlobal = null;
       {
         const extraTotalPlays = totalPlays;
 
@@ -476,6 +477,7 @@
         });
         const avgClvPct = clvCount > 0 ? totalClvPct / clvCount : null;
         const avgXROI = clvCount > 0 ? totalXROI / clvCount : null;
+        avgClvPctGlobal = avgClvPct;
         const fmtSignedPct1d = n => { const s = fmtPct1d(Math.abs(n)); return (n > 0 ? "+" : n < 0 ? "-" : "") + s + "%"; };
         const clvFmt = avgClvPct !== null ? fmtSignedPct1d(avgClvPct) : "—";
         const expROIFmt = avgXROI !== null ? fmtSignedPct1d(avgXROI) : "—";
@@ -668,7 +670,8 @@
         playTypeSectionEl.appendChild(table);
       }
 
-      const copyText = `ytd record: ${Math.round(topAdjW)}-${Math.round(topAdjL)}, ${fmtSigned(totalUnits)}u // [archive](https://causticarrow.com/results/esports-2026)`;
+      const clvCopyStr = avgClvPctGlobal !== null ? `, no-vig clv: ${(avgClvPctGlobal >= 0 ? "+" : "-") + fmtPct1dTbl(avgClvPctGlobal) + "%"}` : "";
+      const copyText = `ytd record: ${Math.round(topAdjW)}-${Math.round(topAdjL)}, ${fmtSigned(totalUnits)}u${clvCopyStr} // [archive](https://causticarrow.com/results/esports-2026)`;
       const copyBox = document.getElementById("copyBox");
       copyBox.onclick = () => {
         navigator.clipboard.writeText(copyText).then(() => {
