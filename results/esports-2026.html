@@ -54,6 +54,7 @@
     .col-score, .hdr-score { width: 90px; text-align: center; }
     .col-units, .hdr-units { width: 90px; text-align: center; }
     .col-profit, .hdr-profit { width: 90px; text-align: center; white-space: nowrap; }
+    .col-clv, .hdr-clv { width: 110px; text-align: center; white-space: nowrap; }
     .positive { color: var(--positive); }
     .negative { color: var(--negative); }
     .bet-type { font-weight: 600; color: var(--accent-orange); }
@@ -111,7 +112,7 @@
       .chart-container { height: 180px !important; padding: 10px !important; margin-bottom: 20px !important; }
       table { display: table; width: 100% !important; table-layout: fixed; font-size: 11px; }
       th, td { padding: 6px 4px !important; font-size: 10px !important; overflow: hidden; text-overflow: ellipsis; }
-      .col-units, .hdr-units, .col-score, .hdr-score, .col-line, .hdr-line, .col-risk, .hdr-risk { display: none !important; }
+      .col-units, .hdr-units, .col-score, .hdr-score, .col-line, .hdr-line, .col-risk, .hdr-risk, .col-clv, .hdr-clv { display: none !important; }
       .col-date, .hdr-date { width: 50px !important; }
       .col-game { width: 38px !important; }
       .col-play, .hdr-play { width: auto !important; }
@@ -133,30 +134,30 @@
 <body>
   <script>
     const PICKS = [
-      { date: "2026-02-06", play: "Ninjas in Pyjamas PK (-125) vs. Gentle Mates", note: "", result: "W", score: "2-1", game: "CS2", extra: true },
-      { date: "2026-02-02", play: "FURIA PK (-130) vs. Natus Vincere", note: "", result: "W", score: "2-1", game: "CS2" },
-      { date: "2026-02-02", play: "NRG +1.5 (+225) vs. Falcons", note: "", result: "W", score: "1-2", game: "CS2" },
-      { date: "2026-02-02", play: "MOUZ PK (-175) vs. Aurora", note: "", result: "L", score: "0-2", game: "CS2" },
-      { date: "2026-02-02", play: "FaZe PK (-175) vs. BC.Game", note: "", result: "W", score: "2-1", game: "CS2" },
-      { date: "2026-02-01", play: "FUT PK (+150) vs. G2", note: "", result: "L", score: "1-2", game: "CS2" },
-      { date: "2026-02-01", play: "Astralis +1.5 (-125) vs. PARIVISION", note: "", result: "W", score: "2-1", game: "CS2" },
-      { date: "2026-02-01", play: "MOUZ -1.5 (-140) vs. NRG", note: "", result: "W", score: "2-0", game: "CS2" },
-      { date: "2026-02-01", play: "Aurora +1.5 (-140) vs. Falcons", note: "", result: "W", score: "2-1", game: "CS2" },
-      { date: "2026-01-31", play: "3DMAX PK (+160) vs. FaZe", note: "", result: "W", score: "2-0", game: "CS2" },
-      { date: "2026-01-30", play: "FUT PK (-105) vs. Liquid", note: "", result: "W", score: "2-0", game: "CS2" },
-      { date: "2026-01-29", play: "Liquid PK (+180) vs. G2", note: "", result: "L", score: "1-2", game: "CS2" },
-      { date: "2026-01-28", play: "3DMAX PK (+120) vs. FUT", note: "", result: "W", score: "2-1", game: "CS2" },
-      { date: "2026-01-28", play: "Liquid PK (+110) vs. NiP", note: "", result: "W", score: "2-0", game: "CS2" },
-      { date: "2026-01-28", play: "Liquid PK (-105) vs. NiP", note: "", result: "W", score: "2-0", game: "CS2" },
-      { date: "2026-01-23", play: "PARIVISION +1.5 (-110) vs. Spirit", note: "", result: "W", score: "2-1", game: "CS2" },
-      { date: "2026-01-22", play: "FURIA -1.5 (-110) vs. HEROIC", note: "", result: "L", score: "2-1", game: "CS2" },
-      { date: "2026-01-21", play: "HOTU PK (+150) vs. Gentle Mates", note: "", result: "W", score: "2-0", game: "CS2", extra: true },
-      { date: "2026-01-18", play: "Astralis PK (+140) vs. PARIVISION", note: "", result: "L", score: "0-2", game: "CS2" },
-      { date: "2026-01-17", play: "HEROIC PK (+125) vs. paiN", note: "", result: "W", score: "2-0", game: "CS2" },
-      { date: "2026-01-17", play: "Liquid PK (+115) vs. Ninjas in Pyjamas", note: "", result: "W", score: "2-1", game: "CS2" },
-      { date: "2026-01-14", play: "Monte +1.5 (+150) vs. Natus Vincere", note: "", result: "W", score: "2-1", game: "CS2" },
-      { date: "2026-01-14", play: "GamerLegion PK (+105) vs. Passion UA", note: "", result: "W", score: "2-1", game: "CS2" },
-      { date: "2026-01-13", play: "OG PK (+180) vs. FUT", note: "", result: "L", score: "0-2", game: "CS2" },
+      { date: "2026-02-06", play: "Ninjas in Pyjamas PK (-125) vs. Gentle Mates", result: "W", score: "2-1", game: "CS2", close: "-173", extra: true },
+      { date: "2026-02-02", play: "FURIA PK (-130) vs. Natus Vincere", result: "W", score: "2-1", game: "CS2", close: "" },
+      { date: "2026-02-02", play: "NRG +1.5 (+225) vs. Falcons", result: "W", score: "1-2", game: "CS2", close: "" },
+      { date: "2026-02-02", play: "MOUZ PK (-175) vs. Aurora", result: "L", score: "0-2", game: "CS2", close: "" },
+      { date: "2026-02-02", play: "FaZe PK (-175) vs. BC.Game", result: "W", score: "2-1", game: "CS2", close: "" },
+      { date: "2026-02-01", play: "FUT PK (+150) vs. G2", result: "L", score: "1-2", game: "CS2", close: "" },
+      { date: "2026-02-01", play: "Astralis +1.5 (-125) vs. PARIVISION", result: "W", score: "2-1", game: "CS2", close: "" },
+      { date: "2026-02-01", play: "MOUZ -1.5 (-140) vs. NRG", result: "W", score: "2-0", game: "CS2", close: "" },
+      { date: "2026-02-01", play: "Aurora +1.5 (-140) vs. Falcons", result: "W", score: "2-1", game: "CS2", close: "" },
+      { date: "2026-01-31", play: "3DMAX PK (+160) vs. FaZe", result: "W", score: "2-0", game: "CS2", close: "" },
+      { date: "2026-01-30", play: "FUT PK (-105) vs. Liquid", result: "W", score: "2-0", game: "CS2", close: "" },
+      { date: "2026-01-29", play: "Liquid PK (+180) vs. G2", result: "L", score: "1-2", game: "CS2", close: "" },
+      { date: "2026-01-28", play: "3DMAX PK (+120) vs. FUT", result: "W", score: "2-1", game: "CS2", close: "" },
+      { date: "2026-01-28", play: "Liquid PK (+110) vs. NiP", result: "W", score: "2-0", game: "CS2", close: "" },
+      { date: "2026-01-28", play: "Liquid PK (-105) vs. NiP", result: "W", score: "2-0", game: "CS2", close: "" },
+      { date: "2026-01-23", play: "PARIVISION +1.5 (-110) vs. Spirit", result: "W", score: "2-1", game: "CS2", close: "" },
+      { date: "2026-01-22", play: "FURIA -1.5 (-110) vs. HEROIC", result: "L", score: "2-1", game: "CS2", close: "" },
+      { date: "2026-01-21", play: "HOTU PK (+150) vs. Gentle Mates", result: "W", score: "2-0", game: "CS2", close: "", extra: true },
+      { date: "2026-01-18", play: "Astralis PK (+140) vs. PARIVISION", result: "L", score: "0-2", game: "CS2", close: "" },
+      { date: "2026-01-17", play: "HEROIC PK (+125) vs. paiN", result: "W", score: "2-0", game: "CS2", close: "" },
+      { date: "2026-01-17", play: "Liquid PK (+115) vs. Ninjas in Pyjamas", result: "W", score: "2-1", game: "CS2", close: "" },
+      { date: "2026-01-14", play: "Monte +1.5 (+150) vs. Natus Vincere", result: "W", score: "2-1", game: "CS2", close: "" },
+      { date: "2026-01-14", play: "GamerLegion PK (+105) vs. Passion UA", result: "W", score: "2-1", game: "CS2", close: "" },
+      { date: "2026-01-13", play: "OG PK (+180) vs. FUT", result: "L", score: "0-2", game: "CS2", close: "" },
     ];
   </script>
 
@@ -182,7 +183,7 @@
       <div class="stat-box"><div class="stat-label">Net Profit</div><div class="stat-value" id="netProfit">+0.0</div></div>
       <div class="stat-box"><div class="stat-label">ROI</div><div class="stat-value" id="roi">+0.0%</div></div>
     </div>
-    <div class="monthly-stats" id="extraStats" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 32px;"></div>
+    <div class="monthly-stats" id="extraStats" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 32px;"></div>
     <div class="monthly-stats" id="monthlyStats"></div>
     <div class="chart-container" style="width:100%;height:300px;margin-bottom:32px;background:#161616;border-radius:12px;padding:20px;box-sizing:border-box">
       <canvas id="profitChart"></canvas>
@@ -223,6 +224,7 @@
       const fmtSignedPct = n => n === 0 ? "0%" : fmtSigned(n) + "%";
       const fmtROI = n => n === 0 ? "0%" : (isMobile() ? (Math.round(n) > 0 ? "+" : "") + Math.round(n) + "%" : fmtSignedPct(n));
       const getValueClass = n => n === 0 ? "" : n > 0 ? "positive" : "negative";
+      const fmtPct1dTbl = n => { const s = Math.abs(n).toFixed(1); return s.endsWith(".0") ? Math.round(Math.abs(n)).toString() : s; };
       const getStatClass = n => n === 0 ? "" : n > 0 ? "stat-positive" : "stat-negative";
 
     function calcUnits(odds, result, isExtra = false) {
@@ -315,6 +317,41 @@
         return { cleanPlay, line };
       }
 
+      // --- CLV helpers ---
+      const ESPORTS_VIG = 1.0476; // -110/-110
+      function amToDec(a) { const n = parseInt(a); return n > 0 ? (n / 100) + 1 : (100 / -n) + 1; }
+      function getOtherSide(closeOdds) {
+        const c = parseInt(closeOdds);
+        const pClose = c > 0 ? 100 / (c + 100) : -c / (-c + 100);
+        const otherImpl = ESPORTS_VIG - pClose;
+        return otherImpl >= 0.5 ? -Math.round(100 * otherImpl / (1 - otherImpl)) : Math.round(100 * (1 - otherImpl) / otherImpl);
+      }
+      function solveForC(d1, d2) {
+        let c = 1.0;
+        for (let i = 0; i < 50; i++) {
+          const p1 = Math.pow(1 / d1, c), p2 = Math.pow(1 / d2, c);
+          const f = p1 + p2 - 1;
+          if (Math.abs(f) < 1e-10) break;
+          const df = p1 * Math.log(1 / d1) + p2 * Math.log(1 / d2);
+          if (Math.abs(df) < 1e-12) break;
+          c = c - f / df;
+        }
+        return c;
+      }
+      function calcFairProb(closeOdds) {
+        const d1 = amToDec(closeOdds);
+        const d2 = amToDec(getOtherSide(closeOdds));
+        const c = solveForC(d1, d2);
+        return Math.pow(1 / d1, c);
+      }
+      function calcCLV(myOdds, closeOdds) {
+        const myDec = amToDec(myOdds);
+        const fairProb = calcFairProb(closeOdds);
+        const clvPct = (fairProb - (1 / myDec)) * 100;
+        const xRoi = (fairProb * myDec - 1) * 100;
+        return { clvPct, xRoi };
+      }
+
       Object.keys(grouped).sort((a, b) => parseDate(grouped[b][0].date) - parseDate(grouped[a][0].date)).forEach(monthName => {
         const monthPicks = grouped[monthName];
         let mWins = 0, mLosses = 0, mRisk = 0, mUnits = 0;
@@ -323,7 +360,8 @@
         const profitHdr = isMobile()
           ? '<th class="hdr-profit">Profit</th>'
           : '<th class="hdr-profit">Profit</th>';
-        table.innerHTML = `<thead><tr><th class="hdr-date">Date</th><th class="col-game"></th><th class="hdr-play">Play</th><th class="hdr-line">Line</th><th class="hdr-risk">Risk</th><th class="hdr-score">Score</th><th class="hdr-result">Result</th>${profitHdr}</tr></thead><tbody></tbody>`;
+        const clvHdrLabel = isMobile() ? 'CLV' : 'No-Vig CLV';
+        table.innerHTML = `<thead><tr><th class="hdr-date">Date</th><th class="col-game"></th><th class="hdr-play">Play</th><th class="hdr-line">Line</th><th class="hdr-risk">Risk</th><th class="hdr-score">Score</th><th class="hdr-result">Result</th>${profitHdr}<th class="hdr-clv">${clvHdrLabel}</th></tr></thead><tbody></tbody>`;
         const tbody = table.querySelector("tbody");
 
         monthPicks.forEach(pick => {
@@ -357,14 +395,23 @@
                    .replace(/(?<![">a-zA-Z0-9])([+-]\d+\.?\d*)(?![^<]*<\/span>)/g, '<span class="bet-type">$1</span>');
           }
 
-          if (pick.note) fp += ` <span class="note-pill">${pick.note}</span>`;
           if (isExtra) fp += ` <span class="extra-pill">Extra</span>`;
 
           const gameCell = pick.game ? `<span class="game-pill ${pick.game.toLowerCase().replace(" ", "")}">${pick.game}</span>` : "";
           const lineDisplay = line ? (line.startsWith("+") || line.startsWith("-") ? line : (parseInt(line) > 0 ? "+" + line : line)) : "";
 
+          // CLV for this pick
+          let clvCell = "";
+          if (pick.close && !isPending) {
+            const { clvPct } = calcCLV(odds, pick.close);
+            const clvFmt = (clvPct >= 0 ? "+" : "") + fmtPct1dTbl(clvPct) + "%";
+            clvCell = `<td class="col-clv ${clvPct >= 0 ? "positive" : "negative"}">${clvFmt}</td>`;
+          } else {
+            clvCell = `<td class="col-clv"></td>`;
+          }
+
           const row = document.createElement("tr");
-          row.innerHTML = `<td class="col-date">${formatDate(pick.date)}</td><td class="col-game">${gameCell}</td><td class="col-play"></td><td class="col-line">${lineDisplay}</td><td class="col-risk">${fmtNum(risk) + "u"}</td><td class="col-score">${pick.score}</td><td class="col-result ${isPending ? "" : pick.result === "W" ? "positive" : "negative"}">${isPending ? "Pending" : pick.result === "W" ? "Win" : "Loss"}</td><td class="col-profit ${isPending ? "" : getValueClass(units)}">${isPending ? "" : fmtUnits(units) + "u"}</td>`;
+          row.innerHTML = `<td class="col-date">${formatDate(pick.date)}</td><td class="col-game">${gameCell}</td><td class="col-play"></td><td class="col-line">${lineDisplay}</td><td class="col-risk">${fmtNum(risk) + "u"}</td><td class="col-score">${pick.score}</td><td class="col-result ${isPending ? "" : pick.result === "W" ? "positive" : "negative"}">${isPending ? "Pending" : pick.result === "W" ? "Win" : "Loss"}</td><td class="col-profit ${isPending ? "" : getValueClass(units)}">${isPending ? "" : fmtUnits(units) + "u"}</td>${clvCell}`;
           row.querySelector(".col-play").innerHTML = fp;
           tbody.appendChild(row);
         });
@@ -416,30 +463,30 @@
         const fmtPct1d = p => { const s = p.toFixed(1); return s.endsWith(".0") ? Math.round(p).toString() : s; };
         const avgOddsFmt = (avgAmericanRaw >= 0 ? "+" : "-") + fmtOdds1d(avgAmericanRaw) + " (" + fmtPct1d(avgProb) + "%)";
 
-        // Average Margin
-        let totalMargin = 0, marginCount = 0;
+        // No-Vig CLV & Expected ROI — uses shared calcCLV()
+        let totalClvPct = 0, totalXROI = 0, clvCount = 0;
         PICKS.forEach(p => {
-          if (p.result === "Pending") return;
-          const scoreParts = p.score.match(/^(\d+)-(\d+)$/);
-          if (!scoreParts) return;
-          const myMaps = parseInt(scoreParts[1]);
-          const oppMaps = parseInt(scoreParts[2]);
-          let rawDiff = myMaps - oppMaps;
-          // Apply handicap if present
-          const hcapMatch = p.play.match(/([-+]\d+\.5)/);
-          if (hcapMatch) rawDiff += parseFloat(hcapMatch[1]);
-          totalMargin += rawDiff;
-          marginCount++;
+          if (p.result === "Pending" || !p.close) return;
+          const odds = p.play.match(/\(([-+]?\d+)\)/)?.[1];
+          if (!odds) return;
+          const { clvPct, xRoi } = calcCLV(odds, p.close);
+          totalClvPct += clvPct;
+          totalXROI += xRoi;
+          clvCount++;
         });
-        const avgMargin = marginCount > 0 ? totalMargin / marginCount : 0;
-        const fmtMargin = m => { const v = stripZeros(Math.abs(m).toFixed(2)); return (m > 0 ? "+" : m < 0 ? "-" : "") + v; };
+        const avgClvPct = clvCount > 0 ? totalClvPct / clvCount : null;
+        const avgXROI = clvCount > 0 ? totalXROI / clvCount : null;
+        const fmtSignedPct1d = n => { const s = fmtPct1d(Math.abs(n)); return (n > 0 ? "+" : n < 0 ? "-" : "") + s + "%"; };
+        const clvFmt = avgClvPct !== null ? fmtSignedPct1d(avgClvPct) : "—";
+        const expROIFmt = avgXROI !== null ? fmtSignedPct1d(avgXROI) : "—";
 
         const mobile = isMobile();
         const extraStatsEl = document.getElementById("extraStats");
         const extraItems = [
           { label: mobile ? "n" : "Total Plays", value: extraTotalPlays.toString(), cls: "" },
           { label: mobile ? "Avg Odds" : "Average Odds", value: avgOddsFmt, cls: "" },
-          { label: mobile ? "Avg Margin" : "Average Margin", value: fmtMargin(avgMargin), cls: getValueClass(avgMargin) },
+          { label: mobile ? "CLV" : "No-Vig CLV", value: clvFmt, cls: avgClvPct !== null ? getValueClass(avgClvPct) : "" },
+          { label: mobile ? "xROI" : "Expected ROI", value: expROIFmt, cls: avgXROI !== null ? getValueClass(avgXROI) : "" },
         ];
         extraItems.forEach(item => {
           const box = document.createElement("div");
@@ -738,7 +785,16 @@
               borderWidth: 1,
               padding: 12,
               displayColors: false,
-              callbacks: { label: c => "Profit: " + fmtSigned(c.parsed.y) + "u" }
+              callbacks: {
+                title: items => {
+                  const d = items[0].label;
+                  if (d === "Start") return d;
+                  const [y,m,dd] = d.split("-");
+                  const mn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                  return mn[+m-1] + " " + +dd + ", " + y;
+                },
+                label: c => "Profit: " + fmtSigned(c.parsed.y) + "u"
+              }
             }
           },
           scales: {
