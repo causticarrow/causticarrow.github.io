@@ -404,7 +404,7 @@
           let clvCell = "";
           if (pick.close && !isPending) {
             const { clvPct } = calcCLV(odds, pick.close);
-            const clvFmt = (clvPct >= 0 ? "+" : "") + fmtPct1dTbl(clvPct) + "%";
+            const clvFmt = (clvPct >= 0 ? "+" : "-") + fmtPct1dTbl(clvPct) + "%";
             clvCell = `<td class="col-clv ${clvPct >= 0 ? "positive" : "negative"}">${clvFmt}</td>`;
           } else {
             clvCell = `<td class="col-clv"></td>`;
