@@ -673,7 +673,7 @@
         playTypeSectionEl.appendChild(table);
       }
 
-      const clvCopyStr = avgClvPctGlobal !== null ? `, no-vig clv: ${(avgClvPctGlobal >= 0 ? "+" : "-") + fmtPct1dTbl(avgClvPctGlobal) + "%"}` : "";
+      const clvCopyStr = avgClvPctGlobal !== null ? `, avg no-vig clv: ${(avgClvPctGlobal >= 0 ? "+" : "-") + fmtPct1dTbl(avgClvPctGlobal) + "%"}` : "";
       const copyText = `ytd record: ${Math.round(topAdjW)}-${Math.round(topAdjL)}, ${fmtSigned(totalUnits)}u${clvCopyStr} // [archive](https://causticarrow.com/results/esports-2026)`;
       const copyBox = document.getElementById("copyBox");
       copyBox.onclick = () => {
