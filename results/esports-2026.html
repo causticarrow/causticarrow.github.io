@@ -52,14 +52,11 @@
     .col-risk, .hdr-risk { width: 90px; text-align: center; }
     .col-result, .hdr-result { width: 90px; text-align: center; }
     .col-score, .hdr-score { width: 90px; text-align: center; }
-    .col-units, .hdr-units { width: 90px; text-align: center; }
     .col-profit, .hdr-profit { width: 90px; text-align: center; white-space: nowrap; }
-    .col-clv, .hdr-clv { width: 110px; text-align: center; white-space: nowrap; }
     .positive { color: var(--positive); }
     .negative { color: var(--negative); }
     .bet-type { font-weight: 600; color: var(--accent-orange); }
     .vs-separator { color: var(--accent-purple); }
-    .note-pill { display: inline; background: var(--border); color: var(--text-dim); font-size: 12px; padding: 4px 8px; border-radius: 6px; margin-left: 8px; font-weight: 500; }
     .game-pill { display: inline-block; font-size: 12px; padding: 4px 8px; border-radius: 6px; font-weight: 500; }
     .col-game .game-pill { margin-left: 0; }
     .game-pill.cs2 { color: var(--cs2-text); background-color: var(--cs2-bg); }
@@ -88,6 +85,7 @@
     .copy-box { position: fixed; top: 20px; right: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 18px; color: var(--text); cursor: pointer; z-index: 1000; transition: all 0.2s; user-select: none; line-height: 1; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
     .copy-box:hover { background: var(--bg-header); border-color: var(--positive); color: var(--positive); }
     .copy-box:active { background: var(--bg); transform: scale(0.98); }
+    .chart-container { width: 100%; height: 300px; margin-bottom: 32px; background: var(--bg-card); border-radius: 12px; padding: 20px; box-sizing: border-box; }
     .mobile-menu-toggle { display: none; }
     @media (max-width: 768px) {
       body { padding: 0; font-size: 13px; }
@@ -97,8 +95,8 @@
       .sidebar > ul { display: none; padding: 15px; }
       .sidebar.open > ul { display: block; }
       .mobile-menu-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; background: var(--bg-card); color: var(--text-light); font-weight: 600; cursor: pointer; border: none; width: 100%; font-size: 14px; }
-      .mobile-menu-toggle::after { content: "☰"; font-size: 18px; }
-      .sidebar.open .mobile-menu-toggle::after { content: "✕"; }
+      .mobile-menu-toggle::after { content: "\2630"; font-size: 18px; }
+      .sidebar.open .mobile-menu-toggle::after { content: "\2715"; }
       h1 { font-size: 18px !important; margin-bottom: 16px; word-wrap: break-word; }
       .stats { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
       .stat-box { padding: 10px !important; }
@@ -112,7 +110,7 @@
       .chart-container { height: 180px !important; padding: 10px !important; margin-bottom: 20px !important; }
       table { display: table; width: 100% !important; table-layout: fixed; font-size: 11px; }
       th, td { padding: 6px 4px !important; font-size: 10px !important; overflow: hidden; text-overflow: ellipsis; }
-      .col-units, .hdr-units, .col-score, .hdr-score, .col-line, .hdr-line, .col-risk, .hdr-risk, .col-clv, .hdr-clv { display: none !important; }
+      .col-score, .hdr-score, .col-line, .hdr-line, .col-risk, .hdr-risk { display: none !important; }
       .col-date, .hdr-date { width: 50px !important; }
       .col-game { width: 38px !important; }
       .col-play, .hdr-play { width: auto !important; }
@@ -123,7 +121,7 @@
       .play-type-table th:nth-child(2), .play-type-table td:nth-child(2) { width: 36% !important; }
       .play-type-table td:not(:first-child), .play-type-table th:not(:first-child) { text-align: center !important; }
       canvas#profitChart { max-height: 160px !important; }
-      .note-pill, .game-pill, .extra-pill { font-size: 9px !important; padding: 2px 5px !important; margin-left: 4px !important; }
+      .game-pill, .extra-pill { font-size: 9px !important; padding: 2px 5px !important; margin-left: 4px !important; }
       .play-type-table { display: table; width: 100% !important; table-layout: fixed; }
       .play-type-table th, .play-type-table td { padding: 8px 6px !important; font-size: 11px !important; }
       .stats-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
@@ -134,33 +132,33 @@
 <body>
   <script>
     const PICKS = [
-      { date: "2026-02-14", play: "PARIVISION PK (+155) vs. MOUZ", result: "Pending", score: "", game: "CS2", close: "" },
-      { date: "2026-02-14", play: "B8 +1.5 (+125) vs. FURIA", result: "Pending", score: "", game: "CS2", close: "" },
-      { date: "2026-02-08", play: "FURIA +1.5 (-110) vs. Vitality", result: "L", score: "1-3", game: "CS2", close: "-125" },
-      { date: "2026-02-06", play: "Ninjas in Pyjamas PK (-125) vs. Gentle Mates", result: "W", score: "2-1", game: "CS2", close: "-175", extra: true },
-      { date: "2026-02-02", play: "FURIA PK (-130) vs. Natus Vincere", result: "W", score: "2-1", game: "CS2", close: "-150" },
-      { date: "2026-02-02", play: "NRG +1.5 (+225) vs. Falcons", result: "W", score: "1-2", game: "CS2", close: "+180" },
-      { date: "2026-02-02", play: "MOUZ PK (-175) vs. Aurora", result: "L", score: "0-2", game: "CS2", close: "-255" },
-      { date: "2026-02-02", play: "FaZe PK (-175) vs. BC.Game", result: "W", score: "2-1", game: "CS2", close: "-250" },
-      { date: "2026-02-01", play: "FUT PK (+150) vs. G2", result: "L", score: "1-2", game: "CS2", close: "+125" },
-      { date: "2026-02-01", play: "Astralis +1.5 (-125) vs. PARIVISION", result: "W", score: "2-1", game: "CS2", close: "-140" },
-      { date: "2026-02-01", play: "MOUZ -1.5 (-140) vs. NRG", result: "W", score: "2-0", game: "CS2", close: "-200" },
-      { date: "2026-02-01", play: "Aurora +1.5 (-140) vs. Falcons", result: "W", score: "2-1", game: "CS2", close: "-140" },
-      { date: "2026-01-31", play: "3DMAX PK (+160) vs. FaZe", result: "W", score: "2-0", game: "CS2", close: "+130" },
-      { date: "2026-01-30", play: "FUT PK (-105) vs. Liquid", result: "W", score: "2-0", game: "CS2", close: "-115" },
-      { date: "2026-01-29", play: "Liquid PK (+180) vs. G2", result: "L", score: "1-2", game: "CS2", close: "+175" },
-      { date: "2026-01-28", play: "3DMAX PK (+120) vs. FUT", result: "W", score: "2-1", game: "CS2", close: "+100" },
-      { date: "2026-01-28", play: "Liquid PK (+110) vs. NiP", result: "W", score: "2-0", game: "CS2", close: "-105" },
-      { date: "2026-01-28", play: "Liquid PK (-105) vs. NiP", result: "W", score: "2-0", game: "CS2", close: "-105" },
-      { date: "2026-01-23", play: "PARIVISION +1.5 (-110) vs. Spirit", result: "W", score: "2-1", game: "CS2", close: "-125" },
-      { date: "2026-01-22", play: "FURIA -1.5 (-110) vs. HEROIC", result: "L", score: "2-1", game: "CS2", close: "-165" },
-      { date: "2026-01-21", play: "HOTU PK (+150) vs. Gentle Mates", result: "W", score: "2-0", game: "CS2", close: "+130", extra: true },
-      { date: "2026-01-18", play: "Astralis PK (+140) vs. PARIVISION", result: "L", score: "0-2", game: "CS2", close: "+125" },
-      { date: "2026-01-17", play: "HEROIC PK (+125) vs. paiN", result: "W", score: "2-0", game: "CS2", close: "+110" },
-      { date: "2026-01-15", play: "Liquid PK (+115) vs. Ninjas in Pyjamas", result: "W", score: "2-1", game: "CS2", close: "+105" },
-      { date: "2026-01-14", play: "Monte +1.5 (+150) vs. Natus Vincere", result: "W", score: "2-1", game: "CS2", close: "+120" },
-      { date: "2026-01-14", play: "GamerLegion PK (+105) vs. Passion UA", result: "W", score: "2-1", game: "CS2", close: "-110" },
-      { date: "2026-01-13", play: "OG PK (+180) vs. FUT", result: "L", score: "0-2", game: "CS2", close: "+165" },
+      { date: "2026-02-14", play: "PARIVISION PK (+155) vs. MOUZ", result: "L", score: "1-2", game: "CS2" },
+      { date: "2026-02-14", play: "B8 +1.5 (+125) vs. FURIA", result: "Pending", score: "", game: "CS2" },
+      { date: "2026-02-08", play: "FURIA +1.5 (-110) vs. Vitality", result: "L", score: "1-3", game: "CS2" },
+      { date: "2026-02-06", play: "Ninjas in Pyjamas PK (-125) vs. Gentle Mates", result: "W", score: "2-1", game: "CS2", extra: true },
+      { date: "2026-02-02", play: "FURIA PK (-130) vs. Natus Vincere", result: "W", score: "2-1", game: "CS2" },
+      { date: "2026-02-02", play: "NRG +1.5 (+225) vs. Falcons", result: "W", score: "1-2", game: "CS2" },
+      { date: "2026-02-02", play: "MOUZ PK (-175) vs. Aurora", result: "L", score: "0-2", game: "CS2" },
+      { date: "2026-02-02", play: "FaZe PK (-175) vs. BC.Game", result: "W", score: "2-1", game: "CS2" },
+      { date: "2026-02-01", play: "FUT PK (+150) vs. G2", result: "L", score: "1-2", game: "CS2" },
+      { date: "2026-02-01", play: "Astralis +1.5 (-125) vs. PARIVISION", result: "W", score: "2-1", game: "CS2" },
+      { date: "2026-02-01", play: "MOUZ -1.5 (-140) vs. NRG", result: "W", score: "2-0", game: "CS2" },
+      { date: "2026-02-01", play: "Aurora +1.5 (-140) vs. Falcons", result: "W", score: "2-1", game: "CS2" },
+      { date: "2026-01-31", play: "3DMAX PK (+160) vs. FaZe", result: "W", score: "2-0", game: "CS2" },
+      { date: "2026-01-30", play: "FUT PK (-105) vs. Liquid", result: "W", score: "2-0", game: "CS2" },
+      { date: "2026-01-29", play: "Liquid PK (+180) vs. G2", result: "L", score: "1-2", game: "CS2" },
+      { date: "2026-01-28", play: "3DMAX PK (+120) vs. FUT", result: "W", score: "2-1", game: "CS2" },
+      { date: "2026-01-28", play: "Liquid PK (+110) vs. NiP", result: "W", score: "2-0", game: "CS2" },
+      { date: "2026-01-28", play: "Liquid PK (-105) vs. NiP", result: "W", score: "2-0", game: "CS2" },
+      { date: "2026-01-23", play: "PARIVISION +1.5 (-110) vs. Spirit", result: "W", score: "2-1", game: "CS2" },
+      { date: "2026-01-22", play: "FURIA -1.5 (-110) vs. HEROIC", result: "L", score: "2-1", game: "CS2" },
+      { date: "2026-01-21", play: "HOTU PK (+150) vs. Gentle Mates", result: "W", score: "2-0", game: "CS2", extra: true },
+      { date: "2026-01-18", play: "Astralis PK (+140) vs. PARIVISION", result: "L", score: "0-2", game: "CS2" },
+      { date: "2026-01-17", play: "HEROIC PK (+125) vs. paiN", result: "W", score: "2-0", game: "CS2" },
+      { date: "2026-01-15", play: "Liquid PK (+115) vs. Ninjas in Pyjamas", result: "W", score: "2-1", game: "CS2" },
+      { date: "2026-01-14", play: "Monte +1.5 (+150) vs. Natus Vincere", result: "W", score: "2-1", game: "CS2" },
+      { date: "2026-01-14", play: "GamerLegion PK (+105) vs. Passion UA", result: "W", score: "2-1", game: "CS2" },
+      { date: "2026-01-13", play: "OG PK (+180) vs. FUT", result: "L", score: "0-2", game: "CS2" },
     ];
   </script>
 
@@ -169,7 +167,7 @@
     <input type="text" class="search-bar" placeholder="Search">
     <ul>
       <li><a href="../index">Home</a></li>
-      <li><a href="https://x.com/causticarrow">𝕏 (Twitter)</a></li>
+      <li><a href="https://x.com/causticarrow">&#120143; (Twitter)</a></li>
       <li><a href="https://discord.gg/hammer">Discord</a></li>
       <li class="category-header">
         <span class="category-toggle">Results</span>
@@ -177,7 +175,7 @@
       </li>
     </ul>
   </aside>
-  <div class="copy-box" id="copyBox">📋</div>
+  <div class="copy-box" id="copyBox">&#128203;</div>
   <div class="container">
     <h1>@causticarrow // 2026 esports</h1>
     <div class="stats">
@@ -186,9 +184,9 @@
       <div class="stat-box"><div class="stat-label">Net Profit</div><div class="stat-value" id="netProfit">+0.0</div></div>
       <div class="stat-box"><div class="stat-label">ROI</div><div class="stat-value" id="roi">+0.0%</div></div>
     </div>
-    <div class="monthly-stats" id="extraStats" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 32px;"></div>
+    <div class="monthly-stats" id="extraStats" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 32px;"></div>
     <div class="monthly-stats" id="monthlyStats"></div>
-    <div class="chart-container" style="width:100%;height:300px;margin-bottom:32px;background:#161616;border-radius:12px;padding:20px;box-sizing:border-box">
+    <div class="chart-container">
       <canvas id="profitChart"></canvas>
     </div>
     <div class="stats-grid" id="playTypeSection"></div>
@@ -200,44 +198,37 @@
     const parseDate = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
     const formatDate = s => { const [y, m, d] = s.split("-"); return `${+m}/${+d}/${y.slice(-2)}`; };
     const stripZeros = s => String(s).includes(".") ? String(s).replace(/\.?0+$/, "") : String(s);
-    
-    const MONTH_SHORT = { January: "Jan", February: "Feb", March: "Mar", April: "Apr", May: "May", June: "Jun", July: "Jul", August: "Aug", September: "Sep", October: "Oct", November: "Nov", December: "Dec" };
-    const shortenMonth = m => isMobile() ? m.replace(/^(\w+)/, x => MONTH_SHORT[x] || x) : m;
+
+    const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const MONTH_LONG = { January: "Jan", February: "Feb", March: "Mar", April: "Apr", May: "May", June: "Jun", July: "Jul", August: "Aug", September: "Sep", October: "Oct", November: "Nov", December: "Dec" };
+    const shortenMonth = m => isMobile() ? m.replace(/^(\w+)/, x => MONTH_LONG[x] || x) : m;
 
     const TEAM_ABBR = {
-      Falcons: "FLCN", Yandex: "TY", "Natus Vincere": "NAVI", Xtreme: "XG", "Yakult Brothers": "YB",
-      Tidebound: "TT", Execration: "XctN", Tearlaments: "TT", BetBoom: "BB", PARIVISION: "PV",
-      "Nigma Galaxy": "NGX", Nemesis: "NMSS", Cloud9: "C9", "Gaimin Gladiators": "GG", Vitality: "VIT",
-      "The MongolZ": "MGLZ", "Passion US": "P.UA", "Virtus.pro": "VP", "Ninjas in Pyjamas": "NiP",
-      "Lynn Vision": "LV", GamerLegion: "GL", FlyQuest: "FQ", Astralis: "AST", Aurora: "AUR"
+      "Shopify Rebellion": "SR", "Nongshim RedForce": "NS", "Ninjas in Pyjamas": "NIP",
+      "FunPlus Phoenix": "FPX", "Rex Regum Qeon": "RRQ", "Natus Vincere": "NAVI",
+      "Dragon Ranger": "DRG", "Evil Geniuses": "EG", "100 Thieves": "100T",
+      "Eternal Fire": "EF", "Gentle Mates": "M8", "Karmine Corp": "KC",
+      "Inner Circle": "IC", "The MongolZ": "MGLZ", "Lynn Vision": "LV",
+      "RED Canids": "RED", "Rare Atom": "RA", "Passion UA": "P.UA",
+      "Paper Rex": "PRX", "All Gamers": "AG", "Xi Lai": "XLG",
+      "BC.Game": "BC.G", GamerLegion: "GL", PARIVISION: "PV", EYEBALLERS: "EB",
+      Heretics: "TH", Leviatan: "LEV", Bilibili: "BLG", Vitality: "VIT",
+      Falcons: "FLC", Nemesis: "NMSS", BetBoom: "BB", Imperial: "IMP",
+      ELEVATE: "ELV", EDward: "EDG", Cloud9: "C9", HEROIC: "HERO",
+      Aurora: "AUR", Spirit: "TS", Liquid: "TL", VARREL: "VL",
+      GIANTX: "GX", Legacy: "LGCY", FURIA: "FUR", TYLOO: "TYL",
+      "3DMAX": "3D", Dplus: "DK", fnatic: "FNC"
     };
 
-    function abbreviatePlay(play) {
-      if (!isMobile()) return play;
-      let a = play.replace(/\s+vs\.\s+([^<]+?)(?=\s*(?:<span|$))/g, "");
-      for (const [full, abbr] of Object.entries(TEAM_ABBR)) a = a.replace(new RegExp(full, "g"), abbr);
-      return a.replace(/Map\s+(\d+)/g, "M$1").replace(/Dota 2/g, "D2");
-    }
-
-      const fmtNum = n => stripZeros(n.toFixed(2));
-      const fmtWinPct = n => isMobile() ? Math.round(n).toString() : stripZeros(n.toFixed(2));
-      const fmtUnits = n => n === 0 ? "0.0" : (n > 0 ? "+" : "-") + (Math.abs(n - Math.round(n)) < 0.001 ? Math.abs(n).toFixed(1) : stripZeros(Math.abs(n).toFixed(2)));
-      const fmtUnitsHdr = n => n === 0 ? "0.0" : (isMobile() ? (n > 0 ? "+" : "-") + Math.abs(n).toFixed(1) : fmtUnits(n));
-      const fmtSigned = n => n === 0 ? "0" : (n > 0 ? "+" : "-") + stripZeros(Math.abs(n).toFixed(2));
-      const fmtSignedPct = n => n === 0 ? "0%" : fmtSigned(n) + "%";
-      const fmtROI = n => n === 0 ? "0%" : (isMobile() ? (Math.round(n) > 0 ? "+" : "") + Math.round(n) + "%" : fmtSignedPct(n));
-      const getValueClass = n => n === 0 ? "" : n > 0 ? "positive" : "negative";
-      const fmtPct1dTbl = n => { const s = Math.abs(n).toFixed(1); return s.endsWith(".0") ? Math.round(Math.abs(n)).toString() : s; };
-      const getStatClass = n => n === 0 ? "" : n > 0 ? "stat-positive" : "stat-negative";
-
-    function calcUnits(odds, result, isExtra = false) {
-      if (result === "Pending") return 0;
-      const a = parseInt(odds);
-      const winAmount = isExtra ? 0.5 : 1.0;
-      const riskFor1u = a > 0 ? 100 / a : -a / 100;
-      const risk = isExtra ? riskFor1u * 0.5 : riskFor1u;
-      return result === "W" ? winAmount : -risk;
-    }
+    const fmtNum = n => stripZeros(n.toFixed(2));
+    const fmtWinPct = n => isMobile() ? Math.round(n).toString() : stripZeros(n.toFixed(2));
+    const fmtUnits = n => n === 0 ? "0.0" : (n > 0 ? "+" : "-") + (Math.abs(n - Math.round(n)) < 0.001 ? Math.abs(n).toFixed(1) : stripZeros(Math.abs(n).toFixed(2)));
+    const fmtUnitsHdr = n => n === 0 ? "0.0" : (isMobile() ? (n > 0 ? "+" : "-") + Math.abs(n).toFixed(1) : fmtUnits(n));
+    const fmtSigned = n => n === 0 ? "0" : (n > 0 ? "+" : "-") + stripZeros(Math.abs(n).toFixed(2));
+    const fmtSignedPct = n => n === 0 ? "0%" : fmtSigned(n) + "%";
+    const fmtROI = n => n === 0 ? "0%" : (isMobile() ? (Math.round(n) > 0 ? "+" : "") + Math.round(n) + "%" : fmtSignedPct(n));
+    const getValueClass = n => n === 0 ? "" : n > 0 ? "positive" : "negative";
+    const getStatClass = n => n === 0 ? "" : n > 0 ? "stat-positive" : "stat-negative";
 
     function calcRisk(odds, isExtra = false) {
       const a = parseInt(odds);
@@ -245,56 +236,115 @@
       return isExtra ? riskFor1u * 0.5 : riskFor1u;
     }
 
+    function calcUnits(odds, result, isExtra = false) {
+      if (result === "Pending") return 0;
+      return result === "W" ? (isExtra ? 0.5 : 1.0) : -calcRisk(odds, isExtra);
+    }
+
     function calcAdjustedRecord(w, l, profit, globalAvgRisked) {
       const total = w + l;
       if (total === 0 || globalAvgRisked === 0) return { adjW: 0, adjL: 0 };
       const adjW = (total + profit / globalAvgRisked) / 2;
-      const adjL = Math.max(total - adjW, 0);
-      return { adjW, adjL };
+      return { adjW, adjL: Math.max(total - adjW, 0) };
     }
+
+    // Precompute odds, risk, units once per pick
+    const ODDS_RE = /\(([-+]?\d+)\)/;
+    PICKS.forEach(p => {
+      const m = p.play.match(ODDS_RE);
+      if (m) {
+        p._odds = m[1];
+        p._isExtra = p.extra === true;
+        p._isPending = p.result === "Pending";
+        p._risk = calcRisk(p._odds, p._isExtra);
+        p._units = calcUnits(p._odds, p.result, p._isExtra);
+      }
+    });
 
     window.addEventListener("load", () => {
       const container = document.getElementById("tablesContainer");
-      const chartDates = ["Start"], chartCumulativeUnits = [0];
+      const mobile = isMobile();
 
+      // Single pass: globals, monthly, game stats, play types, avg odds
       let wins = 0, losses = 0, totalRisk = 0, totalUnits = 0;
+      let totalDecimalOdds = 0, oddsCount = 0;
+      const monthlyData = {};
+      const gameStats = {};
+      const emptyBucket = () => ({ wins: 0, losses: 0, pushes: 0, units: 0, risk: 0 });
+      const playTypes = { "Pick'ems": emptyBucket(), Handicaps: emptyBucket(), Totals: emptyBucket(), Extras: emptyBucket(), Favourites: emptyBucket(), Dogs: emptyBucket(), Overs: emptyBucket(), Unders: emptyBucket() };
+
       PICKS.forEach(p => {
-        if (p.result === "Pending") return;
-        const odds = p.play.match(/\(([-+]?\d+)\)/)?.[1];
-        if (!odds) return;
-        const isExtra = p.extra === true;
-        const units = calcUnits(odds, p.result, isExtra);
-        const risk = calcRisk(odds, isExtra);
-        totalUnits += units;
-        totalRisk += risk;
+        if (!p._odds || p._isPending) return;
+        totalUnits += p._units;
+        totalRisk += p._risk;
         p.result === "W" ? wins++ : losses++;
+
+        const a = parseInt(p._odds);
+        totalDecimalOdds += a < 0 ? 1 + (100 / Math.abs(a)) : 1 + (a / 100);
+        oddsCount++;
+
+        const mo = parseDate(p.date).getMonth();
+        if (!monthlyData[mo]) monthlyData[mo] = { risk: 0, units: 0 };
+        monthlyData[mo].risk += p._risk;
+        monthlyData[mo].units += p._units;
+
+        if (p.game) {
+          if (!gameStats[p.game]) gameStats[p.game] = emptyBucket();
+          gameStats[p.game].risk += p._risk;
+          gameStats[p.game].units += p._units;
+          if (p.result === "W") gameStats[p.game].wins++;
+          else if (p.result === "P") gameStats[p.game].pushes++;
+          else gameStats[p.game].losses++;
+        }
+
+        const oddsNum = a;
+        const isSide = / PK /i.test(p.play);
+        const handicapMatch = p.play.match(/[+-]\d+\.5/);
+        const isHandicap = !!handicapMatch;
+        const isOver = / Over /i.test(p.play);
+        const isUnder = / Under /i.test(p.play);
+        const isTotal = isOver || isUnder;
+        const addTo = type => {
+          playTypes[type].risk += p._risk;
+          playTypes[type].units += p._units;
+          if (p.result === "W") playTypes[type].wins++;
+          else if (p.result === "P") playTypes[type].pushes++;
+          else playTypes[type].losses++;
+        };
+        if (p._isExtra) { addTo("Extras"); }
+        else if (isSide) { addTo("Pick'ems"); }
+        else if (isHandicap) { addTo("Handicaps"); }
+        else if (isTotal) { addTo("Totals"); }
+        if (!p._isExtra) {
+          if (isHandicap) { parseFloat(handicapMatch[0]) < 0 ? addTo("Favourites") : addTo("Dogs"); }
+          else if (!isTotal) { oddsNum < 0 ? addTo("Favourites") : addTo("Dogs"); }
+          if (isOver) addTo("Overs");
+          if (isUnder) addTo("Unders");
+        }
       });
+
       const totalPlays = wins + losses;
       const globalAvgRisked = totalPlays > 0 ? totalRisk / totalPlays : 0;
 
-      const chrono = [...PICKS].sort((a, b) => {
+      // Chart data (chronological)
+      const chartDates = ["Start"], chartCumulativeUnits = [0];
+      let cumUnits = 0, lastMonth = -1;
+      const monthBoundaries = [];
+      [...PICKS].filter(p => p._odds).sort((a, b) => {
         const d = parseDate(a.date) - parseDate(b.date);
         return d !== 0 ? d : a.play.localeCompare(b.play);
-      });
-      let cumUnits = 0;
-      let lastMonth = -1;
-      const monthBoundaries = [];
-      chrono.forEach((pick, idx) => {
-        const odds = pick.play.match(/\(([-+]?\d+)\)/)?.[1];
-        if (odds) {
-          cumUnits += calcUnits(odds, pick.result, pick.extra);
-          chartDates.push(pick.date);
-          chartCumulativeUnits.push(cumUnits);
-          const m = parseDate(pick.date).getMonth();
-          if (lastMonth === -1) {
-            monthBoundaries.push({ index: chartDates.length - 1, month: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m] });
-          } else if (m !== lastMonth) {
-            monthBoundaries.push({ index: chartDates.length - 1, month: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m] });
-          }
+      }).forEach(pick => {
+        cumUnits += pick._units;
+        chartDates.push(pick.date);
+        chartCumulativeUnits.push(cumUnits);
+        const m = parseDate(pick.date).getMonth();
+        if (m !== lastMonth) {
+          monthBoundaries.push({ index: chartDates.length - 1, month: MONTH_NAMES[m] });
           lastMonth = m;
         }
       });
 
+      // Group picks by month (reverse chrono for tables)
       const sorted = [...PICKS].sort((a, b) => {
         const d = parseDate(b.date) - parseDate(a.date);
         return d !== 0 ? d : b.play.localeCompare(a.play);
@@ -306,133 +356,64 @@
         (grouped[key] ||= []).push(p);
       });
 
-      function getPlayType(play) {
-        if (/ Over /i.test(play) || / Under /i.test(play)) return "Total";
-        if (/ PK /i.test(play)) return "Pick'em";
-        if (/[+-]\d+\.5/.test(play)) return "Handicap";
-        return "Pick'em";
-      }
-
       function parsePlayLine(play) {
-        const oddsMatch = play.match(/\(([-+]?\d+)\)/);
+        const oddsMatch = play.match(ODDS_RE);
         const line = oddsMatch ? oddsMatch[1] : "";
         const cleanPlay = play.replace(/\s*\([-+]?\d+\)\s*/, " ").replace(/\s+/g, " ").trim();
         return { cleanPlay, line };
       }
 
-      // --- CLV helpers ---
-      const ESPORTS_VIG = 1.0476; // -110/-110
-      function amToDec(a) { const n = parseInt(a); return n > 0 ? (n / 100) + 1 : (100 / -n) + 1; }
-      function getOtherSide(closeOdds) {
-        const c = parseInt(closeOdds);
-        const pClose = c > 0 ? 100 / (c + 100) : -c / (-c + 100);
-        const otherImpl = ESPORTS_VIG - pClose;
-        return otherImpl >= 0.5 ? -Math.round(100 * otherImpl / (1 - otherImpl)) : Math.round(100 * (1 - otherImpl) / otherImpl);
-      }
-      function solveForC(d1, d2) {
-        let c = 1.0;
-        for (let i = 0; i < 50; i++) {
-          const p1 = Math.pow(1 / d1, c), p2 = Math.pow(1 / d2, c);
-          const f = p1 + p2 - 1;
-          if (Math.abs(f) < 1e-10) break;
-          const df = p1 * Math.log(1 / d1) + p2 * Math.log(1 / d2);
-          if (Math.abs(df) < 1e-12) break;
-          c = c - f / df;
-        }
-        return c;
-      }
-      function calcFairProb(closeOdds) {
-        const d1 = amToDec(closeOdds);
-        const d2 = amToDec(getOtherSide(closeOdds));
-        const c = solveForC(d1, d2);
-        return Math.pow(1 / d1, c);
-      }
-      function calcCLV(myOdds, closeOdds) {
-        const myDec = amToDec(myOdds);
-        const fairProb = calcFairProb(closeOdds);
-        const clvPct = (fairProb - (1 / myDec)) * 100;
-        const xRoi = (fairProb * myDec - 1) * 100;
-        return { clvPct, xRoi };
-      }
-
+      // Render month tables
       Object.keys(grouped).sort((a, b) => parseDate(grouped[b][0].date) - parseDate(grouped[a][0].date)).forEach(monthName => {
         const monthPicks = grouped[monthName];
         let mWins = 0, mLosses = 0, mRisk = 0, mUnits = 0;
 
         const table = document.createElement("table");
-        const profitHdr = isMobile()
-          ? '<th class="hdr-profit">Profit</th>'
-          : '<th class="hdr-profit">Profit</th>';
-        const clvHdrLabel = isMobile() ? 'CLV' : 'No-Vig CLV';
-        table.innerHTML = `<thead><tr><th class="hdr-date">Date</th><th class="col-game"></th><th class="hdr-play">Play</th><th class="hdr-line">Line</th><th class="hdr-risk">Risk</th><th class="hdr-score">Score</th><th class="hdr-result">Result</th>${profitHdr}<th class="hdr-clv">${clvHdrLabel}</th></tr></thead><tbody></tbody>`;
+        table.innerHTML = `<thead><tr><th class="hdr-date">Date</th><th class="col-game"></th><th class="hdr-play">Play</th><th class="hdr-line">Line</th><th class="hdr-risk">Risk</th><th class="hdr-score">Score</th><th class="hdr-result">Result</th><th class="hdr-profit">Profit</th></tr></thead><tbody></tbody>`;
         const tbody = table.querySelector("tbody");
 
         monthPicks.forEach(pick => {
-          const odds = pick.play.match(/\(([-+]?\d+)\)/)?.[1];
-          if (!odds) return;
-
-          const isExtra = pick.extra === true;
-          const units = calcUnits(odds, pick.result, isExtra);
-          const isPending = pick.result === "Pending";
-          const risk = calcRisk(odds, isExtra);
-
-          if (!isPending) {
-            mUnits += units;
-            mRisk += risk;
+          if (!pick._odds) return;
+          if (!pick._isPending) {
+            mUnits += pick._units;
+            mRisk += pick._risk;
             pick.result === "W" ? mWins++ : mLosses++;
           }
 
           const { cleanPlay, line } = parsePlayLine(pick.play);
-
           let fp = cleanPlay.replace(/^\d+\s+/, "").replace(/<\/?span[^>]*>/g, "");
-          const mobile = isMobile();
           if (mobile) {
             fp = fp.replace(/\s+vs\.\s+[^(]+(?=\s*$)/g, "");
             for (const [full, abbr] of Object.entries(TEAM_ABBR)) fp = fp.replace(new RegExp(full, "g"), abbr);
+          } else {
+            fp = fp.replace(/\s+vs\.\s+/g, ' <span class="vs-separator">vs.</span> ');
           }
-
-          {
-            if (!mobile) fp = fp.replace(/\s+vs\.\s+/g, ' <span class="vs-separator">vs.</span> ');
-            fp = fp.replace(/\b(PK)\b/g, '<span class="bet-type">$1</span>')
-                   .replace(/(Over|Under)\s+(\d+\.?\d*)/g, '<span class="bet-type">$1 $2</span>')
-                   .replace(/(?<![">a-zA-Z0-9])([+-]\d+\.?\d*)(?![^<]*<\/span>)/g, '<span class="bet-type">$1</span>');
-          }
-
-          if (isExtra) fp += ` <span class="extra-pill">Extra</span>`;
+          fp = fp.replace(/\b(PK)\b/g, '<span class="bet-type">$1</span>')
+                 .replace(/(Over|Under)\s+(\d+\.?\d*)/g, '<span class="bet-type">$1 $2</span>')
+                 .replace(/(?<![">a-zA-Z0-9])([+-]\d+\.?\d*)(?![^<]*<\/span>)/g, '<span class="bet-type">$1</span>');
+          if (pick._isExtra) fp += ` <span class="extra-pill">Extra</span>`;
 
           const gameCell = pick.game ? `<span class="game-pill ${pick.game.toLowerCase().replace(" ", "")}">${pick.game}</span>` : "";
           const lineDisplay = line ? (line.startsWith("+") || line.startsWith("-") ? line : (parseInt(line) > 0 ? "+" + line : line)) : "";
-
-          // CLV for this pick
-          let clvCell = "";
-          if (pick.close && !isPending) {
-            const { clvPct } = calcCLV(odds, pick.close);
-            const clvFmt = (clvPct >= 0 ? "+" : "-") + fmtPct1dTbl(clvPct) + "%";
-            clvCell = `<td class="col-clv ${clvPct >= 0 ? "positive" : "negative"}">${clvFmt}</td>`;
-          } else {
-            clvCell = `<td class="col-clv"></td>`;
-          }
-
           const row = document.createElement("tr");
-          row.innerHTML = `<td class="col-date">${formatDate(pick.date)}</td><td class="col-game">${gameCell}</td><td class="col-play"></td><td class="col-line">${lineDisplay}</td><td class="col-risk">${fmtNum(risk) + "u"}</td><td class="col-score">${pick.score}</td><td class="col-result ${isPending ? "" : pick.result === "W" ? "positive" : "negative"}">${isPending ? "Pending" : pick.result === "W" ? "Win" : "Loss"}</td><td class="col-profit ${isPending ? "" : getValueClass(units)}">${isPending ? "" : fmtUnits(units) + "u"}</td>${clvCell}`;
+          row.innerHTML = `<td class="col-date">${formatDate(pick.date)}</td><td class="col-game">${gameCell}</td><td class="col-play"></td><td class="col-line">${lineDisplay}</td><td class="col-risk">${fmtNum(pick._risk)}u</td><td class="col-score">${pick.score}</td><td class="col-result ${pick._isPending ? "" : pick.result === "W" ? "positive" : "negative"}">${pick._isPending ? "Pending" : pick.result === "W" ? "Win" : "Loss"}</td><td class="col-profit ${pick._isPending ? "" : getValueClass(pick._units)}">${pick._isPending ? "" : fmtUnits(pick._units) + "u"}</td>`;
           row.querySelector(".col-play").innerHTML = fp;
           tbody.appendChild(row);
         });
 
         container.appendChild(table);
-        const roi = mRisk ? (mUnits / mRisk) * 100 : 0;
+        const mRoi = mRisk ? (mUnits / mRisk) * 100 : 0;
         const { adjW: mAdjW, adjL: mAdjL } = calcAdjustedRecord(mWins, mLosses, mUnits, globalAvgRisked);
         const mAdjWinPct = (mAdjW + mAdjL) > 0 ? (mAdjW / (mAdjW + mAdjL)) * 100 : 0;
         const header = document.createElement("h2");
         header.className = "month-title";
-        const monthIndex = new Date(Date.parse(monthName.split(" ")[0] + " 1, 2000")).getMonth();
-        header.id = `month-${monthIndex}`;
-        header.innerHTML = `${shortenMonth(monthName)}: ${Math.round(mAdjW)}-${Math.round(mAdjL)} (${fmtWinPct(mAdjWinPct)}%), <span class="${getValueClass(mUnits)}">${fmtUnitsHdr(mUnits)}u</span>, <span class="${getValueClass(roi)}">${fmtROI(roi).replace(/^\+/, "")} ROI</span>`;
+        header.id = `month-${new Date(Date.parse(monthName.split(" ")[0] + " 1, 2000")).getMonth()}`;
+        header.innerHTML = `${shortenMonth(monthName)}: ${Math.round(mAdjW)}-${Math.round(mAdjL)} (${fmtWinPct(mAdjWinPct)}%), <span class="${getValueClass(mUnits)}">${fmtUnitsHdr(mUnits)}u</span>, <span class="${getValueClass(mRoi)}">${fmtROI(mRoi).replace(/^\+/, "")} ROI</span>`;
         container.insertBefore(header, table);
       });
 
+      // Top stats
       const roi = totalRisk ? (totalUnits / totalRisk) * 100 : 0;
-
       const { adjW: topAdjW, adjL: topAdjL } = calcAdjustedRecord(wins, losses, totalUnits, globalAvgRisked);
       const topAdjWinPct = (topAdjW + topAdjL) > 0 ? (topAdjW / (topAdjW + topAdjL)) * 100 : 0;
       document.getElementById("totalPlays").textContent = `${Math.round(topAdjW)}-${Math.round(topAdjL)} (${fmtNum(topAdjWinPct)}%)`;
@@ -444,78 +425,29 @@
       roiEl.textContent = fmtSignedPct(roi).replace(/^\+/, "");
       roiEl.className = `stat-value ${getStatClass(roi)}`;
 
-      // --- Extra Stats ---
-      let avgClvPctGlobal = null;
+      // Extra Stats
       {
-        const extraTotalPlays = totalPlays;
-
-        // Average Odds — average in decimal, then convert back
-        let totalDecimalOdds = 0, oddsCount = 0;
-        PICKS.forEach(p => {
-          if (p.result === "Pending") return;
-          const odds = p.play.match(/\(([-+]?\d+)\)/)?.[1];
-          if (!odds) return;
-          const a = parseInt(odds);
-          const dec = a < 0 ? 1 + (100 / Math.abs(a)) : 1 + (a / 100);
-          totalDecimalOdds += dec;
-          oddsCount++;
-        });
         const avgDec = oddsCount > 0 ? totalDecimalOdds / oddsCount : 0;
         const avgAmericanRaw = avgDec >= 2 ? (avgDec - 1) * 100 : -100 / (avgDec - 1);
         const avgProb = avgDec > 0 ? (1 / avgDec) * 100 : 0;
-        const fmtOdds1d = n => { const s = Math.abs(n).toFixed(1); return s.endsWith(".0") ? Math.round(Math.abs(n)).toString() : s; };
+        const fmt1d = n => { const s = Math.abs(n).toFixed(1); return s.endsWith(".0") ? Math.round(Math.abs(n)).toString() : s; };
         const fmtPct1d = p => { const s = p.toFixed(1); return s.endsWith(".0") ? Math.round(p).toString() : s; };
-        const avgOddsFmt = (avgAmericanRaw >= 0 ? "+" : "-") + fmtOdds1d(avgAmericanRaw) + " (" + fmtPct1d(avgProb) + "%)";
+        const avgOddsFmt = (avgAmericanRaw >= 0 ? "+" : "-") + fmt1d(avgAmericanRaw) + " (" + fmtPct1d(avgProb) + "%)";
 
-        // No-Vig CLV & Expected ROI — uses shared calcCLV()
-        let totalClvPct = 0, totalXROI = 0, clvCount = 0;
-        PICKS.forEach(p => {
-          if (p.result === "Pending" || !p.close) return;
-          const odds = p.play.match(/\(([-+]?\d+)\)/)?.[1];
-          if (!odds) return;
-          const { clvPct, xRoi } = calcCLV(odds, p.close);
-          totalClvPct += clvPct;
-          totalXROI += xRoi;
-          clvCount++;
-        });
-        const avgClvPct = clvCount > 0 ? totalClvPct / clvCount : null;
-        const avgXROI = clvCount > 0 ? totalXROI / clvCount : null;
-        avgClvPctGlobal = avgClvPct;
-        const fmtSignedPct1d = n => { const s = fmtPct1d(Math.abs(n)); return (n > 0 ? "+" : n < 0 ? "-" : "") + s + "%"; };
-        const clvFmt = avgClvPct !== null ? fmtSignedPct1d(avgClvPct) : "—";
-        const expROIFmt = avgXROI !== null ? fmtSignedPct1d(avgXROI) : "—";
-
-        const mobile = isMobile();
         const extraStatsEl = document.getElementById("extraStats");
-        const extraItems = [
-          { label: mobile ? "n" : "Total Plays", value: extraTotalPlays.toString(), cls: "" },
-          { label: mobile ? "Avg Odds" : "Average Odds", value: avgOddsFmt, cls: "" },
-          { label: mobile ? "CLV" : "No-Vig CLV", value: clvFmt, cls: avgClvPct !== null ? getValueClass(avgClvPct) : "" },
-          { label: mobile ? "xROI" : "Expected ROI", value: expROIFmt, cls: avgXROI !== null ? getValueClass(avgXROI) : "" },
-        ];
-        extraItems.forEach(item => {
+        [
+          { label: mobile ? "n" : "Total Plays", value: totalPlays.toString() },
+          { label: mobile ? "Avg Odds" : "Average Odds", value: avgOddsFmt },
+        ].forEach(item => {
           const box = document.createElement("div");
           box.className = "month-box";
-          box.innerHTML = `<div class="month-box-label">${item.label}</div><div class="month-box-value${item.cls ? " " + item.cls : ""}">${item.value}</div>`;
+          box.innerHTML = `<div class="month-box-label">${item.label}</div><div class="month-box-value">${item.value}</div>`;
           extraStatsEl.appendChild(box);
         });
       }
 
+      // Monthly boxes
       const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-      const monthlyData = {};
-      PICKS.forEach(p => {
-        const d = parseDate(p.date);
-        const m = d.getMonth();
-        if (!monthlyData[m]) monthlyData[m] = { risk: 0, units: 0 };
-        const odds = p.play.match(/\(([-+]?\d+)\)/)?.[1];
-        if (odds && p.result !== "Pending") {
-          const isExtra = p.extra === true;
-          const risk = calcRisk(odds, isExtra);
-          const units = calcUnits(odds, p.result, isExtra);
-          monthlyData[m].risk += risk;
-          monthlyData[m].units += units;
-        }
-      });
       const monthlyStatsEl = document.getElementById("monthlyStats");
       MONTHS.forEach((name, i) => {
         const box = document.createElement("div");
@@ -525,7 +457,7 @@
           box.className = "month-box month-box-clickable";
           box.innerHTML = `<div class="month-box-label">${name}</div><div class="month-box-value"><span class="${getValueClass(data.units)}">${fmtSigned(data.units)}u</span>, <span class="${getValueClass(mRoi)}">${fmtSignedPct(mRoi).replace(/^\+/, "")}</span></div>`;
           box.addEventListener("click", () => {
-            if (isMobile()) return;
+            if (mobile) return;
             const target = document.getElementById(`month-${i}`);
             if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
           });
@@ -536,175 +468,73 @@
         monthlyStatsEl.appendChild(box);
       });
 
-      const gameStats = {};
-      PICKS.forEach(p => {
-        if (p.result === "Pending" || !p.game) return;
-        const odds = p.play.match(/\(([-+]?\d+)\)/)?.[1];
-        if (!odds) return;
-
-        const isExtra = p.extra === true;
-        if (!gameStats[p.game]) gameStats[p.game] = { wins: 0, losses: 0, pushes: 0, units: 0, risk: 0 };
-
-        const units = calcUnits(odds, p.result, isExtra);
-        const risk = calcRisk(odds, isExtra);
-        gameStats[p.game].risk += risk;
-        gameStats[p.game].units += units;
-        if (p.result === "W") gameStats[p.game].wins++;
-        else if (p.result === "P") gameStats[p.game].pushes++;
-        else gameStats[p.game].losses++;
-      });
-
-      const emptyBucket = () => ({ wins: 0, losses: 0, pushes: 0, units: 0, risk: 0 });
-      const playTypes = {
-        "Pick'ems": emptyBucket(),
-        Handicaps: emptyBucket(),
-        Totals: emptyBucket(),
-        Extras: emptyBucket(),
-        Favourites: emptyBucket(),
-        Dogs: emptyBucket(),
-        Overs: emptyBucket(),
-        Unders: emptyBucket()
-      };
-
-      PICKS.forEach(p => {
-        if (p.result === "Pending") return;
-        const odds = p.play.match(/\(([-+]?\d+)\)/)?.[1];
-        if (!odds) return;
-
-        const isExtra = p.extra === true;
-        const oddsNum = parseInt(odds);
-        const isSide = / PK /i.test(p.play);
-        const handicapMatch = p.play.match(/[+-]\d+\.5/);
-        const isHandicap = !!handicapMatch;
-        const isOver = / Over /i.test(p.play);
-        const isUnder = / Under /i.test(p.play);
-        const isTotal = isOver || isUnder;
-
-        const units = calcUnits(odds, p.result, isExtra);
-        const risk = calcRisk(odds, isExtra);
-
-        const addTo = (type) => {
-          playTypes[type].risk += risk;
-          playTypes[type].units += units;
-          if (p.result === "W") playTypes[type].wins++;
-          else if (p.result === "P") playTypes[type].pushes++;
-          else playTypes[type].losses++;
-        };
-
-        if (isExtra) {
-          addTo("Extras");
-        } else if (isSide) {
-          addTo("Pick'ems");
-        } else if (isHandicap) {
-          addTo("Handicaps");
-        } else if (isTotal) {
-          addTo("Totals");
-        }
-
-        if (!isExtra) {
-          if (isHandicap) {
-            const hcap = parseFloat(handicapMatch[0]);
-            if (hcap < 0) addTo("Favourites");
-            else if (hcap > 0) addTo("Dogs");
-          } else if (!isTotal) {
-            if (oddsNum < 0) addTo("Favourites");
-            else if (oddsNum > 0) addTo("Dogs");
-          }
-
-          if (isOver) addTo("Overs");
-          if (isUnder) addTo("Unders");
-        }
-      });
-
+      // Summary tables
       const playTypeSectionEl = document.getElementById("playTypeSection");
-
-      const gameColors = {
-        'CS2': 'rgb(97, 175, 239)',
-        'Dota 2': 'rgb(224, 108, 117)'
-      };
+      const gameColors = { 'CS2': 'rgb(97, 175, 239)', 'Dota 2': 'rgb(224, 108, 117)' };
 
       function buildSummaryRow(name, d, nameStyle) {
         const { adjW, adjL } = calcAdjustedRecord(d.wins, d.losses, d.units, globalAvgRisked);
         const winPctVal = (adjW + adjL) > 0 ? (adjW / (adjW + adjL)) * 100 : 0;
         const record = d.pushes > 0 ? `${Math.round(adjW)}-${Math.round(adjL)}-${d.pushes}` : `${Math.round(adjW)}-${Math.round(adjL)}`;
-        const recordStr = `${record} (${fmtNum(winPctVal)}%)`;
-        const roi = d.risk ? (d.units / d.risk * 100) : 0;
+        const r = d.risk ? (d.units / d.risk * 100) : 0;
         const row = document.createElement("tr");
-        row.innerHTML = `<td${nameStyle ? ' style="' + nameStyle + '"' : ''}>${name}</td><td>${recordStr}</td><td class="pt-risk">${fmtNum(d.risk)}u</td><td class="${getValueClass(d.units)}">${fmtSigned(d.units)}u</td><td class="${getValueClass(roi)}">${fmtSignedPct(roi).replace(/^\+/, "")}</td>
-`;
+        row.innerHTML = `<td${nameStyle ? ' style="' + nameStyle + '"' : ''}>${name}</td><td>${record} (${fmtNum(winPctVal)}%)</td><td class="pt-risk">${fmtNum(d.risk)}u</td><td class="${getValueClass(d.units)}">${fmtSigned(d.units)}u</td><td class="${getValueClass(r)}">${fmtSignedPct(r).replace(/^\+/, "")}</td>`;
         return row;
       }
 
-      const activeGames = Object.entries(gameStats)
-        .filter(([_, d]) => d.wins + d.losses + d.pushes > 0)
-        .sort((a, b) => a[0].localeCompare(b[0]));
+      const activeGames = Object.entries(gameStats).filter(([_, d]) => d.wins + d.losses + d.pushes > 0).sort((a, b) => a[0].localeCompare(b[0]));
       if (activeGames.length > 0) {
         const gameTable = document.createElement("table");
         gameTable.className = "play-type-table";
-        const profitColLabel = isMobile() ? "Profit" : "Net Profit";
-        gameTable.innerHTML = `<thead><tr><th>Game</th><th>Record</th><th class="pt-hdr-risk">Net Risk</th><th>${profitColLabel}</th><th>ROI</th></tr></thead><tbody></tbody>`;
+        const profitLabel = mobile ? "Profit" : "Net Profit";
+        gameTable.innerHTML = `<thead><tr><th>Game</th><th>Record</th><th class="pt-hdr-risk">Net Risk</th><th>${profitLabel}</th><th>ROI</th></tr></thead><tbody></tbody>`;
         const tbody = gameTable.querySelector("tbody");
-
-        activeGames.forEach(([name, d]) => {
-          const gameColor = gameColors[name] || 'var(--text-light)';
-          tbody.appendChild(buildSummaryRow(name, d, `color: ${gameColor}`));
-        });
-
+        activeGames.forEach(([name, d]) => tbody.appendChild(buildSummaryRow(name, d, `color: ${gameColors[name] || 'var(--text-light)'}`)));
         playTypeSectionEl.appendChild(gameTable);
       }
 
       const typeOrder = ["Pick'ems", "Handicaps", "Totals", "Extras", "Favourites", "Dogs", "Overs", "Unders"];
-      const activeTypes = typeOrder.filter(name => {
-        const d = playTypes[name];
-        return d.wins + d.losses + d.pushes > 0;
-      });
+      const activeTypes = typeOrder.filter(name => { const d = playTypes[name]; return d.wins + d.losses + d.pushes > 0; });
       if (activeTypes.length > 0) {
         const table = document.createElement("table");
         table.className = "play-type-table";
-        const ptProfitLabel = isMobile() ? "Profit" : "Net Profit";
-        const ptTypeLabel = isMobile() ? "Type" : "Play Type";
+        const ptProfitLabel = mobile ? "Profit" : "Net Profit";
+        const ptTypeLabel = mobile ? "Type" : "Play Type";
         table.innerHTML = `<thead><tr><th>${ptTypeLabel}</th><th>Record</th><th class="pt-hdr-risk">Net Risk</th><th>${ptProfitLabel}</th><th>ROI</th></tr></thead><tbody></tbody>`;
         const tbody = table.querySelector("tbody");
-
-        activeTypes.forEach(name => {
-          tbody.appendChild(buildSummaryRow(name, playTypes[name], null));
-        });
-
+        activeTypes.forEach(name => tbody.appendChild(buildSummaryRow(name, playTypes[name], null)));
         playTypeSectionEl.appendChild(table);
       }
 
-      const clvCopyStr = avgClvPctGlobal !== null ? `, avg no-vig clv: ${(avgClvPctGlobal >= 0 ? "+" : "-") + fmtPct1dTbl(avgClvPctGlobal) + "%"}` : "";
-      const copyText = `ytd record: ${Math.round(topAdjW)}-${Math.round(topAdjL)}, ${fmtSigned(totalUnits)}u${clvCopyStr} // [archive](https://causticarrow.com/results/esports-2026)`;
+      // Copy box
+      const copyText = `ytd record: ${Math.round(topAdjW)}-${Math.round(topAdjL)}, ${fmtSigned(totalUnits)}u // [archive](https://causticarrow.com/results/esports-2026)`;
       const copyBox = document.getElementById("copyBox");
       copyBox.onclick = () => {
         navigator.clipboard.writeText(copyText).then(() => {
-          copyBox.textContent = "✓";
+          copyBox.textContent = "\u2713";
           copyBox.style.borderColor = "#4ade80";
           copyBox.style.color = "#4ade80";
-          setTimeout(() => { copyBox.textContent = "📋"; copyBox.style.borderColor = "#2a2a2a"; copyBox.style.color = "#e6e6e6"; }, 1000);
+          setTimeout(() => { copyBox.textContent = "\uD83D\uDCCB"; copyBox.style.borderColor = "#2a2a2a"; copyBox.style.color = "#e6e6e6"; }, 1000);
         });
       };
 
+      // --- Chart ---
       const ctx = document.getElementById("profitChart").getContext("2d");
 
       const createZeroCrossingGradient = (chartCtx, y0, y1, yScale, isBackground = false) => {
         const pixel0 = yScale.getPixelForValue(y0);
         const pixel1 = yScale.getPixelForValue(y1);
         const gradient = chartCtx.createLinearGradient(0, pixel0, 0, pixel1);
-        const red = isBackground ? "rgba(248, 113, 113, 0.1)" : "#f87171";
-        const green = isBackground ? "rgba(74, 222, 128, 0.1)" : "#4ade80";
+        const red = isBackground ? "rgba(248, 113, 113, 0.08)" : "#f87171";
+        const green = isBackground ? "rgba(74, 222, 128, 0.08)" : "#4ade80";
         if (y0 < 0 && y1 >= 0) {
-          const zeroRatio = Math.abs(y0) / (Math.abs(y0) + y1);
-          gradient.addColorStop(0, red);
-          gradient.addColorStop(zeroRatio, red);
-          gradient.addColorStop(zeroRatio, green);
-          gradient.addColorStop(1, green);
+          const r = Math.abs(y0) / (Math.abs(y0) + y1);
+          gradient.addColorStop(0, red); gradient.addColorStop(r, red);
+          gradient.addColorStop(r, green); gradient.addColorStop(1, green);
         } else if (y0 >= 0 && y1 < 0) {
-          const zeroRatio = y0 / (y0 + Math.abs(y1));
-          gradient.addColorStop(0, green);
-          gradient.addColorStop(zeroRatio, green);
-          gradient.addColorStop(zeroRatio, red);
-          gradient.addColorStop(1, red);
+          const r = y0 / (y0 + Math.abs(y1));
+          gradient.addColorStop(0, green); gradient.addColorStop(r, green);
+          gradient.addColorStop(r, red); gradient.addColorStop(1, red);
         }
         return gradient;
       };
@@ -713,35 +543,71 @@
       const dynRadius = totalPoints <= 30 ? 3 : totalPoints <= 60 ? 2 : totalPoints <= 120 ? 1.5 : 1;
       const dynHover = dynRadius + 2;
 
+      const zeroLinePlugin = {
+        id: 'zeroLine',
+        beforeDraw(chart) {
+          const { ctx, chartArea, scales: { y } } = chart;
+          if (!chartArea || y.min >= 0 || y.max <= 0) return;
+          const yPos = y.getPixelForValue(0);
+          ctx.save();
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(chartArea.left, yPos);
+          ctx.lineTo(chartArea.right, yPos);
+          ctx.stroke();
+          ctx.restore();
+        }
+      };
+
       const monthLinePlugin = {
         id: 'monthLines',
         afterDraw(chart) {
-          const { ctx, chartArea, scales: { x, y } } = chart;
+          const { ctx, chartArea, scales: { x } } = chart;
           if (!chartArea) return;
           monthBoundaries.forEach(b => {
             const xPos = x.getPixelForValue(b.index);
             if (xPos < chartArea.left || xPos > chartArea.right) return;
             ctx.save();
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
             ctx.lineWidth = 1;
-            ctx.setLineDash([4, 4]);
+            ctx.setLineDash([3, 5]);
             ctx.beginPath();
             ctx.moveTo(xPos, chartArea.top);
             ctx.lineTo(xPos, chartArea.bottom);
             ctx.stroke();
             ctx.setLineDash([]);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
             ctx.font = '10px Roboto, system-ui, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(b.month, xPos, chartArea.top - 5);
+            ctx.fillText(b.month, xPos, chartArea.top - 6);
             ctx.restore();
           });
         }
       };
 
+      const endLabelPlugin = {
+        id: 'endLabel',
+        afterDraw(chart) {
+          const { ctx, chartArea, scales: { y } } = chart;
+          if (!chartArea) return;
+          const lastVal = chartCumulativeUnits[chartCumulativeUnits.length - 1];
+          if (lastVal === undefined) return;
+          const yPos = y.getPixelForValue(lastVal);
+          ctx.save();
+          ctx.fillStyle = lastVal >= 0 ? '#4ade80' : '#f87171';
+          ctx.globalAlpha = 0.7;
+          ctx.font = 'bold 11px Roboto, system-ui, sans-serif';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText((lastVal >= 0 ? '+' : '') + lastVal.toFixed(1) + 'u', chartArea.right + 6, yPos);
+          ctx.restore();
+        }
+      };
+
       new Chart(ctx, {
         type: "line",
-        plugins: [monthLinePlugin],
+        plugins: [zeroLinePlugin, monthLinePlugin, endLabelPlugin],
         data: {
           labels: chartDates,
           datasets: [{
@@ -754,22 +620,22 @@
               const {ctx: c, chartArea, scales: {y}} = chart;
               if (!chartArea) return 'transparent';
               const gradient = c.createLinearGradient(0, y.getPixelForValue(y.max), 0, y.getPixelForValue(y.min));
-              const zeroPos = (y.max - 0) / (y.max - y.min);
-              gradient.addColorStop(0, 'rgba(74, 222, 128, 0.1)');
-              gradient.addColorStop(Math.max(0, Math.min(1, zeroPos)), 'rgba(74, 222, 128, 0.1)');
-              gradient.addColorStop(Math.max(0, Math.min(1, zeroPos)), 'rgba(248, 113, 113, 0.1)');
-              gradient.addColorStop(1, 'rgba(248, 113, 113, 0.1)');
+              const zeroPos = Math.max(0, Math.min(1, (y.max) / (y.max - y.min)));
+              gradient.addColorStop(0, 'rgba(74, 222, 128, 0.12)');
+              gradient.addColorStop(zeroPos, 'rgba(74, 222, 128, 0.01)');
+              gradient.addColorStop(zeroPos, 'rgba(248, 113, 113, 0.01)');
+              gradient.addColorStop(1, 'rgba(248, 113, 113, 0.12)');
               return gradient;
             },
-            tension: 0.1,
+            tension: 0.15,
             pointRadius: dynRadius,
             pointHoverRadius: dynHover,
-            pointBackgroundColor: chartCumulativeUnits.map(v => v === 0 ? "#999" : v < 0 ? "#f87171" : "#4ade80"),
-            pointBorderColor: chartCumulativeUnits.map(v => v === 0 ? "#999" : v < 0 ? "#f87171" : "#4ade80"),
+            pointBackgroundColor: chartCumulativeUnits.map(v => v === 0 ? "#666" : v < 0 ? "#f87171" : "#4ade80"),
+            pointBorderColor: chartCumulativeUnits.map(v => v === 0 ? "#666" : v < 0 ? "#f87171" : "#4ade80"),
+            pointBorderWidth: 0,
             segment: {
               borderColor: c => {
-                const y0 = c.p0.parsed.y;
-                const y1 = c.p1.parsed.y;
+                const y0 = c.p0.parsed.y, y1 = c.p1.parsed.y;
                 if (y0 < 0 && y1 < 0) return "#f87171";
                 if (y0 >= 0 && y1 >= 0) return "#4ade80";
                 return createZeroCrossingGradient(c.chart.ctx, y0, y1, c.chart.scales.y, false);
@@ -780,37 +646,51 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          layout: { padding: { top: 16 } },
+          layout: { padding: { top: 16, right: 48 } },
+          interaction: { mode: 'index', intersect: false },
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: "#1a1a1a",
+              backgroundColor: "rgba(22, 22, 22, 0.95)",
               titleColor: "#f0f0f0",
               bodyColor: "#e6e6e6",
-              borderColor: "#2a2a2a",
+              borderColor: "rgba(255,255,255,0.08)",
               borderWidth: 1,
-              padding: 12,
+              padding: { top: 10, bottom: 10, left: 14, right: 14 },
+              cornerRadius: 8,
               displayColors: false,
+              titleFont: { size: 12, weight: 600 },
+              bodyFont: { size: 13 },
               callbacks: {
                 title: items => {
                   const d = items[0].label;
                   if (d === "Start") return d;
                   const [y,m,dd] = d.split("-");
-                  const mn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-                  return mn[+m-1] + " " + +dd + ", " + y;
+                  return MONTH_NAMES[+m-1] + " " + +dd + ", " + y;
                 },
-                label: c => "Profit: " + fmtSigned(c.parsed.y) + "u"
+                label: c => "Profit: " + fmtSigned(c.parsed.y) + "u",
+                afterLabel: c => {
+                  if (c.dataIndex === 0) return "";
+                  const delta = chartCumulativeUnits[c.dataIndex] - chartCumulativeUnits[c.dataIndex - 1];
+                  if (Math.abs(delta) < 0.001) return "";
+                  return "Change: " + (delta > 0 ? "+" : "") + delta.toFixed(2) + "u";
+                }
               }
             }
           },
           scales: {
             x: { display: false, border: { display: false } },
             y: {
-              grid: { 
-                color: ctx => ctx.tick.value === 0 ? 'transparent' : '#2a2a2a',
-                drawTicks: false 
+              grid: {
+                color: ctx => ctx.tick.value === 0 ? 'transparent' : 'rgba(255,255,255,0.04)',
+                drawTicks: false
               },
-              ticks: { color: "#999", callback: v => v === 0 ? "0.0u" : (v > 0 ? "+" : "") + v.toFixed(1) + "u", padding: 10 },
+              ticks: {
+                color: "#666",
+                font: { size: 11 },
+                callback: v => v === 0 ? "0" : (v > 0 ? "+" : "") + v.toFixed(1) + "u",
+                padding: 10
+              },
               border: { display: false }
             }
           }
@@ -839,8 +719,7 @@
     function filterSidebar() {
       const filter = document.querySelector(".search-bar").value.toUpperCase();
       document.querySelectorAll(".sidebar ul li").forEach(li => {
-        const txt = (li.textContent || li.innerText).toUpperCase();
-        li.style.display = txt.includes(filter) ? "" : "none";
+        li.style.display = (li.textContent || li.innerText).toUpperCase().includes(filter) ? "" : "none";
       });
     }
 
