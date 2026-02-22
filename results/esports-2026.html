@@ -17,12 +17,12 @@
       --text-dim: #aaa;
       --positive: #4ade80;
       --negative: #f87171;
-      --accent-orange: rgb(209, 154, 102);
-      --accent-purple: rgb(198, 120, 221);
-      --cs2-text: rgb(97, 175, 239);
-      --cs2-bg: rgb(48, 87, 119);
-      --val-text: rgb(224, 108, 117);
-      --val-bg: rgb(112, 54, 58);
+      --accent-highlight: rgb(252, 211, 77);
+      --accent-separator: rgb(203, 213, 225);
+      --cs2-text: rgb(96, 165, 250);
+      --cs2-bg: rgb(48, 82, 125);
+      --val-text: rgb(251, 146, 60);
+      --val-bg: rgb(125, 73, 30);
     }
     body { font-family: "Roboto", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 32px; margin: 0; font-size: 15px; }
     .container { max-width: 1400px; margin-left: 300px; padding: 32px; }
@@ -55,13 +55,13 @@
     .col-profit, .hdr-profit { width: 90px; text-align: center; white-space: nowrap; }
     .positive { color: var(--positive); }
     .negative { color: var(--negative); }
-    .bet-type { font-weight: 600; color: var(--accent-orange); }
-    .vs-separator { color: var(--accent-purple); }
+    .bet-type { font-weight: 600; color: var(--accent-highlight); }
+    .vs-separator { color: var(--accent-separator); }
     .game-pill { display: inline-block; font-size: 12px; padding: 4px 8px; border-radius: 6px; font-weight: 500; }
     .col-game .game-pill { margin-left: 0; }
     .game-pill.cs2 { color: var(--cs2-text); background-color: var(--cs2-bg); }
     .game-pill.val { color: var(--val-text); background-color: var(--val-bg); }
-    .extra-pill { display: inline; font-size: 12px; padding: 4px 8px; border-radius: 6px; margin-left: 8px; font-weight: 500; color: rgb(230, 197, 112); background-color: rgb(92, 79, 45); }
+    .extra-pill { display: inline; font-size: 12px; padding: 4px 8px; border-radius: 6px; margin-left: 8px; font-weight: 500; color: rgb(161, 161, 170); background-color: rgb(80, 80, 85); }
     .play-type-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; box-shadow: none; margin-bottom: 0; }
     .play-type-table th, .play-type-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
     .play-type-table th { color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; background: var(--bg-header); }
@@ -355,28 +355,40 @@
       // Chart data (chronological)
       const chartDates = ["Start"], chartCumulativeUnits = [0];
       const gameChartData = {}; // { gameName: [cumulative values] }
+      const gameFirstIndex = {}; // track first data index per game
       let cumUnits = 0, lastMonth = -1;
       const monthBoundaries = [];
       const gameCumUnits = {}; // running totals per game
-      [...PICKS].filter(p => p._odds).sort((a, b) => {
+      const sortedForChart = [...PICKS].filter(p => p._odds).sort((a, b) => {
         const d = parseDate(a.date) - parseDate(b.date);
         return d !== 0 ? d : a.play.localeCompare(b.play);
-      }).forEach(pick => {
+      });
+      sortedForChart.forEach((pick, idx) => {
         cumUnits += pick._units;
         chartDates.push(pick.date);
         chartCumulativeUnits.push(cumUnits);
+        const currentIdx = chartDates.length - 1; // index in chartDates
 
         // Track per-game cumulative
         if (pick.game) {
-          if (!gameCumUnits[pick.game]) gameCumUnits[pick.game] = 0;
+          if (!(pick.game in gameCumUnits)) {
+            gameCumUnits[pick.game] = 0;
+            gameFirstIndex[pick.game] = currentIdx;
+          }
           gameCumUnits[pick.game] += pick._units;
         }
-        // Store snapshot for all games at this point
+        // Store snapshot for all known games at this point
         for (const g of Object.keys(gameCumUnits)) {
-          if (!gameChartData[g]) gameChartData[g] = [0]; // start value
-          // Pad if behind
-          while (gameChartData[g].length < chartDates.length - 1) {
-            gameChartData[g].push(gameChartData[g][gameChartData[g].length - 1]);
+          if (!gameChartData[g]) gameChartData[g] = [];
+          // Pad with null up to one before first play, then 0 at the point just before
+          while (gameChartData[g].length < currentIdx) {
+            if (gameChartData[g].length < gameFirstIndex[g] - 1) {
+              gameChartData[g].push(null);
+            } else if (gameChartData[g].length === gameFirstIndex[g] - 1) {
+              gameChartData[g].push(0);
+            } else {
+              gameChartData[g].push(gameChartData[g][gameChartData[g].length - 1]);
+            }
           }
           gameChartData[g].push(gameCumUnits[g]);
         }
@@ -522,7 +534,7 @@
 
       // Summary tables
       const playTypeSectionEl = document.getElementById("playTypeSection");
-      const gameColors = { 'CS2': 'rgb(97, 175, 239)', 'Valorant': 'rgb(224, 108, 117)' };
+      const gameColors = { 'CS2': 'rgb(96, 165, 250)', 'Valorant': 'rgb(251, 146, 60)' };
 
       function buildSummaryRow(name, d, nameStyle) {
         const { adjW, adjL } = calcAdjustedRecord(d.wins, d.losses, d.units, globalAvgRisked);
@@ -708,6 +720,7 @@
               backgroundColor: 'transparent',
               fill: false,
               tension: 0.15,
+              spanGaps: false,
               pointRadius: 0,
               pointHoverRadius: dynRadius + 1,
               pointBackgroundColor: `rgba(${r}, ${g}, ${b}, 0.5)`,
@@ -734,8 +747,7 @@
               cornerRadius: 8,
               displayColors: true,
               filter: item => {
-                // Don't show game lines in tooltip if they have no value yet
-                if (item.datasetIndex > 0 && item.parsed.y === 0) return false;
+                if (item.datasetIndex > 0 && (item.parsed.y === 0 || item.parsed.y === null)) return false;
                 return true;
               },
               titleFont: { size: 12, weight: 600 },
@@ -751,12 +763,6 @@
                   const val = c.parsed.y;
                   if (c.datasetIndex === 0) return "Overall: " + fmtSigned(val) + "u";
                   return c.dataset.label + ": " + fmtSigned(val) + "u";
-                },
-                afterLabel: c => {
-                  if (c.datasetIndex !== 0 || c.dataIndex === 0) return "";
-                  const delta = chartCumulativeUnits[c.dataIndex] - chartCumulativeUnits[c.dataIndex - 1];
-                  if (Math.abs(delta) < 0.001) return "";
-                  return "Change: " + (delta > 0 ? "+" : "") + delta.toFixed(2) + "u";
                 }
               }
             }
