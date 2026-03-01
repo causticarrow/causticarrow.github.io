@@ -85,7 +85,17 @@
     .copy-box { position: fixed; top: 20px; right: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 18px; color: var(--text); cursor: pointer; z-index: 1000; transition: all 0.2s; user-select: none; line-height: 1; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
     .copy-box:hover { background: var(--bg-header); border-color: var(--positive); color: var(--positive); }
     .copy-box:active { background: var(--bg); transform: scale(0.98); }
-    .chart-container { width: 100%; height: 300px; margin-bottom: 32px; background: var(--bg-card); border-radius: 12px; padding: 20px; box-sizing: border-box; }
+    .chart-container { width: 100%; height: 380px; margin-bottom: 32px; background: var(--bg-card); border-radius: 12px; padding: 0; box-sizing: border-box; display: flex; flex-direction: column; }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; min-height: 44px; padding: 0 14px; flex-shrink: 0; }
+    .chart-canvas-wrap { flex: 1; min-height: 0; padding: 0 6px 6px; }
+    .chart-header-left { display: flex; align-items: center; gap: 8px; }
+    .chart-header-text { font-size: 13px; font-weight: 500; color: var(--text-muted); font-family: inherit; }
+    .chart-header-dot { font-size: 15px; color: rgba(255,255,255,0.4); font-family: inherit; font-weight: 400; }
+    .chart-header-roi { text-transform: none; }
+    .chart-header-right { display: flex; gap: 4px; }
+    .chart-range-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+    .chart-range-btn:hover { color: var(--text-light); background: rgba(255,255,255,0.05); }
+    .chart-range-btn.active { color: var(--text-light); background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.1); }
     .mobile-menu-toggle { display: none; }
     @media (max-width: 768px) {
       body { padding: 0; font-size: 13px; }
@@ -108,7 +118,11 @@
       .month-box-label { font-size: 9px !important; }
       .month-box-value { font-size: 9px !important; }
       .month-title { font-size: 12px !important; padding: 8px 6px !important; line-height: 1.4; }
-      .chart-container { height: 180px !important; padding: 10px !important; margin-bottom: 20px !important; }
+      .chart-container { height: 260px !important; }
+      .chart-header { padding: 8px 10px !important; }
+      .chart-header-text { font-size: 10px !important; letter-spacing: 0.3px !important; }
+      .chart-header-dot { font-size: 10px !important; }
+      .chart-range-btn { font-size: 10px !important; padding: 3px 7px !important; }
       table { display: table; width: 100% !important; table-layout: fixed; font-size: 11px; }
       th, td { padding: 6px 4px !important; font-size: 10px !important; overflow: hidden; text-overflow: ellipsis; }
       .col-score, .hdr-score, .col-line, .hdr-line, .col-risk, .hdr-risk { display: none !important; }
@@ -197,7 +211,29 @@
     <div class="monthly-stats" id="extraStats" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 32px;"></div>
     <div class="monthly-stats" id="monthlyStats"></div>
     <div class="chart-container">
-      <canvas id="profitChart"></canvas>
+      <div class="chart-header">
+        <div class="chart-header-left">
+          <span class="chart-header-text" id="chartPeriodLabel">YTD</span>
+          <span class="chart-header-dot">·</span>
+          <span class="chart-header-text">CAUSTICARROW</span>
+          <span class="chart-header-dot">·</span>
+          <span class="chart-header-text" id="chartProfitValue">+0.0u</span>
+          <span class="chart-header-text chart-header-roi" id="chartRoiValue">(0%)</span>
+        </div>
+        <div class="chart-header-right">
+          <button class="chart-range-btn" data-range="1D">1D</button>
+          <button class="chart-range-btn" data-range="1W">1W</button>
+          <button class="chart-range-btn" data-range="1M">1M</button>
+          <button class="chart-range-btn" data-range="3M">3M</button>
+          <button class="chart-range-btn" data-range="6M">6M</button>
+          <button class="chart-range-btn" data-range="9M">9M</button>
+          <button class="chart-range-btn" data-range="YTD">YTD</button>
+          <button class="chart-range-btn active" data-range="ALL">ALL</button>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="profitChart"></canvas>
+      </div>
     </div>
     <div class="stats-grid" id="playTypeSection"></div>
     <div id="tablesContainer"></div>
@@ -606,187 +642,322 @@
         return gradient;
       };
 
-      const totalPoints = chartCumulativeUnits.length;
-      const dynRadius = totalPoints <= 30 ? 3 : totalPoints <= 60 ? 2 : totalPoints <= 120 ? 1.5 : 1;
-      const dynHover = dynRadius + 2;
+      // Store full data for range filtering
+      const fullChartDates = [...chartDates];
+      const fullChartCumulativeUnits = [...chartCumulativeUnits];
+      const fullGameChartData = {};
+      for (const [g, d] of Object.entries(gameChartData)) fullGameChartData[g] = [...d];
+      const fullMonthBoundaries = [...monthBoundaries];
 
-      const zeroLinePlugin = {
-        id: 'zeroLine',
-        beforeDraw(chart) {
-          const { ctx, chartArea, scales: { y } } = chart;
-          if (!chartArea || y.min >= 0 || y.max <= 0) return;
-          const yPos = y.getPixelForValue(0);
-          ctx.save();
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(chartArea.left, yPos);
-          ctx.lineTo(chartArea.right, yPos);
-          ctx.stroke();
-          ctx.restore();
+      // Current filtered data (mutated on range change)
+      let filteredDates = fullChartDates;
+      let filteredUnits = fullChartCumulativeUnits;
+      let filteredGameData = fullGameChartData;
+      let filteredMonthBoundaries = fullMonthBoundaries;
+      let currentRange = 'ALL';
+
+      function getFilteredData(range) {
+        if (range === 'ALL') {
+          return { dates: fullChartDates, units: fullChartCumulativeUnits, games: fullGameChartData, months: fullMonthBoundaries, rangeUnits: totalUnits, rangeRisk: totalRisk };
         }
-      };
+        const now = new Date();
+        let cutoff;
+        if (range === '1D') { cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 1); }
+        else if (range === '1W') { cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 7); }
+        else if (range === '1M') { cutoff = new Date(now); cutoff.setMonth(cutoff.getMonth() - 1); }
+        else if (range === '3M') { cutoff = new Date(now); cutoff.setMonth(cutoff.getMonth() - 3); }
+        else if (range === '6M') { cutoff = new Date(now); cutoff.setMonth(cutoff.getMonth() - 6); }
+        else if (range === '9M') { cutoff = new Date(now); cutoff.setMonth(cutoff.getMonth() - 9); }
+        else if (range === 'YTD') { cutoff = new Date(now.getFullYear(), 0, 1); }
 
-      const monthLinePlugin = {
-        id: 'monthLines',
-        afterDraw(chart) {
-          const { ctx, chartArea, scales: { x } } = chart;
-          if (!chartArea) return;
-          monthBoundaries.forEach(b => {
-            const xPos = x.getPixelForValue(b.index);
-            if (xPos < chartArea.left || xPos > chartArea.right) return;
-            ctx.save();
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([3, 5]);
-            ctx.beginPath();
-            ctx.moveTo(xPos, chartArea.top);
-            ctx.lineTo(xPos, chartArea.bottom);
-            ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-            ctx.font = '10px Roboto, system-ui, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(b.month, xPos, chartArea.top - 6);
-            ctx.restore();
-          });
-        }
-      };
-
-      const endLabelPlugin = {
-        id: 'endLabel',
-        afterDraw(chart) {
-          const { ctx, chartArea, scales: { y } } = chart;
-          if (!chartArea) return;
-          const lastVal = chartCumulativeUnits[chartCumulativeUnits.length - 1];
-          if (lastVal === undefined) return;
-          const yPos = y.getPixelForValue(lastVal);
-          ctx.save();
-          ctx.fillStyle = lastVal >= 0 ? '#4ade80' : '#f87171';
-          ctx.globalAlpha = 0.7;
-          ctx.font = 'bold 11px Roboto, system-ui, sans-serif';
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(fmtUnits(lastVal) + 'u', chartArea.right + 6, yPos);
-          ctx.restore();
-        }
-      };
-
-      new Chart(ctx, {
-        type: "line",
-        plugins: [zeroLinePlugin, monthLinePlugin, endLabelPlugin],
-        data: {
-          labels: chartDates,
-          datasets: [{
-            label: "Cumulative Profit (Units)",
-            data: chartCumulativeUnits,
-            borderWidth: 2,
-            fill: { target: { value: 0 } },
-            backgroundColor: ctx => {
-              const chart = ctx.chart;
-              const {ctx: c, chartArea, scales: {y}} = chart;
-              if (!chartArea) return 'transparent';
-              const gradient = c.createLinearGradient(0, y.getPixelForValue(y.max), 0, y.getPixelForValue(y.min));
-              const zeroPos = Math.max(0, Math.min(1, (y.max) / (y.max - y.min)));
-              gradient.addColorStop(0, 'rgba(74, 222, 128, 0.12)');
-              gradient.addColorStop(zeroPos, 'rgba(74, 222, 128, 0.01)');
-              gradient.addColorStop(zeroPos, 'rgba(248, 113, 113, 0.01)');
-              gradient.addColorStop(1, 'rgba(248, 113, 113, 0.12)');
-              return gradient;
-            },
-            tension: 0.15,
-            pointRadius: dynRadius,
-            pointHoverRadius: dynHover,
-            pointBackgroundColor: chartCumulativeUnits.map(v => v === 0 ? "#666" : v < 0 ? "#f87171" : "#4ade80"),
-            pointBorderColor: chartCumulativeUnits.map(v => v === 0 ? "#666" : v < 0 ? "#f87171" : "#4ade80"),
-            pointBorderWidth: 0,
-            segment: {
-              borderColor: c => {
-                const y0 = c.p0.parsed.y, y1 = c.p1.parsed.y;
-                if (y0 < 0 && y1 < 0) return "#f87171";
-                if (y0 >= 0 && y1 >= 0) return "#4ade80";
-                return createZeroCrossingGradient(c.chart.ctx, y0, y1, c.chart.scales.y, false);
-              }
-            },
-            order: 0
-          },
-          ...Object.entries(gameChartData).map(([gameName, data]) => {
-            const color = gameColors[gameName] || '#888';
-            const r = parseInt(color.match(/\d+/g)[0]);
-            const g = parseInt(color.match(/\d+/g)[1]);
-            const b = parseInt(color.match(/\d+/g)[2]);
-            return {
-              label: gameName,
-              data: data,
-              borderWidth: 1.5,
-              borderColor: `rgba(${r}, ${g}, ${b}, 0.35)`,
-              backgroundColor: 'transparent',
-              fill: false,
-              tension: 0.15,
-              spanGaps: false,
-              pointRadius: 0,
-              pointHoverRadius: dynRadius + 1,
-              pointBackgroundColor: `rgba(${r}, ${g}, ${b}, 0.5)`,
-              pointBorderWidth: 0,
-              borderDash: [4, 3],
-              order: 1
-            };
-          })]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          layout: { padding: { top: 16, right: 48 } },
-          interaction: { mode: 'index', intersect: false },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: "rgba(22, 22, 22, 0.95)",
-              titleColor: "#f0f0f0",
-              bodyColor: "#e6e6e6",
-              borderColor: "rgba(255,255,255,0.08)",
-              borderWidth: 1,
-              padding: { top: 10, bottom: 10, left: 14, right: 14 },
-              cornerRadius: 8,
-              displayColors: true,
-              filter: item => {
-                if (item.datasetIndex > 0 && (item.parsed.y === 0 || item.parsed.y === null)) return false;
-                return true;
-              },
-              titleFont: { size: 12, weight: 600 },
-              bodyFont: { size: 13 },
-              callbacks: {
-                title: items => {
-                  const d = items[0].label;
-                  if (d === "Start") return d;
-                  const [y,m,dd] = d.split("-");
-                  return MONTH_NAMES[+m-1] + " " + +dd + ", " + y;
-                },
-                label: c => {
-                  const val = c.parsed.y;
-                  if (c.datasetIndex === 0) return "Overall: " + fmtSigned(val) + "u";
-                  return c.dataset.label + ": " + fmtSigned(val) + "u";
-                }
-              }
-            }
-          },
-          scales: {
-            x: { display: false, border: { display: false } },
-            y: {
-              grid: {
-                color: ctx => ctx.tick.value === 0 ? 'transparent' : 'rgba(255,255,255,0.04)',
-                drawTicks: false
-              },
-              ticks: {
-                color: "#666",
-                font: { size: 11 },
-                callback: v => v === 0 ? "0" : (v > 0 ? "+" : "") + v.toFixed(1) + "u",
-                padding: 10
-              },
-              border: { display: false }
-            }
+        // Find the start index in fullChartDates
+        let startIdx = 0; // default to "Start" (index 0)
+        for (let i = 1; i < fullChartDates.length; i++) {
+          if (parseDate(fullChartDates[i]) >= cutoff) {
+            startIdx = Math.max(0, i - 1); // one point before as baseline
+            break;
           }
         }
+
+        const baselineUnits = fullChartCumulativeUnits[startIdx];
+        const dates = fullChartDates.slice(startIdx);
+        const units = fullChartCumulativeUnits.slice(startIdx).map(v => v - baselineUnits);
+
+        const games = {};
+        for (const [g, d] of Object.entries(fullGameChartData)) {
+          const baseGame = d[startIdx] || 0;
+          games[g] = d.slice(startIdx).map(v => v === null ? null : v - baseGame);
+        }
+
+        const months = fullMonthBoundaries
+          .filter(b => b.index >= startIdx)
+          .map(b => ({ ...b, index: b.index - startIdx }));
+
+        // Compute range-specific units and risk from picks within cutoff
+        let rangeUnits = 0, rangeRisk = 0;
+        sortedForChart.forEach(p => {
+          if (p._isPending || !p._odds) return;
+          if (parseDate(p.date) >= cutoff) {
+            rangeUnits += p._units;
+            rangeRisk += p._risk;
+          }
+        });
+
+        return { dates, units, games, months, rangeUnits, rangeRisk };
+      }
+
+      function updateChartHeader(rangeUnits, rangeRisk, range) {
+        const profitEl = document.getElementById('chartProfitValue');
+        const roiEl = document.getElementById('chartRoiValue');
+        const periodEl = document.getElementById('chartPeriodLabel');
+        profitEl.textContent = fmtUnits(rangeUnits) + 'u';
+        profitEl.style.color = rangeUnits >= 0 ? 'var(--positive)' : 'var(--negative)';
+        const roiVal = rangeRisk > 0 ? (rangeUnits / rangeRisk) * 100 : 0;
+        roiEl.textContent = '(' + fmtSignedPct(roiVal).replace(/^\+/, '') + ')';
+        roiEl.style.color = roiVal >= 0 ? 'var(--positive)' : 'var(--negative)';
+        const periodLabels = { '1D': '1D', '1W': '1W', '1M': '1M', '3M': '3M', '6M': '6M', '9M': '9M', 'YTD': 'YTD', 'ALL': 'ALL' };
+        periodEl.textContent = periodLabels[range] || 'YTD';
+      }
+
+      let profitChart = null;
+
+      function buildChart(range) {
+        currentRange = range;
+        const { dates, units, games, months, rangeUnits, rangeRisk } = getFilteredData(range);
+        filteredDates = dates;
+        filteredUnits = units;
+        filteredGameData = games;
+        filteredMonthBoundaries = months;
+
+        updateChartHeader(rangeUnits, rangeRisk, range);
+
+        const tp = units.length;
+        const dr = tp <= 30 ? 3 : tp <= 60 ? 2 : tp <= 120 ? 1.5 : 1;
+        const dh = dr + 2;
+
+        if (profitChart) profitChart.destroy();
+
+        const lineGlowPlugin = {
+          id: 'lineGlow',
+          beforeDatasetDraw(chart, args) {
+            if (args.index !== 0) return;
+            chart.ctx.save();
+            chart.ctx.shadowColor = 'rgba(74, 222, 128, 0.3)';
+            chart.ctx.shadowBlur = 12;
+          },
+          afterDatasetDraw(chart, args) {
+            if (args.index !== 0) return;
+            chart.ctx.restore();
+          }
+        };
+
+        const zeroLinePlugin = {
+          id: 'zeroLine',
+          beforeDraw(chart) {
+            const { ctx: c, chartArea, scales: { y } } = chart;
+            if (!chartArea || y.min >= 0 || y.max <= 0) return;
+            const yPos = y.getPixelForValue(0);
+            c.save(); c.strokeStyle = 'rgba(255, 255, 255, 0.1)'; c.lineWidth = 1;
+            c.beginPath(); c.moveTo(chartArea.left, yPos); c.lineTo(chartArea.right, yPos); c.stroke(); c.restore();
+          }
+        };
+
+        const monthLinePlugin = {
+          id: 'monthLines',
+          afterDraw(chart) {
+            const { ctx: c, chartArea, scales: { x } } = chart;
+            if (!chartArea) return;
+            filteredMonthBoundaries.forEach(b => {
+              const xPos = x.getPixelForValue(b.index);
+              if (xPos < chartArea.left || xPos > chartArea.right) return;
+              c.save(); c.strokeStyle = 'rgba(255, 255, 255, 0.06)'; c.lineWidth = 1; c.setLineDash([3, 5]);
+              c.beginPath(); c.moveTo(xPos, chartArea.top); c.lineTo(xPos, chartArea.bottom); c.stroke(); c.setLineDash([]);
+              c.fillStyle = 'rgba(255, 255, 255, 0.25)'; c.font = '10px Roboto, system-ui, sans-serif'; c.textAlign = 'center';
+              c.fillText(b.month, xPos, chartArea.top - 6); c.restore();
+            });
+          }
+        };
+
+        const currentLinePlugin = {
+          id: 'currentLine',
+          beforeDraw(chart) {
+            const { ctx: c, chartArea, scales: { y } } = chart;
+            if (!chartArea) return;
+            const lastVal = filteredUnits[filteredUnits.length - 1];
+            if (lastVal === undefined || lastVal === 0) return;
+            const yPos = y.getPixelForValue(lastVal);
+            c.save();
+            c.strokeStyle = lastVal >= 0 ? 'rgba(74, 222, 128, 0.35)' : 'rgba(248, 113, 113, 0.35)';
+            c.lineWidth = 1; c.setLineDash([4, 4]);
+            c.beginPath(); c.moveTo(chartArea.left, yPos); c.lineTo(chartArea.right, yPos); c.stroke();
+            c.setLineDash([]); c.restore();
+          }
+        };
+
+        const endLabelPlugin = {
+          id: 'endLabel',
+          afterDraw(chart) {
+            const { ctx: c, chartArea, scales: { y }, width } = chart;
+            if (!chartArea) return;
+            const lastVal = filteredUnits[filteredUnits.length - 1];
+            if (lastVal === undefined) return;
+            const yPos = y.getPixelForValue(lastVal);
+            const isPos = lastVal >= 0;
+            const color = isPos ? '#4ade80' : '#f87171';
+            const bgCol = isPos ? 'rgba(74, 222, 128, 0.15)' : 'rgba(248, 113, 113, 0.15)';
+            const bdCol = isPos ? 'rgba(74, 222, 128, 0.5)' : 'rgba(248, 113, 113, 0.5)';
+            const text = fmtUnits(lastVal) + 'u';
+            c.save(); c.font = 'bold 11px Roboto, system-ui, sans-serif';
+            const tw = c.measureText(text).width;
+            const pX = 8, pH = 18, pW = tw + pX * 2;
+            const pillX = width - pW - 4, pillY = yPos - pH / 2;
+            c.fillStyle = bgCol; c.beginPath(); c.roundRect(pillX, pillY, pW, pH, 4); c.fill();
+            c.strokeStyle = bdCol; c.lineWidth = 1; c.beginPath(); c.roundRect(pillX, pillY, pW, pH, 4); c.stroke();
+            c.fillStyle = color; c.textAlign = 'left'; c.textBaseline = 'middle';
+            c.fillText(text, pillX + pX, yPos); c.restore();
+          }
+        };
+
+        profitChart = new Chart(ctx, {
+          type: "line",
+          plugins: [lineGlowPlugin, zeroLinePlugin, monthLinePlugin, currentLinePlugin, endLabelPlugin],
+          data: {
+            labels: dates,
+            datasets: [{
+              label: "Cumulative Profit (Units)",
+              data: units,
+              borderWidth: 2,
+              fill: { target: { value: 0 } },
+              backgroundColor: ctxArg => {
+                const chart = ctxArg.chart;
+                const {ctx: c2, chartArea, scales: {y}} = chart;
+                if (!chartArea) return 'transparent';
+                const gradient = c2.createLinearGradient(0, y.getPixelForValue(y.max), 0, y.getPixelForValue(y.min));
+                const zeroPos = Math.max(0, Math.min(1, (y.max) / (y.max - y.min)));
+                gradient.addColorStop(0, 'rgba(74, 222, 128, 0.22)');
+                gradient.addColorStop(Math.max(0, zeroPos - 0.15), 'rgba(74, 222, 128, 0.06)');
+                gradient.addColorStop(zeroPos, 'rgba(74, 222, 128, 0.01)');
+                gradient.addColorStop(zeroPos, 'rgba(248, 113, 113, 0.01)');
+                gradient.addColorStop(Math.min(1, zeroPos + 0.15), 'rgba(248, 113, 113, 0.06)');
+                gradient.addColorStop(1, 'rgba(248, 113, 113, 0.22)');
+                return gradient;
+              },
+              tension: 0.15,
+              pointRadius: dr,
+              pointHoverRadius: dh,
+              pointBackgroundColor: units.map(v => v === 0 ? "#666" : v < 0 ? "#f87171" : "#4ade80"),
+              pointBorderColor: units.map(v => v === 0 ? "#666" : v < 0 ? "#f87171" : "#4ade80"),
+              pointBorderWidth: 0,
+              segment: {
+                borderColor: c => {
+                  const y0 = c.p0.parsed.y, y1 = c.p1.parsed.y;
+                  if (y0 < 0 && y1 < 0) return "#f87171";
+                  if (y0 >= 0 && y1 >= 0) return "#4ade80";
+                  return createZeroCrossingGradient(c.chart.ctx, y0, y1, c.chart.scales.y, false);
+                }
+              },
+              order: 0
+            },
+            ...Object.entries(games).map(([gameName, data]) => {
+              const color = gameColors[gameName] || '#888';
+              const r = parseInt(color.match(/\d+/g)[0]);
+              const g = parseInt(color.match(/\d+/g)[1]);
+              const b = parseInt(color.match(/\d+/g)[2]);
+              return {
+                label: gameName,
+                data: data,
+                borderWidth: 1.5,
+                borderColor: `rgba(${r}, ${g}, ${b}, 0.35)`,
+                backgroundColor: 'transparent',
+                fill: false,
+                tension: 0.15,
+                spanGaps: false,
+                pointRadius: 0,
+                pointHoverRadius: dr + 1,
+                pointBackgroundColor: `rgba(${r}, ${g}, ${b}, 0.5)`,
+                pointBorderWidth: 0,
+                borderDash: [4, 3],
+                order: 1
+              };
+            })]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { top: 4, right: 4, bottom: 4, left: 4 } },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: "rgba(22, 22, 22, 0.95)",
+                titleColor: "#f0f0f0",
+                bodyColor: "#e6e6e6",
+                borderColor: "rgba(255,255,255,0.08)",
+                borderWidth: 1,
+                padding: { top: 10, bottom: 10, left: 14, right: 14 },
+                cornerRadius: 8,
+                displayColors: true,
+                filter: item => {
+                  if (item.datasetIndex > 0 && (item.parsed.y === 0 || item.parsed.y === null)) return false;
+                  return true;
+                },
+                titleFont: { size: 12, weight: 600 },
+                bodyFont: { size: 13 },
+                callbacks: {
+                  title: items => {
+                    const d = items[0].label;
+                    if (d === "Start") return d;
+                    const [y,m,dd] = d.split("-");
+                    return MONTH_NAMES[+m-1] + " " + +dd + ", " + y;
+                  },
+                  label: c => {
+                    const val = c.parsed.y;
+                    if (c.datasetIndex === 0) return "Overall: " + fmtSigned(val) + "u";
+                    return c.dataset.label + ": " + fmtSigned(val) + "u";
+                  }
+                }
+              }
+            },
+            scales: {
+              x: { display: false, border: { display: false } },
+              y: {
+                position: 'right',
+                grace: '5%',
+                grid: {
+                  color: ctxArg => ctxArg.tick.value === 0 ? 'transparent' : 'rgba(255,255,255,0.04)',
+                  drawTicks: false
+                },
+                ticks: {
+                  color: "#666",
+                  font: { size: 11 },
+                  callback: function(v) {
+                    const lastVal = filteredUnits[filteredUnits.length - 1];
+                    if (lastVal !== undefined) {
+                      const range = this.max - this.min;
+                      const threshold = range * 0.04;
+                      if (Math.abs(v - lastVal) < threshold) return '';
+                    }
+                    return v === 0 ? "0" : (v > 0 ? "+" : "") + v.toFixed(1) + "u";
+                  },
+                  padding: 6
+                },
+                border: { display: false }
+              }
+            }
+          }
+        });
+      }
+
+      // Initial build
+      buildChart('ALL');
+
+      // Range button handlers
+      document.querySelectorAll('.chart-range-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.chart-range-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          buildChart(btn.dataset.range);
+        });
       });
     });
 
