@@ -97,7 +97,7 @@
     .chart-range-btn:hover { color: var(--text-light); background: rgba(255,255,255,0.05); }
     .chart-range-btn.active { color: var(--text-light); background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.1); }
     .mobile-menu-toggle { display: none; }
-    @media (max-width: 768px) {
+    @media (max-width: 1400px) {
       body { padding: 0; font-size: 13px; }
       .container { margin-left: 0; padding: 15px; max-width: 100%; overflow-x: hidden; }
       .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); padding: 0; }
@@ -113,7 +113,7 @@
       .stat-label { font-size: 10px !important; }
       .stat-value { font-size: 14px !important; }
       .monthly-stats { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
-      #extraStats { grid-template-columns: repeat(2, 1fr) !important; max-width: 400px; margin-left: auto; margin-right: auto; }
+      #extraStats { grid-template-columns: repeat(3, 1fr) !important; }
       .month-box { padding: 8px 4px !important; }
       .month-box-label { font-size: 9px !important; }
       .month-box-value { font-size: 9px !important; }
@@ -123,6 +123,7 @@
       .chart-header-text { font-size: 10px !important; letter-spacing: 0.3px !important; }
       .chart-header-dot { font-size: 10px !important; }
       .chart-range-btn { font-size: 10px !important; padding: 3px 7px !important; }
+      .chart-header-right { display: none !important; }
       table { display: table; width: 100% !important; table-layout: fixed; font-size: 11px; }
       th, td { padding: 6px 4px !important; font-size: 10px !important; overflow: hidden; text-overflow: ellipsis; }
       .col-score, .hdr-score, .col-line, .hdr-line, .col-risk, .hdr-risk { display: none !important; }
@@ -208,7 +209,7 @@
       <div class="stat-box"><div class="stat-label">Net Profit</div><div class="stat-value" id="netProfit">+0.0</div></div>
       <div class="stat-box"><div class="stat-label">ROI</div><div class="stat-value" id="roi">+0.0%</div></div>
     </div>
-    <div class="monthly-stats" id="extraStats" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 32px;"></div>
+    <div class="monthly-stats" id="extraStats" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 32px;"></div>
     <div class="monthly-stats" id="monthlyStats"></div>
     <div class="chart-container">
       <div class="chart-header">
@@ -241,6 +242,7 @@
 
   <script>
     const isMobile = () => window.innerWidth <= 768;
+    const isCompact = () => window.innerWidth <= 1400;
     const parseDate = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
     const formatDate = s => { const [y, m, d] = s.split("-"); return `${+m}/${+d}/${y.slice(-2)}`; };
     const stripZeros = s => String(s).includes(".") ? String(s).replace(/\.?0+$/, "") : String(s);
@@ -293,15 +295,12 @@
       const adjW = (total + profit / globalAvgRisked) / 2;
       return { adjW, adjL: Math.max(total - adjW, 0) };
     }
-
-    // Auto-detect result from score
     function detectResult(play, score) {
       if (!score || score === "" || score === undefined) return "Pending";
       const scoreParts = score.split("-").map(Number);
       if (scoreParts.length < 2 || isNaN(scoreParts[0]) || isNaN(scoreParts[1])) return "Pending";
       let team1Score = scoreParts[0];
       const team2Score = scoreParts[1];
-      // Check for handicap (e.g. +1.5, -1.5, -2.5) outside of parentheses
       const handicapMatch = play.match(/\s([+-]\d+\.?\d*)\s+\(/);
       if (handicapMatch && play.indexOf('PK') === -1) {
         team1Score += parseFloat(handicapMatch[1]);
@@ -310,11 +309,8 @@
       if (team1Score < team2Score) return "L";
       return "P";
     }
-
-    // Precompute odds, risk, units once per pick
     const ODDS_RE = /\(([-+]?\d+)\)/;
     PICKS.forEach(p => {
-      // Auto-detect result from score
       p.result = detectResult(p.play, p.score);
       const m = p.play.match(ODDS_RE);
       if (m) {
@@ -329,8 +325,6 @@
     window.addEventListener("load", () => {
       const container = document.getElementById("tablesContainer");
       const mobile = isMobile();
-
-      // Single pass: globals, monthly, game stats, play types, avg odds
       let wins = 0, losses = 0, totalRisk = 0, totalUnits = 0;
       let totalDecimalOdds = 0, oddsCount = 0;
       const monthlyData = {};
@@ -390,14 +384,12 @@
 
       const totalPlays = wins + losses;
       const globalAvgRisked = totalPlays > 0 ? totalRisk / totalPlays : 0;
-
-      // Chart data (chronological)
       const chartDates = ["Start"], chartCumulativeUnits = [0];
-      const gameChartData = {}; // { gameName: [cumulative values] }
-      const gameFirstIndex = {}; // track first data index per game
+      const gameChartData = {};
+      const gameFirstIndex = {};
       let cumUnits = 0, lastMonth = -1;
       const monthBoundaries = [];
-      const gameCumUnits = {}; // running totals per game
+      const gameCumUnits = {};
       const sortedForChart = [...PICKS].filter(p => p._odds).sort((a, b) => {
         const d = parseDate(a.date) - parseDate(b.date);
         return d !== 0 ? d : a.play.localeCompare(b.play);
@@ -406,9 +398,7 @@
         cumUnits += pick._units;
         chartDates.push(pick.date);
         chartCumulativeUnits.push(cumUnits);
-        const currentIdx = chartDates.length - 1; // index in chartDates
-
-        // Track per-game cumulative
+        const currentIdx = chartDates.length - 1;
         if (pick.game) {
           if (!(pick.game in gameCumUnits)) {
             gameCumUnits[pick.game] = 0;
@@ -416,10 +406,8 @@
           }
           gameCumUnits[pick.game] += pick._units;
         }
-        // Store snapshot for all known games at this point
         for (const g of Object.keys(gameCumUnits)) {
           if (!gameChartData[g]) gameChartData[g] = [];
-          // Pad with null up to one before first play, then 0 at the point just before
           while (gameChartData[g].length < currentIdx) {
             if (gameChartData[g].length < gameFirstIndex[g] - 1) {
               gameChartData[g].push(null);
@@ -438,14 +426,11 @@
           lastMonth = m;
         }
       });
-      // Pad any short game arrays to full length
       for (const g of Object.keys(gameChartData)) {
         while (gameChartData[g].length < chartDates.length) {
           gameChartData[g].push(gameChartData[g][gameChartData[g].length - 1]);
         }
       }
-
-      // Group picks by month (reverse chrono for tables)
       const sorted = [...PICKS].sort((a, b) => {
         const d = parseDate(b.date) - parseDate(a.date);
         return d !== 0 ? d : b.play.localeCompare(a.play);
@@ -463,8 +448,6 @@
         const cleanPlay = play.replace(/\s*\([-+]?\d+\)\s*/, " ").replace(/\s+/g, " ").trim();
         return { cleanPlay, line };
       }
-
-      // Render month tables
       Object.keys(grouped).sort((a, b) => parseDate(grouped[b][0].date) - parseDate(grouped[a][0].date)).forEach(monthName => {
         const monthPicks = grouped[monthName];
         let mWins = 0, mLosses = 0, mRisk = 0, mUnits = 0;
@@ -486,6 +469,9 @@
           if (mobile) {
             fp = fp.replace(/\s+vs\.\s+[^(]+(?=\s*$)/g, "");
             for (const [full, abbr] of Object.entries(TEAM_ABBR)) fp = fp.replace(new RegExp(full, "g"), abbr);
+          } else if (isCompact()) {
+            for (const [full, abbr] of Object.entries(TEAM_ABBR)) fp = fp.replace(new RegExp(full, "g"), abbr);
+            fp = fp.replace(/\s+vs\.\s+/g, ' <span class="vs-separator">vs.</span> ');
           } else {
             fp = fp.replace(/\s+vs\.\s+/g, ' <span class="vs-separator">vs.</span> ');
           }
@@ -514,8 +500,6 @@
         header.innerHTML = `${shortenMonth(monthName)}: ${Math.round(mAdjW)}-${Math.round(mAdjL)} (${fmtWinPct(mAdjWinPct)}%), <span class="${getValueClass(mUnits)}">${fmtUnitsHdr(mUnits)}u</span>, <span class="${getValueClass(mRoi)}">${fmtROI(mRoi).replace(/^\+/, "")} ROI</span>`;
         container.insertBefore(header, table);
       });
-
-      // Top stats
       const roi = totalRisk ? (totalUnits / totalRisk) * 100 : 0;
       const { adjW: topAdjW, adjL: topAdjL } = calcAdjustedRecord(wins, losses, totalUnits, globalAvgRisked);
       const topAdjWinPct = (topAdjW + topAdjL) > 0 ? (topAdjW / (topAdjW + topAdjL)) * 100 : 0;
@@ -527,8 +511,6 @@
       const roiEl = document.getElementById("roi");
       roiEl.textContent = fmtSignedPct(roi).replace(/^\+/, "");
       roiEl.className = `stat-value ${getStatClass(roi)}`;
-
-      // Extra Stats
       {
         const avgDec = oddsCount > 0 ? totalDecimalOdds / oddsCount : 0;
         const avgAmericanRaw = avgDec >= 2 ? (avgDec - 1) * 100 : -100 / (avgDec - 1);
@@ -537,9 +519,13 @@
         const fmtPct1d = p => { const s = p.toFixed(1); return s.endsWith(".0") ? Math.round(p).toString() : s; };
         const avgOddsFmt = (avgAmericanRaw >= 0 ? "+" : "-") + fmt1d(avgAmericanRaw) + " (" + fmtPct1d(avgProb) + "%)";
 
+        const avgRisk = totalPlays > 0 ? totalRisk / totalPlays : 0;
+        const avgRiskFmt = fmtNum(avgRisk) + "u";
+
         const extraStatsEl = document.getElementById("extraStats");
         [
           { label: mobile ? "n" : "Total Plays", value: totalPlays.toString() },
+          { label: mobile ? "Avg Size" : "Average Unit Size", value: avgRiskFmt },
           { label: mobile ? "Avg Odds" : "Average Odds", value: avgOddsFmt },
         ].forEach(item => {
           const box = document.createElement("div");
@@ -548,8 +534,6 @@
           extraStatsEl.appendChild(box);
         });
       }
-
-      // Monthly boxes
       const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
       const monthlyStatsEl = document.getElementById("monthlyStats");
       MONTHS.forEach((name, i) => {
@@ -570,8 +554,6 @@
         }
         monthlyStatsEl.appendChild(box);
       });
-
-      // Summary tables
       const playTypeSectionEl = document.getElementById("playTypeSection");
       const gameColors = { 'CS2': 'rgb(96, 165, 250)', 'Valorant': 'rgb(251, 146, 60)' };
 
@@ -608,8 +590,6 @@
         activeTypes.forEach(name => tbody.appendChild(buildSummaryRow(name, playTypes[name], null)));
         playTypeSectionEl.appendChild(table);
       }
-
-      // Copy box
       const copyText = `ytd record: ${Math.round(topAdjW)}-${Math.round(topAdjL)}, ${fmtSigned(totalUnits)}u // [archive](https://causticarrow.com/results/esports-2026)`;
       const copyBox = document.getElementById("copyBox");
       copyBox.onclick = () => {
@@ -620,8 +600,6 @@
           setTimeout(() => { copyBox.textContent = "\uD83D\uDCCB"; copyBox.style.borderColor = "#2a2a2a"; copyBox.style.color = "#e6e6e6"; }, 1000);
         });
       };
-
-      // --- Chart ---
       const ctx = document.getElementById("profitChart").getContext("2d");
 
       const createZeroCrossingGradient = (chartCtx, y0, y1, yScale, isBackground = false) => {
@@ -641,15 +619,11 @@
         }
         return gradient;
       };
-
-      // Store full data for range filtering
       const fullChartDates = [...chartDates];
       const fullChartCumulativeUnits = [...chartCumulativeUnits];
       const fullGameChartData = {};
       for (const [g, d] of Object.entries(gameChartData)) fullGameChartData[g] = [...d];
       const fullMonthBoundaries = [...monthBoundaries];
-
-      // Current filtered data (mutated on range change)
       let filteredDates = fullChartDates;
       let filteredUnits = fullChartCumulativeUnits;
       let filteredGameData = fullGameChartData;
@@ -669,12 +643,10 @@
         else if (range === '6M') { cutoff = new Date(now); cutoff.setMonth(cutoff.getMonth() - 6); }
         else if (range === '9M') { cutoff = new Date(now); cutoff.setMonth(cutoff.getMonth() - 9); }
         else if (range === 'YTD') { cutoff = new Date(now.getFullYear(), 0, 1); }
-
-        // Find the start index in fullChartDates
-        let startIdx = 0; // default to "Start" (index 0)
+        let startIdx = 0;
         for (let i = 1; i < fullChartDates.length; i++) {
           if (parseDate(fullChartDates[i]) >= cutoff) {
-            startIdx = Math.max(0, i - 1); // one point before as baseline
+            startIdx = Math.max(0, i - 1);
             break;
           }
         }
@@ -692,8 +664,6 @@
         const months = fullMonthBoundaries
           .filter(b => b.index >= startIdx)
           .map(b => ({ ...b, index: b.index - startIdx }));
-
-        // Compute range-specific units and risk from picks within cutoff
         let rangeUnits = 0, rangeRisk = 0;
         sortedForChart.forEach(p => {
           if (p._isPending || !p._odds) return;
@@ -947,11 +917,7 @@
           }
         });
       }
-
-      // Initial build
       buildChart('ALL');
-
-      // Range button handlers
       document.querySelectorAll('.chart-range-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.chart-range-btn').forEach(b => b.classList.remove('active'));
