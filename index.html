@@ -391,54 +391,32 @@ let peak = 0, maxDDUnits = 0, cum = 0;
 pnls.forEach(v => { cum += v; if (cum > peak) peak = cum; const dd = peak - cum; if (dd > maxDDUnits) maxDDUnits = dd; });
 
 // P-value
-function lnGamma(x) {
-  const c = [76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,1.208650973866179e-3,-5.395239384953e-6];
-  let y = x, tmp = x + 5.5;
-  tmp -= (x + 0.5) * Math.log(tmp);
-  let ser = 1.000000000190015;
-  for (let j = 0; j < 6; j++) ser += c[j] / ++y;
-  return -tmp + Math.log(2.5066282746310005 * ser / x);
+function normCDF(z) {
+  const x = Math.abs(z) / Math.SQRT2;
+  const t = 1 / (1 + 0.3275911 * x);
+  const erfc = t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429)))) * Math.exp(-x * x);
+  return z >= 0 ? 1 - 0.5 * erfc : 0.5 * erfc;
 }
-function betaContFrac(x, a, b) {
-  const maxIter = 200, eps = 1e-8, tiny = 1e-30;
-  const qab = a+b, qap = a+1, qam = a-1;
-  let c=1, d=1-qab*x/qap;
-  if (Math.abs(d)<tiny) d=tiny; d=1/d; let h=d;
-  for (let m=1; m<=maxIter; m++) {
-    const m2=2*m;
-    let aa=m*(b-m)*x/((qam+m2)*(a+m2));
-    d=1+aa*d; if(Math.abs(d)<tiny)d=tiny;
-    c=1+aa/c; if(Math.abs(c)<tiny)c=tiny;
-    d=1/d; h*=d*c;
-    aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));
-    d=1+aa*d; if(Math.abs(d)<tiny)d=tiny;
-    c=1+aa/c; if(Math.abs(c)<tiny)c=tiny;
-    d=1/d; const del=d*c; h*=del;
-    if(Math.abs(del-1)<eps) break;
-  }
-  return h;
-}
-function regIncompleteBeta(x,a,b) {
-  if(x<=0) return 0; if(x>=1) return 1;
-  const lb=lnGamma(a)+lnGamma(b)-lnGamma(a+b);
-  const f=Math.exp(a*Math.log(x)+b*Math.log(1-x)-lb);
-  if(x<(a+1)/(a+b+2)) return f/a*betaContFrac(x,a,b);
-  return 1-f/b*betaContFrac(1-x,b,a);
-}
-function tDistOneTail(t,df) { if(t<=0) return 1; return 0.5*regIncompleteBeta(df/(df+t*t),df/2,0.5); }
+
 function calcPValue(bets) {
   if (bets.length < 2) return null;
-  const nn = bets.length;
-  const decOdds = bets.map(b => b.odds>=0 ? b.odds/100+1 : 1+100/Math.abs(b.odds));
-  const avgDecimal = decOdds.reduce((s,d)=>s+d,0)/nn;
-  const totalRisk = bets.reduce((s,b)=>s+b.risk,0);
-  const pnlSum = bets.reduce((s,b)=>s+pnlFromAmerican(b.odds,b.risk,b.result),0);
-  const roiDecimal = totalRisk>0 ? pnlSum/totalRisk : 0;
-  const variance = (1+roiDecimal)*(avgDecimal-1-roiDecimal);
-  if(variance<=0||isNaN(variance)) return null;
-  const tStat = roiDecimal*Math.sqrt(nn)/Math.sqrt(variance);
-  if(tStat<=0) return null;
-  return tDistOneTail(tStat,nn-1);
+  const n = bets.length;
+  const returns = bets.map(b => {
+    const d = b.odds>=0 ? b.odds/100+1 : 1+100/Math.abs(b.odds);
+    return b.result==='won' ? d-1 : b.result==='lost' ? -1 : 0;
+  });
+  const meanReturn = returns.reduce((s,r)=>s+r,0)/n;
+  // Analytical per-bet variance: p_win*(d-1)² + (1-p_win)*1
+  // where p_win = 1/d (fair implied probability). E[X]=0 under fair odds so Var=E[X²].
+  const varSum = bets.reduce((s,b) => {
+    const d = b.odds>=0 ? b.odds/100+1 : 1+100/Math.abs(b.odds);
+    const p = 1/d;
+    return s + p*(d-1)*(d-1) + (1-p);
+  }, 0);
+  const sigma = Math.sqrt(varSum/n);
+  if (sigma <= 0) return null;
+  const z = (meanReturn - (-0.0455)) / (sigma / Math.sqrt(n));
+  return 1 - normCDF(z);
 }
 const pVal = calcPValue(closed);
 const pValStr = pVal!==null && pVal<0.5 ? stripTrailing(pVal.toFixed(Math.ceil(-Math.log10(pVal))+1))+" (1-in-"+Math.round(1/pVal)+")" : "—";
