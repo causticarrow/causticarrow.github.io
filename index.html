@@ -379,7 +379,7 @@ const totalVolumeUnitsAll = chronoBets.reduce((s, b) => s + b.risk, 0);
 const totalVolumeUnits = closed.reduce((s, b) => s + b.risk, 0);
 const grossWin = pnls.filter(v => v > 0).reduce((s, v) => s + v, 0);
 const grossLoss = Math.abs(pnls.filter(v => v < 0).reduce((s, v) => s + v, 0));
-const profitFactor = grossLoss > 0 ? stripTrailing((grossWin / grossLoss).toFixed(2)) + ":1" : "∞";
+const profitFactor = grossLoss > 0 ? stripTrailing((grossWin / grossLoss).toFixed(2)) + `<span style="color:var(--text-muted)">:1</span>` : "∞";
 const roi = totalVolumeUnits > 0 ? (totalPnlUnits / totalVolumeUnits * 100) : 0;
 const n = wins.length + losses.length;
 const avgRiskUnitsAll = chronoBets.length ? totalVolumeUnitsAll / chronoBets.length : 0;
