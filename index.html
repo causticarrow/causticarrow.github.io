@@ -757,8 +757,8 @@ function render() {
         </div>
         <div class="card anim d3">
           <div class="card-header">
-            <span class="card-title">Bet Log</span>
-            <span class="card-title" style="opacity:0.5">${BETS.length} bets${pendingBets.length?" · "+pendingBets.length+" pending ("+fmtUnitRisk(pendingBets.reduce((s,b)=>s+b.risk,0))+"u risked)":""}</span>
+            <span class="card-title">Log</span>
+            <span class="card-title" style="opacity:0.5">${BETS.length} plays${pendingBets.length?" · "+pendingBets.length+" pending ("+fmtUnitRisk(pendingBets.reduce((s,b)=>s+b.risk,0))+"u risked)":""}</span>
           </div>
           <div class="table-wrap">
             <table>
@@ -794,7 +794,7 @@ function render() {
           <div class="stats-card-body" id="statsCardBody">${statsHTML}</div>
         </div>
         <div class="card seq-card anim d5">
-          <div class="card-header"><span class="card-title">Bet Sequence</span><span class="card-title" id="seqLabel" style="opacity:0.5"></span></div>
+          <div class="card-header"><span class="card-title">Play Sequence</span><span class="card-title" id="seqLabel" style="opacity:0.5"></span></div>
           <div class="seq-wrap" id="seqWrap"></div>
         </div>
       </div>
@@ -861,7 +861,7 @@ function render() {
             const idx = tooltipModel.dataPoints?.[0]?.dataIndex;
             if(idx===undefined) return;
             const val = equityData[idx];
-            const playText = idx===0 ? "Start" : (equityPlays[idx]||"Bet #"+idx);
+            const playText = idx===0 ? "Start" : (equityPlays[idx]||"Play #"+idx);
             const valColor = val===0?"#64748b":val>0?"#10b981":"#ef4444";
             const valText = val===0?fmtUnit(0):fmtUnit(val,true);
 
