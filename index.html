@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>esports 2026 · @causticarrow</title>
+<title>@causticarrow · esports</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -137,6 +137,32 @@
   .d3 { animation-delay: 0.15s; }
   .d4 { animation-delay: 0.2s; }
   .d5 { animation-delay: 0.25s; }
+
+  @media (max-width: 768px) {
+    body { overflow: auto; }
+    .dashboard { height: auto; overflow: visible; padding: 8px; }
+    .header { display: none; }
+    .top-stats { padding: 10px 14px; margin-bottom: 8px; }
+    .pnl-value { font-size: 22px; }
+    .stat-number { font-size: 16px; }
+    .stats-grid { gap: 14px; }
+    .main-grid { grid-template-columns: 1fr; gap: 8px; flex: none; }
+    .right-col { display: none; }
+    .left-col .card:last-child { flex: none; }
+    .left-col .table-wrap { height: auto; overflow: visible; }
+    .table-wrap { overflow-x: auto; overflow-y: visible; }
+    .chart-wrap { height: 220px; }
+    .copy-record-btn { display: none; }
+    /* Hide #, Tournament, Risk columns (1, 4, 7) */
+    th:nth-child(1), td:nth-child(1),
+    th:nth-child(4), td:nth-child(4),
+    th:nth-child(7), td:nth-child(7) { display: none; }
+    /* Play col is now nth-child(5) visually but DOM stays same — fix text-align */
+    th:nth-child(5), td:nth-child(5) { text-align: left; }
+    th:nth-child(4), td:nth-child(4) { text-align: center; }
+    td { font-size: 11px; padding: 6px 8px; }
+    th { font-size: 9px; padding: 6px 8px; }
+  }
 </style>
 </head>
 <body>
@@ -391,6 +417,18 @@ const dateRangeLabel = getDateRange();
 const daySpan = Math.max(1, Math.round((dateRangeEnd-dateRangeStart)/(1000*60*60*24))+1);
 const playsPerDay = BETS.length/daySpan;
 
+// Season label: "ytd" if single year, "YYYY-YY" if multi-year
+const yearStart = dateRangeStart.getFullYear();
+const yearEnd = dateRangeEnd.getFullYear();
+const seasonLabel = yearStart === yearEnd
+  ? "ytd"
+  : yearStart + "-" + String(yearEnd).slice(2);
+// Page title and header title e.g. "esports 2026" or "esports 2026-27"
+const pageSeason = yearStart === yearEnd
+  ? String(yearStart)
+  : yearStart + "-" + String(yearEnd).slice(2);
+document.title = "@causticarrow · esports " + pageSeason;
+
 // ── Equity curve ──────────────────────────────────────────────────────────────
 const equityLabels = ["0"];
 const equityData = [0];
@@ -513,7 +551,7 @@ function copyRecord() {
   const btn = document.querySelector(".copy-record-btn");
   const w = Math.round(adjWins), l = Math.round(adjLosses);
   const pnlStr = fmtUnit(totalPnlUnits, true);
-  const text = `ytd record: ${w}-${l}, ${pnlStr}`;
+  const text = `${seasonLabel} record: ${w}-${l}, ${pnlStr} // [archive](https://causticarrow.com)`;
   navigator.clipboard.writeText(text).then(() => {
     if (btn) { btn.textContent = "Copied!"; btn.classList.add("copied"); setTimeout(() => { btn.textContent = "Copy Record"; btn.classList.remove("copied"); }, 2000); }
   }).catch(() => {
@@ -651,7 +689,7 @@ function render() {
   app.innerHTML = `
     <div class="header anim">
       <div class="header-brand">
-        <span class="header-title">Esports 2026</span>
+        <span class="header-title">Esports ${pageSeason}</span>
         <a class="header-user" href="https://x.com/causticarrow" target="_blank">𝕏 @causticarrow</a>
       </div>
     </div>
