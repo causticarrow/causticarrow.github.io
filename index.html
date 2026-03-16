@@ -181,6 +181,8 @@
     .date-range-short { display: inline; }
     .main-grid { grid-template-columns: 1fr; gap: 8px; flex: none; }
     .right-col { display: none; }
+    .table-wrap { display: block; overflow: visible; }
+    .table-body-scroll { overflow: visible; height: auto; min-height: unset; flex: none; }
     .left-col .card:last-child { flex: none; }
     .chart-wrap { height: 200px; padding: 8px 10px; }
     .copy-record-btn { display: none; }
@@ -761,19 +763,13 @@ function render() {
             <span class="card-title" style="opacity:0.5">${BETS.length} plays${pendingBets.length?" · "+pendingBets.length+" pending ("+fmtUnitRisk(pendingBets.reduce((s,b)=>s+b.risk,0))+"u risked)":""}</span>
           </div>
           <div class="table-wrap">
-            <table>
-              <colgroup>
-                <col class="col-num"><col class="col-date"><col class="col-game"><col class="col-tourn"><col class="col-play">
-                <col class="col-odds"><col class="col-risk"><col class="col-result">
-              </colgroup>
-              <thead><tr><th class="col-num">#</th><th class="col-date">Date</th><th class="col-game">Game</th><th class="col-tourn">Tournament</th><th class="col-play">Play</th><th class="col-odds">Odds</th><th class="col-risk">Risk</th><th class="col-result">Result</th></tr></thead>
-            </table>
             <div class="table-body-scroll">
               <table>
                 <colgroup>
                   <col class="col-num"><col class="col-date"><col class="col-game"><col class="col-tourn"><col class="col-play">
                   <col class="col-odds"><col class="col-risk"><col class="col-result">
                 </colgroup>
+                <thead><tr><th class="col-num">#</th><th class="col-date">Date</th><th class="col-game">Game</th><th class="col-tourn">Tournament</th><th class="col-play">Play</th><th class="col-odds">Odds</th><th class="col-risk">Risk</th><th class="col-result">Result</th></tr></thead>
                 <tbody id="betTbody">${buildBetTableHTML()}</tbody>
               </table>
             </div>
