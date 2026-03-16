@@ -9,17 +9,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-primary: #0a0e17;
-    --bg-card: #141c2b;
-    --bg-hover: #1a2435;
-    --border: #1e293b;
-    --border-bright: #2d3a4d;
-    --text-primary: #e2e8f0;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
+    --bg-primary: #070c15;
+    --bg-card: #0e1525;
+    --bg-hover: #152030;
+    --border: rgba(255,255,255,0.055);
+    --border-bright: rgba(255,255,255,0.10);
+    --text-primary: #dde6f2;
+    --text-secondary: #8facc4;
+    --text-muted: #4f5d7a;
     --green: #10b981;
     --red: #ef4444;
-    --cyan: #06b6d4;
+    --cyan: #7c6af7;
     --orange: #f59e0b;
     --font: 'Inter', system-ui, sans-serif;
   }
@@ -28,14 +28,13 @@
   body { background: var(--bg-primary); color: var(--text-primary); font-family: var(--font); overflow: hidden; }
   .dashboard { max-width: 1400px; margin: 0 auto; padding: 12px; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-  .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; animation: fadeUp 0.4s ease forwards; }
-  .header-brand { display: flex; align-items: center; gap: 16px; }
-  .header-title { font-size: 15px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--cyan); }
-  .header-user { font-size: 13px; color: var(--text-secondary); font-weight: 500; text-decoration: none; }
-  .header-user:hover { color: var(--text-primary); text-decoration: none; }
+  .footer { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 4px; border-top: 1px solid var(--border); flex-shrink: 0; }
+  .footer-link { font-size: 11px; font-weight: 500; color: var(--text-muted); text-decoration: none; letter-spacing: 0.5px; transition: color 0.15s; }
+  .footer-link:hover { color: var(--text-secondary); }
+  .footer-disclaimer { font-size: 10px; color: var(--text-muted); opacity: 0.5; }
   .header-meta { font-size: 12px; color: var(--text-muted); }
 
-  .top-stats { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 20px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; animation: fadeUp 0.4s 0.05s ease forwards; opacity: 0; flex-shrink: 0; }
+  .top-stats { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 20px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; animation: fadeUp 0.4s 0.05s ease forwards; opacity: 0; flex-shrink: 0; }
   .pnl-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
   .pnl-value { font-size: 28px; font-weight: 800; line-height: 1.1; }
   .pnl-positive { color: var(--green); }
@@ -53,22 +52,22 @@
   .right-col .seq-card { flex: 1; min-height: 0; display: flex; flex-direction: column; }
   .right-col .seq-card .seq-wrap { flex: 1; min-height: 0; height: auto !important; }
 
-  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
   .card-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px; border-bottom: 1px solid var(--border); }
   .card-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
   .card-body { padding: 10px 14px; }
   .chart-wrap { padding: 10px 14px; height: 300px; position: relative; }
 
-  .chart-tooltip { position: absolute; pointer-events: none; background: #111827; border: 1px solid #2d3a4d; border-radius: 6px; padding: 10px 14px; font-family: var(--font); box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 100; transition: opacity 0.1s ease; white-space: nowrap; }
+  .chart-tooltip { position: absolute; pointer-events: none; background: #0e1525; border: 1px solid var(--border-bright); border-radius: 8px; padding: 10px 14px; font-family: var(--font); box-shadow: 0 8px 32px rgba(0,4,18,0.7); z-index: 100; transition: opacity 0.1s ease; white-space: nowrap; }
   .chart-tooltip-play { font-size: 11px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
   .chart-tooltip-value { font-size: 14px; font-weight: 700; }
 
   .cat-row { display: flex; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); gap: 12px; }
   .cat-row:last-child { border-bottom: none; }
-  .cat-badge { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 3px; white-space: nowrap; color: #94a3b8; background: rgba(100,116,139,0.08); border: 1px solid rgba(100,116,139,0.2); }
+  .cat-badge { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; white-space: nowrap; color: #8a99b8; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.10); }
   .cat-pnl { font-size: 13px; font-weight: 600; margin-left: auto; text-align: right; }
 
-  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid rgba(30,41,59,0.5); min-height: 28px; }
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid rgba(29,45,69,0.5); min-height: 28px; }
   .stat-row:last-child { border-bottom: none; }
   .stat-row-label { font-size: 12px; color: var(--text-secondary); }
   .stat-row-value { font-size: 12px; font-weight: 600; }
@@ -97,16 +96,16 @@
 
   table { width: 100%; border-collapse: collapse; table-layout: auto; }
   th { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; padding: 7px 12px; text-align: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
-  td { padding: 7px 12px; border-bottom: 1px solid rgba(30,41,59,0.3); font-size: 12px; color: var(--text-secondary); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  td { padding: 7px 12px; border-bottom: 1px solid rgba(29,45,69,0.3); font-size: 12px; color: var(--text-secondary); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   th:nth-child(4), td:nth-child(4) { text-align: left; }
   th.col-play, td.col-play { text-align: left; }
   th.col-tourn, td.col-tourn { text-align: left; }
   tr:hover td { background: var(--bg-hover); }
 
-  .result-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 3px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid transparent; display: inline-block; }
+  .result-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 5px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid transparent; display: inline-block; }
   .result-won { background: rgba(16,185,129,0.1); color: #34d399; border-color: rgba(16,185,129,0.25); }
   .result-lost { background: rgba(239,68,68,0.1); color: #f87171; border-color: rgba(239,68,68,0.25); }
-  .result-pending { background: rgba(100,116,139,0.08); color: #94a3b8; border-color: rgba(100,116,139,0.2); }
+  .result-pending { background: rgba(255,255,255,0.04); color: #5d6f90; border-color: rgba(255,255,255,0.08); }
   .result-push { background: rgba(245,158,11,0.1); color: #fbbf24; border-color: rgba(245,158,11,0.25); }
 
   .stats-card-body { padding: 6px 14px; overflow: hidden; }
@@ -115,27 +114,27 @@
   .play-cell { display: flex; align-items: center; gap: 6px; }
 
   .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 14px; border-top: 1px solid var(--border); }
-  .page-btn { font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+  .page-btn { font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 4px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
   .page-btn:hover:not(:disabled) { border-color: var(--border-bright); color: var(--text-primary); }
   .page-btn:disabled { opacity: 0.3; cursor: default; }
-  .page-btn.active { border-color: var(--cyan); color: var(--cyan); background: rgba(6,182,212,0.08); }
+  .page-btn.active { border-color: var(--cyan); color: var(--cyan); background: rgba(124,106,247,0.1); }
 
   .copy-record-btn { position: fixed; top: 10px; right: 14px; z-index: 1000; font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-muted); cursor: pointer; letter-spacing: 1px; opacity: 0; transition: opacity 0.15s, color 0.15s, border-color 0.15s; }
   .copy-record-btn:hover { opacity: 1; }
   .copy-record-btn.copied { opacity: 1; color: var(--green); border-color: rgba(16,185,129,0.4); }
 
-  .stats-sub { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 6px 14px 4px; border-bottom: 1px solid rgba(30,41,59,0.5); }
+  .stats-sub { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 6px 14px 4px; border-bottom: 1px solid rgba(29,45,69,0.5); }
   .stats-sub-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
   .stats-sub-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); }
   .stats-sub-record { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
   .stats-sub-pnl { font-size: 11px; font-weight: 600; }
-  .stats-split { padding: 4px 14px 6px; border-bottom: 1px solid rgba(30,41,59,0.5); display: flex; flex-direction: column; gap: 4px; }
+  .stats-split { padding: 4px 14px 6px; border-bottom: 1px solid rgba(29,45,69,0.5); display: flex; flex-direction: column; gap: 4px; }
   .split-row { display: flex; align-items: center; gap: 6px; }
   .split-count { font-size: 10px; font-weight: 600; color: var(--text-muted); min-width: 16px; }
   .split-count-right { text-align: right; }
   .split-track { flex: 1; height: 4px; background: var(--bg-primary); border-radius: 2px; overflow: hidden; display: flex; }
-  .split-a { height: 100%; background: rgba(6,182,212,0.5); border-radius: 2px 0 0 2px; }
-  .split-b { height: 100%; background: rgba(100,116,139,0.25); border-radius: 0 2px 2px 0; }
+  .split-a { height: 100%; background: rgba(124,106,247,0.55); border-radius: 2px 0 0 2px; }
+  .split-b { height: 100%; background: rgba(124,106,247,0.15); border-radius: 0 2px 2px 0; }
 
   .game-pill { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 3px; flex-shrink: 0; }
   .game-pill.cs2 { color: rgb(96,165,250); background: rgba(48,82,125,0.6); }
@@ -768,12 +767,6 @@ function render() {
   const app = document.getElementById("app");
   const statsHTML = buildGeneralStatsHTML();
   app.innerHTML = `
-    <div class="header anim">
-      <div class="header-brand">
-        <span class="header-title">Esports ${pageSeason}</span>
-        <a class="header-user" href="https://x.com/causticarrow" target="_blank">𝕏 @causticarrow</a>
-      </div>
-    </div>
     <div class="top-stats">
       <div style="display:flex;gap:32px;align-items:center">
         <div>
@@ -850,8 +843,12 @@ function render() {
         </div>
       </div>
     </div>
-    <div style="text-align:center;padding:10px 0 6px;font-size:10px;color:var(--text-muted);opacity:0.5;flex-shrink:0">
-      Team logos are property of their respective organizations. This is a personal, non-commercial recordkeeping site with no affiliation to any team, tournament, or betting operator.
+    <div class="footer">
+      <div style="display:flex;align-items:center;gap:16px">
+        <a class="footer-link" href="https://x.com/causticarrow" target="_blank">𝕏 @causticarrow</a>
+        <a class="footer-link" href="https://discord.gg/hammer" target="_blank">Discord</a>
+      </div>
+      <span class="footer-disclaimer">Team logos are property of their respective organizations. Personal, non-commercial recordkeeping site.</span>
     </div>
   `;
 
@@ -1027,6 +1024,9 @@ function render() {
           ctx.save(); ctx.beginPath(); ctx.rect(x,chartArea.top,maxW,14); ctx.clip();
           ctx.fillText(b.label,x,chartArea.top+3); ctx.restore();
         });
+        ctx.font="600 11px Inter, system-ui, sans-serif"; ctx.textBaseline="bottom"; ctx.textAlign="right";
+        ctx.fillStyle="rgba(143,172,196,0.18)";
+        ctx.fillText("causticarrow.com", chartArea.right - 6, chartArea.bottom - 6);
         ctx.restore();
       }
     }]
