@@ -378,7 +378,7 @@ const profitFactor = grossLoss > 0 ? stripTrailing((grossWin / grossLoss).toFixe
 const roi = totalVolumeUnits > 0 ? (totalPnlUnits / totalVolumeUnits * 100) : 0;
 const n = wins.length + losses.length;
 const avgRiskUnitsAll = chronoBets.length ? totalVolumeUnitsAll / chronoBets.length : 0;
-const adjWins = n > 0 && totalVolumeUnits > 0 ? (n + totalPnlUnits / (totalVolumeUnits / closed.length)) / 2 : 0;
+const adjWins = n > 0 ? (1.1 * n + totalPnlUnits) / 2.1 : 0;
 const adjLosses = Math.max(n - adjWins, 0);
 const adjWinRate = (adjWins + adjLosses) > 0 ? adjWins / (adjWins + adjLosses) * 100 : 0;
 
@@ -545,8 +545,7 @@ closed.forEach((b,i) => {
 });
 Object.values(betClasses).forEach(d => {
   const nn=d.wins+d.losses;
-  const avgR=nn>0?d.risk/nn:0;
-  const aw=nn>0&&avgR>0?(nn+d.pnl/avgR)/2:0;
+  const aw=nn>0?(1.1*nn+d.pnl)/2.1:0;
   d.adjWins=aw; d.adjLosses=Math.max(nn-aw,0);
 });
 
