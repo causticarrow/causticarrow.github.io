@@ -146,6 +146,8 @@
   .d4 { animation-delay: 0.2s; }
   .d5 { animation-delay: 0.25s; }
 
+  .play-short { display: none; }
+  .pnl-label-short { display: none; }
   .result-short { display: none; }
   .odds-short { display: none; }
 
@@ -158,6 +160,9 @@
     .stat-number { font-size: 15px; }
     .stats-grid { gap: 10px; }
     .stat-label { font-size: 9px; letter-spacing: 1px; }
+    .stat-hide-mobile { display: none; }
+    .pnl-label-full { display: none; }
+    .pnl-label-short { display: inline; }
     .main-grid { grid-template-columns: 1fr; gap: 8px; flex: none; }
     .right-col { display: none; }
     .left-col .card:last-child { flex: none; }
@@ -173,7 +178,10 @@
     .col-result { white-space: nowrap; }
     td { font-size: 11px; padding: 5px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     th { font-size: 9px; padding: 5px 6px; white-space: nowrap; overflow: hidden; }
-    .logo-slot { display: none; }
+    .logo-slot { display: inline-flex; }
+    .team-logo { width: 14px; height: 14px; }
+    .play-full { display: none; }
+    .play-short { display: inline; }
     .result-full { display: none; }
     .result-short { display: inline; }
     .odds-full { display: none; }
@@ -555,6 +563,36 @@ function normalizeLogo(img) {
   if(scale>1.01) img.style.transform="scale("+scale.toFixed(3)+")";
 }
 
+const TEAM_ABBR = {
+  "Shopify Rebellion":"SR","Nongshim RedForce":"NS","Ninjas in Pyjamas":"NIP",
+  "FunPlus Phoenix":"FPX","Rex Regum Qeon":"RRQ","Natus Vincere":"NAVI",
+  "Dragon Ranger":"DRG","Evil Geniuses":"EG","100 Thieves":"100T",
+  "Eternal Fire":"EF","Gentle Mates":"M8","Karmine Corp":"KC",
+  "Inner Circle":"IC","The MongolZ":"MGLZ","MongolZ":"MGLZ","Lynn Vision":"LV",
+  "RED Canids":"RED","Rare Atom":"RA","Passion UA":"P.UA",
+  "Paper Rex":"PRX","All Gamers":"AG","Xi Lai":"XLG",
+  "BC.Game":"BC.G","GamerLegion":"GL","PARIVISION":"PV","EYEBALLERS":"EB",
+  "Heretics":"TH","Leviatan":"LEV","Bilibili":"BLG","Vitality":"VIT",
+  "Falcons":"FLC","Nemesis":"NMSS","BetBoom":"BB","Imperial":"IMP",
+  "ELEVATE":"ELV","EDward":"EDG","Cloud9":"C9","HEROIC":"HERO",
+  "Aurora":"AUR","Spirit":"TS","Liquid":"TL","VARREL":"VL",
+  "GIANTX":"GX","Legacy":"LGCY","FURIA":"FUR","TYLOO":"TYL",
+  "3DMAX":"3D","Dplus":"DK","fnatic":"FNC","Astralis":"AST",
+  "NiP":"NIP","G2":"G2","FaZe":"FaZe","MOUZ":"MOUZ","HOTU":"HOTU",
+  "OG":"OG","FUT":"FUT","M80":"M80","NRG":"NRG","paiN":"paiN",
+  "B8":"B8","Monte":"Monte","T1":"T1",
+};
+function abbr(name) { return TEAM_ABBR[name] || name; }
+
+// Returns mobile-shortened play: full team name + line, no opponent
+function shortenPlay(play) {
+  const m = play.match(/^(.+?)\s+(PK|[+-]\d[\d.]*)\s+vs\..+$/);
+  if (!m) return play;
+  const team = m[1].trim();
+  const line = m[2];
+  return line === "PK" ? team + " PK" : team + " " + line;
+}
+
 function gameClass(game) {
   if(!game) return "";
   const g = game.toLowerCase();
@@ -644,7 +682,7 @@ function buildBetTableHTML() {
       <td class="col-date">${fmtDate(b.date)}</td>
       <td class="col-game">${pillHTML}</td>
       <td class="col-tourn">${b.tournament}</td>
-      <td class="col-play" style="color:var(--text-primary)"><span class="play-cell">${logoHTML}${b.play}${b.isExtra?" <span style='font-size:10px;font-weight:600;padding:1px 6px;border-radius:3px;background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);flex-shrink:0'>Extra</span>":""}</span></td>
+      <td class="col-play" style="color:var(--text-primary)"><span class="play-cell">${logoHTML}<span class="play-full">${b.play}${b.isExtra?" <span style='font-size:10px;font-weight:600;padding:1px 6px;border-radius:3px;background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);flex-shrink:0'>Extra</span>":""}</span><span class="play-short">${shortenPlay(b.play)}${b.isExtra?" <span style='font-size:10px;font-weight:600;padding:1px 6px;border-radius:3px;background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);flex-shrink:0'>Extra</span>":""}</span></span></td>
       <td class="col-odds"><span class="odds-full">${fmtOddsWithProb(b.odds)}</span><span class="odds-short">${fmtAmerican(b.odds)}</span></td>
       <td class="col-risk">${fmtUnitRisk(b.risk)}</td>
       <td class="col-result"><span class="result-badge ${resultClass} result-full">${resultFull}</span><span class="result-badge ${resultClass} result-short">${resultShort}</span></td>
@@ -714,7 +752,7 @@ function render() {
     <div class="top-stats">
       <div style="display:flex;gap:32px;align-items:center">
         <div>
-          <div class="pnl-label">Net Profit</div>
+          <div class="pnl-label"><span class="pnl-label-full">Net Profit</span><span class="pnl-label-short">Profit</span></div>
           <div class="pnl-value ${totalPnlUnits>=0?"pnl-positive":"pnl-negative"}">${fmtUnit(totalPnlUnits,true)}</div>
         </div>
         <div>
@@ -725,8 +763,8 @@ function render() {
       <div class="stats-grid">
         <div class="stat-item"><div class="stat-number" style="color:var(--green)">${adjWins.toFixed(1)}</div><div class="stat-label">Wins</div></div>
         <div class="stat-item"><div class="stat-number" style="color:var(--red)">${adjLosses.toFixed(1)}</div><div class="stat-label">Losses</div></div>
-        <div class="stat-item"><div class="stat-number">${adjWinRate.toFixed(2)}%</div><div class="stat-label">Win Rate</div></div>
-        <div class="stat-item"><div class="stat-number">${fmtUnitRisk(totalVolumeUnitsAll)}</div><div class="stat-label">Net Risk</div></div>
+        <div class="stat-item stat-hide-mobile"><div class="stat-number">${adjWinRate.toFixed(2)}%</div><div class="stat-label">Win Rate</div></div>
+        <div class="stat-item stat-hide-mobile"><div class="stat-number">${fmtUnitRisk(totalVolumeUnitsAll)}</div><div class="stat-label">Net Risk</div></div>
       </div>
     </div>
     <button class="copy-record-btn" onclick="copyRecord()">Copy Record</button>
