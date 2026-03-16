@@ -181,9 +181,9 @@
     .left-col .card:last-child { flex: none; }
     .chart-wrap { height: 200px; padding: 8px 10px; }
     .copy-record-btn { display: none; }
-    /* Hide these columns entirely */
+    
     .col-num, .col-game, .col-tourn, .col-risk { display: none; }
-    /* Auto layout — browser sizes cols to content, Play gets the rest */
+    
     table { table-layout: auto; width: 100%; }
     .col-date { white-space: nowrap; }
     .col-play { text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 0; width: 100%; }
@@ -207,16 +207,9 @@
 <div class="dashboard" id="app"></div>
 
 <script>
-// ── Bets ──────────────────────────────────────────────────────────────────────
-// Format: odds extracted from esports-2026 play strings, result from score
-// Each bet is 1 unit to win (risk = 1u for dogs/pk at even, or fractional for favs)
-// We normalise everything: unitSize = 1, risk = units risked per bet
 
-const UNIT_SIZE = 1; // everything is in units
+const UNIT_SIZE = 1;
 
-// Raw picks from esports-2026, converted to BETS format
-// result auto-detected from score (same logic as original file)
-// odds stripped from play string; extra bets are 0.5u size
 const RAW_PICKS = [
   { date: "2026-03-15", tournament: "ESL Pro League", play: "Aurora +1.5 vs. Natus Vincere", odds: -135, score: "1-3", game: "CS2" },
   { date: "2026-03-15", tournament: "ESL Pro League", play: "Astralis PK vs. FUT", odds: +110, score: "2-1", game: "CS2" },
@@ -275,7 +268,6 @@ const RAW_PICKS = [
   { date: "2026-01-13", tournament: "BLAST Bounty", play: "OG PK vs. FUT", odds: +180, score: "0-2", game: "CS2" },
 ];
 
-// ── Result detection (same logic as esports-2026) ─────────────────────────────
 function detectResult(play, score, odds) {
   if (!score) return "pending";
   const parts = score.split("-").map(Number);
@@ -288,14 +280,11 @@ function detectResult(play, score, odds) {
   return "push";
 }
 
-// ── Risk calculation (in units) ───────────────────────────────────────────────
-// extra bets are 0.5u, regular are 1u
 function calcRiskUnits(odds, isExtra) {
   const base = isExtra ? 0.5 : 1.0;
   return odds > 0 ? base * 100 / odds : base * Math.abs(odds) / 100;
 }
 
-// Build BETS array
 const BETS = RAW_PICKS.map(p => {
   const isExtra = !!p.extra;
   const result = detectResult(p.play, p.score, p.odds);
@@ -309,7 +298,7 @@ const BETS = RAW_PICKS.map(p => {
     game: p.game || null,
     isExtra,
     unitSize: UNIT_SIZE,
-    risk: riskUnits, // risk in units
+    risk: riskUnits,
   };
 });
 
@@ -326,7 +315,6 @@ BETS.forEach(b => {
 const TOURNAMENT_ORDER = Object.keys(tournLastDate).sort((a, b) => tournLastDate[b].localeCompare(tournLastDate[a]));
 function tournDisplayName(key) { const [name, year] = key.split("|"); return name + " (" + year + ")"; }
 
-// ── Formatting ────────────────────────────────────────────────────────────────
 function stripTrailing(str) {
   if (str.indexOf(".") === -1) return str;
   return str.replace(/0+$/, "").replace(/\.$/, "");
@@ -361,7 +349,6 @@ function fmtDate(d) {
   return (dt.getMonth() + 1) + "/" + dt.getDate() + "/" + String(dt.getFullYear()).slice(2);
 }
 
-// ── Stats ─────────────────────────────────────────────────────────────────────
 function pnlFromAmerican(odds, riskUnits, result) {
   if (result === "pending") return null;
   if (result === "lost") return -riskUnits;
@@ -390,7 +377,6 @@ const adjWinRate = (adjWins + adjLosses) > 0 ? adjWins / (adjWins + adjLosses) *
 let peak = 0, maxDDUnits = 0, cum = 0;
 pnls.forEach(v => { cum += v; if (cum > peak) peak = cum; const dd = peak - cum; if (dd > maxDDUnits) maxDDUnits = dd; });
 
-// P-value
 function normCDF(z) {
   const x = Math.abs(z) / Math.SQRT2;
   const t = 1 / (1 + 0.3275911 * x);
@@ -406,8 +392,7 @@ function calcPValue(bets) {
     return b.result==='won' ? d-1 : b.result==='lost' ? -1 : 0;
   });
   const meanReturn = returns.reduce((s,r)=>s+r,0)/n;
-  // Analytical per-bet variance: p_win*(d-1)² + (1-p_win)*1
-  // where p_win = 1/d (fair implied probability). E[X]=0 under fair odds so Var=E[X²].
+
   const varSum = bets.reduce((s,b) => {
     const d = b.odds>=0 ? b.odds/100+1 : 1+100/Math.abs(b.odds);
     const p = 1/d;
@@ -440,19 +425,17 @@ const shortDateRangeLabel = getShortDateRange();
 const daySpan = Math.max(1, Math.round((dateRangeEnd-dateRangeStart)/(1000*60*60*24))+1);
 const playsPerDay = BETS.length/daySpan;
 
-// Season label: "ytd" if single year, "YYYY-YY" if multi-year
 const yearStart = dateRangeStart.getFullYear();
 const yearEnd = dateRangeEnd.getFullYear();
 const seasonLabel = yearStart === yearEnd
   ? "ytd"
   : yearStart + "-" + String(yearEnd).slice(2);
-// Page title and header title e.g. "esports 2026" or "esports 2026-27"
+
 const pageSeason = yearStart === yearEnd
   ? String(yearStart)
   : yearStart + "-" + String(yearEnd).slice(2);
 document.title = "@causticarrow · esports " + pageSeason;
 
-// ── Equity curve ──────────────────────────────────────────────────────────────
 const equityLabels = ["0"];
 const equityData = [0];
 const equityPlays = [""];
@@ -480,33 +463,31 @@ for(let i=1; i<equityData.length; i++) {
   athData.push(ath);
 }
 
-// ── Per-game equity series ────────────────────────────────────────────────────
 const GAME_COLORS = { "CS2": "rgb(96,165,250)", "VAL": "rgb(251,146,60)" };
-// Build one cumulative series per game, aligned to equityLabels (length = closed.length + 1)
-// Index 0 = "Start" point (null for games, since we don't know their start yet)
-const gameSeries = {}; // game → array of length equityData.length
+
+const gameSeries = {};
 const gameCum2 = {};
-const firstGameIdx = {}; // game → index in closed[] where it first appears
+const firstGameIdx = {};
 closed.forEach((b, i) => {
   const g = b.game;
   if (g && GAME_COLORS[g] && !(g in firstGameIdx)) firstGameIdx[g] = i;
 });
 Object.keys(firstGameIdx).forEach(g => {
   gameCum2[g] = 0;
-  gameSeries[g] = []; // will be filled below
+  gameSeries[g] = [];
 });
-// Fill: one entry per equityData point (0..closed.length)
+
 for (let i = 0; i <= closed.length; i++) {
   Object.keys(firstGameIdx).forEach(g => {
     if (i < firstGameIdx[g]) {
-      gameSeries[g].push(null); // before this game started
+      gameSeries[g].push(null);
     } else if (i === firstGameIdx[g]) {
-      gameSeries[g].push(0); // baseline
+      gameSeries[g].push(0);
     } else {
-      gameSeries[g].push(gameCum2[g]); // carry value from previous step
+      gameSeries[g].push(gameCum2[g]);
     }
   });
-  // After recording the "before" snapshot, accumulate this bet
+
   if (i < closed.length) {
     const b = closed[i];
     const g = b.game;
@@ -532,7 +513,6 @@ Object.values(betClasses).forEach(d => {
   d.adjWins=aw; d.adjLosses=Math.max(nn-aw,0);
 });
 
-// ── Tournament stats ──────────────────────────────────────────────────────────
 const tournMap = {};
 closed.forEach((b,i) => {
   const key = b.tournament+"|"+b.date.slice(0,4);
@@ -551,7 +531,6 @@ let tournPage = 0;
 const TOURN_PAGE_SIZE = 5;
 const totalTournPages = Math.ceil(allTournStats.length/TOURN_PAGE_SIZE);
 
-// ── Helper fns ────────────────────────────────────────────────────────────────
 function getPickTeam(play) {
   if(/\bOver\b|\bUnder\b/.test(play)&&play.includes("/")) return null;
   const match = play.match(/^(.+?)\s+(PK|[+-]\d)/);
@@ -586,7 +565,6 @@ const TEAM_ABBR = {
 };
 function abbr(name) { return TEAM_ABBR[name] || name; }
 
-// Returns mobile-shortened play: full team name + line, no opponent
 function shortenPlay(play) {
   const m = play.match(/^(.+?)\s+(PK|[+-]\d[\d.]*)\s+vs\..+$/);
   if (!m) return play;
@@ -603,7 +581,6 @@ function gameClass(game) {
   return "";
 }
 
-// ── Screenshot ────────────────────────────────────────────────────────────────
 function copyRecord() {
   const btn = document.querySelector(".copy-record-btn");
   const w = Math.round(adjWins), l = Math.round(adjLosses);
@@ -618,7 +595,6 @@ function copyRecord() {
 
 let chartInstance = null;
 
-// ── Build HTML pieces ─────────────────────────────────────────────────────────
 function buildGeneralStatsHTML() {
   return [
     ["p (vig-adjusted)", pValStr, "var(--text-primary)"],
@@ -740,7 +716,6 @@ function resizeSeq() {
   if(seqLbl) seqLbl.textContent="Last "+count;
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
 function render() {
   const app = document.getElementById("app");
   const statsHTML = buildGeneralStatsHTML();
@@ -833,7 +808,6 @@ function render() {
   if(chartInstance) chartInstance.destroy();
   const ctx = document.getElementById("equityChart").getContext("2d");
 
-  // Build legend
   const legendEl = document.getElementById("chartLegend");
   if (legendEl) {
     const overallDot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:4px"></span>`;
@@ -887,7 +861,7 @@ function render() {
             const playText = idx===0 ? "Start" : (equityPlays[idx]||"Bet #"+idx);
             const valColor = val===0?"#64748b":val>0?"#10b981":"#ef4444";
             const valText = val===0?fmtUnit(0):fmtUnit(val,true);
-            // per-game lines
+
             let gameLines = "";
             Object.entries(GAME_COLORS).filter(([g]) => gameSeries[g]).forEach(([g, col]) => {
               const gv = gameSeries[g][idx];
