@@ -150,6 +150,8 @@
   .pnl-label-short { display: none; }
   .result-short { display: none; }
   .odds-short { display: none; }
+  .chart-title-short { display: none; }
+  .date-range-short { display: none; }
 
   @media (max-width: 900px) {
     body { overflow: auto; }
@@ -163,6 +165,10 @@
     .stat-hide-mobile { display: none; }
     .pnl-label-full { display: none; }
     .pnl-label-short { display: inline; }
+    .chart-title-full { display: none; }
+    .chart-title-short { display: inline; }
+    .date-range-full { display: none; }
+    .date-range-short { display: inline; }
     .main-grid { grid-template-columns: 1fr; gap: 8px; flex: none; }
     .right-col { display: none; }
     .left-col .card:last-child { flex: none; }
@@ -439,6 +445,13 @@ function getDateRange() {
   return s===e ? s : s+" through "+e;
 }
 const dateRangeLabel = getDateRange();
+const shortMonthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+function getShortDateRange() {
+  const s = shortMonthNames[dateRangeStart.getMonth()] + dateRangeStart.getFullYear();
+  const e = shortMonthNames[dateRangeEnd.getMonth()] + dateRangeEnd.getFullYear();
+  return s === e ? s : s + " to " + e;
+}
+const shortDateRangeLabel = getShortDateRange();
 const daySpan = Math.max(1, Math.round((dateRangeEnd-dateRangeStart)/(1000*60*60*24))+1);
 const playsPerDay = BETS.length/daySpan;
 
@@ -772,8 +785,8 @@ function render() {
       <div class="left-col">
         <div class="card anim d2">
           <div class="card-header">
-            <span class="card-title">Net Profit Curve</span>
-            <span class="card-title" style="opacity:0.5">${dateRangeLabel}</span>
+            <span class="card-title"><span class="chart-title-full">Net Profit Curve</span><span class="chart-title-short">Chart</span></span>
+            <span class="card-title" style="opacity:0.5"><span class="date-range-full">${dateRangeLabel}</span><span class="date-range-short">${shortDateRangeLabel}</span></span>
           </div>
           <div class="chart-wrap">
             <canvas id="equityChart"></canvas>
