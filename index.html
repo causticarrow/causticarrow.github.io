@@ -77,8 +77,8 @@
   col.col-num { width: 38px; }
   col.col-date { width: 72px; }
   col.col-game { width: 54px; }
-  col.col-tourn { width: 170px; }
-  col.col-play { width: auto; }
+  col.col-tourn { width: 140px; }
+  col.col-play { }
   col.col-odds { width: 114px; }
   col.col-risk { width: 72px; }
   col.col-result { width: 90px; }
@@ -90,10 +90,12 @@
   .seq-push { background: var(--orange); opacity: 0.85; }
   .seq-pending { background: var(--text-muted); opacity: 0.5; }
 
-  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  table { width: 100%; border-collapse: collapse; table-layout: auto; }
   th { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; padding: 7px 12px; text-align: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
   td { padding: 7px 12px; border-bottom: 1px solid rgba(30,41,59,0.3); font-size: 12px; color: var(--text-secondary); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   th:nth-child(4), td:nth-child(4) { text-align: left; }
+  th.col-play, td.col-play { text-align: left; }
+  th.col-tourn, td.col-tourn { text-align: left; }
   tr:hover td { background: var(--bg-hover); }
 
   .result-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 3px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid transparent; display: inline-block; }
@@ -153,7 +155,7 @@
   .chart-title-short { display: none; }
   .date-range-short { display: none; }
 
-  @media (max-width: 900px) {
+  @media (max-width: 768px) {
     body { overflow: auto; }
     .dashboard { height: auto; overflow: visible; padding: 8px; }
     .header { display: none; }
@@ -829,6 +831,9 @@ function render() {
           <div class="seq-wrap" id="seqWrap"></div>
         </div>
       </div>
+    </div>
+    <div style="text-align:center;padding:10px 0 6px;font-size:10px;color:var(--text-muted);opacity:0.5;flex-shrink:0">
+      Team logos are property of their respective organizations. This is a personal, non-commercial recordkeeping site with no affiliation to any team, tournament, or betting operator.
     </div>
   `;
 
