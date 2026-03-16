@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>esports 2026 · @causticarrow</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0a0e17;
+    --bg-card: #141c2b;
+    --bg-hover: #1a2435;
+    --border: #1e293b;
+    --border-bright: #2d3a4d;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --green: #10b981;
+    --red: #ef4444;
+    --cyan: #06b6d4;
+    --orange: #f59e0b;
+    --font: 'Inter', system-ui, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg-primary); color: var(--text-primary); font-family: var(--font); overflow: hidden; }
+  .dashboard { max-width: 1400px; margin: 0 auto; padding: 12px; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+  .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; animation: fadeUp 0.4s ease forwards; }
+  .header-brand { display: flex; align-items: center; gap: 16px; }
+  .header-title { font-size: 15px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--cyan); }
+  .header-user { font-size: 13px; color: var(--text-secondary); font-weight: 500; text-decoration: none; }
+  .header-user:hover { color: var(--text-primary); text-decoration: none; }
+  .header-meta { font-size: 12px; color: var(--text-muted); }
+
+  .top-stats { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 20px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; animation: fadeUp 0.4s 0.05s ease forwards; opacity: 0; flex-shrink: 0; }
+  .pnl-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
+  .pnl-value { font-size: 28px; font-weight: 800; line-height: 1.1; }
+  .pnl-positive { color: var(--green); }
+  .pnl-negative { color: var(--red); }
+  .stats-grid { display: flex; gap: 24px; align-items: center; }
+  .stat-item { text-align: center; }
+  .stat-number { font-size: 20px; font-weight: 700; line-height: 1.2; }
+  .stat-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-top: 2px; }
+
+  .main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 10px; flex: 1; min-height: 0; }
+  .left-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .left-col .card:last-child { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .left-col .table-wrap { flex: 1; min-height: 0; }
+  .right-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; height: 100%; }
+  .right-col .seq-card { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .right-col .seq-card .seq-wrap { flex: 1; min-height: 0; height: auto !important; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  .card-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+  .card-body { padding: 10px 14px; }
+  .chart-wrap { padding: 10px 14px; height: 300px; position: relative; }
+
+  .chart-tooltip { position: absolute; pointer-events: none; background: #111827; border: 1px solid #2d3a4d; border-radius: 6px; padding: 10px 14px; font-family: var(--font); box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 100; transition: opacity 0.1s ease; white-space: nowrap; }
+  .chart-tooltip-play { font-size: 11px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+  .chart-tooltip-value { font-size: 14px; font-weight: 700; }
+
+  .cat-row { display: flex; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); gap: 12px; }
+  .cat-row:last-child { border-bottom: none; }
+  .cat-badge { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 3px; white-space: nowrap; color: #94a3b8; background: rgba(100,116,139,0.08); border: 1px solid rgba(100,116,139,0.2); }
+  .cat-pnl { font-size: 13px; font-weight: 600; margin-left: auto; text-align: right; }
+
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid rgba(30,41,59,0.5); min-height: 28px; }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-row-label { font-size: 12px; color: var(--text-secondary); }
+  .stat-row-value { font-size: 12px; font-weight: 600; }
+
+  .table-wrap { overflow-x: auto; overflow-y: auto; }
+  .seq-wrap { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; padding: 10px 14px; align-content: flex-start; overflow: hidden; }
+  .seq-block { aspect-ratio: 1; border-radius: 3px; transition: transform 0.15s; cursor: default; }
+  .seq-block:hover { transform: scale(1.3); z-index: 2; position: relative; }
+  .seq-won { background: var(--green); opacity: 0.85; }
+  .seq-lost { background: var(--red); opacity: 0.85; }
+  .seq-push { background: var(--orange); opacity: 0.85; }
+  .seq-pending { background: var(--text-muted); opacity: 0.5; }
+
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  th { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; padding: 7px 12px; text-align: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
+  td { padding: 7px 12px; border-bottom: 1px solid rgba(30,41,59,0.3); font-size: 12px; color: var(--text-secondary); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  th:nth-child(4), td:nth-child(4) { text-align: left; }
+  tr:hover td { background: var(--bg-hover); }
+
+  .result-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 3px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid transparent; display: inline-block; }
+  .result-won { background: rgba(16,185,129,0.1); color: #34d399; border-color: rgba(16,185,129,0.25); }
+  .result-lost { background: rgba(239,68,68,0.1); color: #f87171; border-color: rgba(239,68,68,0.25); }
+  .result-pending { background: rgba(100,116,139,0.08); color: #94a3b8; border-color: rgba(100,116,139,0.2); }
+  .result-push { background: rgba(245,158,11,0.1); color: #fbbf24; border-color: rgba(245,158,11,0.25); }
+
+  .stats-card-body { padding: 6px 14px; overflow: hidden; }
+  .logo-slot { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 16px; flex-shrink: 0; }
+  .team-logo { width: 18px; height: 18px; object-fit: contain; }
+  .play-cell { display: flex; align-items: center; gap: 6px; }
+
+  .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 14px; border-top: 1px solid var(--border); }
+  .page-btn { font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+  .page-btn:hover:not(:disabled) { border-color: var(--border-bright); color: var(--text-primary); }
+  .page-btn:disabled { opacity: 0.3; cursor: default; }
+  .page-btn.active { border-color: var(--cyan); color: var(--cyan); background: rgba(6,182,212,0.08); }
+
+  .copy-record-btn { position: fixed; top: 10px; right: 14px; z-index: 1000; font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-muted); cursor: pointer; letter-spacing: 1px; opacity: 0; transition: opacity 0.15s, color 0.15s, border-color 0.15s; }
+  .copy-record-btn:hover { opacity: 1; }
+  .copy-record-btn.copied { opacity: 1; color: var(--green); border-color: rgba(16,185,129,0.4); }
+
+  .stats-sub { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 6px 14px 4px; border-bottom: 1px solid rgba(30,41,59,0.5); }
+  .stats-sub-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .stats-sub-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); }
+  .stats-sub-record { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+  .stats-sub-pnl { font-size: 11px; font-weight: 600; }
+  .stats-split { padding: 4px 14px 6px; border-bottom: 1px solid rgba(30,41,59,0.5); display: flex; flex-direction: column; gap: 4px; }
+  .split-row { display: flex; align-items: center; gap: 6px; }
+  .split-count { font-size: 10px; font-weight: 600; color: var(--text-muted); min-width: 16px; }
+  .split-count-right { text-align: right; }
+  .split-track { flex: 1; height: 4px; background: var(--bg-primary); border-radius: 2px; overflow: hidden; display: flex; }
+  .split-a { height: 100%; background: rgba(6,182,212,0.5); border-radius: 2px 0 0 2px; }
+  .split-b { height: 100%; background: rgba(100,116,139,0.25); border-radius: 0 2px 2px 0; }
+
+  .game-pill { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 3px; flex-shrink: 0; }
+  .game-pill.cs2 { color: rgb(96,165,250); background: rgba(48,82,125,0.6); }
+  .game-pill.val { color: rgb(251,146,60); background: rgba(125,73,30,0.6); }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-primary); }
+  ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .anim { animation: fadeUp 0.4s ease forwards; opacity: 0; }
+  .d1 { animation-delay: 0.05s; }
+  .d2 { animation-delay: 0.1s; }
+  .d3 { animation-delay: 0.15s; }
+  .d4 { animation-delay: 0.2s; }
+  .d5 { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+<div class="dashboard" id="app"></div>
+
+<script>
+// ── Bets ──────────────────────────────────────────────────────────────────────
+// Format: odds extracted from esports-2026 play strings, result from score
+// Each bet is 1 unit to win (risk = 1u for dogs/pk at even, or fractional for favs)
+// We normalise everything: unitSize = 1, risk = units risked per bet
+
+const UNIT_SIZE = 1; // everything is in units
+
+// Raw picks from esports-2026, converted to BETS format
+// result auto-detected from score (same logic as original file)
+// odds stripped from play string; extra bets are 0.5u size
+const RAW_PICKS = [
+  { date: "2026-03-15", tournament: "ESL Pro League S22", play: "Aurora +1.5 vs. Natus Vincere", odds: -135, score: "1-3", game: "CS2" },
+  { date: "2026-03-15", tournament: "ESL Pro League S22", play: "Astralis PK vs. FUT", odds: +110, score: "2-1", game: "CS2" },
+  { date: "2026-03-13", tournament: "ESL Pro League S22", play: "Astralis +1.5 vs. Spirit", odds: +100, score: "2-0", game: "CS2" },
+  { date: "2026-03-10", tournament: "ESL Pro League S22", play: "Natus Vincere PK vs. 3DMAX", odds: -180, score: "2-1", game: "CS2" },
+  { date: "2026-03-08", tournament: "ESL Pro League S22", play: "FURIA PK vs. HEROIC", odds: -180, score: "2-1", game: "CS2" },
+  { date: "2026-03-08", tournament: "ESL Pro League S22", play: "FaZe PK vs. Monte", odds: -120, score: "2-1", game: "CS2" },
+  { date: "2026-03-07", tournament: "ESL Pro League S22", play: "Spirit -1.5 vs. B8", odds: -125, score: "2-1", game: "CS2" },
+  { date: "2026-03-07", tournament: "ESL Pro League S22", play: "FUT PK vs. HEROIC", odds: -170, score: "2-1", game: "CS2" },
+  { date: "2026-03-07", tournament: "ESL Pro League S22", play: "FaZe PK vs. paiN", odds: -130, score: "1-2", game: "CS2" },
+  { date: "2026-03-06", tournament: "ESL Pro League S22", play: "G2 PK vs. FaZe", odds: -115, score: "2-0", game: "CS2" },
+  { date: "2026-03-06", tournament: "ESL Pro League S22", play: "Astralis PK vs. FUT", odds: +180, score: "2-0", game: "CS2" },
+  { date: "2026-03-04", tournament: "ESL Pro League S22", play: "Liquid PK vs. M80", odds: +105, score: "2-1", game: "CS2" },
+  { date: "2026-03-04", tournament: "ESL Pro League S22", play: "G2 PK vs. paiN", odds: -210, score: "0-2", game: "CS2" },
+  { date: "2026-03-04", tournament: "ESL Pro League S22", play: "HEROIC PK vs. Passion UA", odds: +120, score: "2-0", game: "CS2" },
+  { date: "2026-03-04", tournament: "ESL Pro League S22", play: "PARIVISION PK vs. Monte", odds: -290, score: "1-2", game: "CS2" },
+  { date: "2026-03-03", tournament: "ESL Pro League S22", play: "Ninjas in Pyjamas PK vs. NRG", odds: -130, score: "2-1", game: "CS2" },
+  { date: "2026-03-03", tournament: "ESL Pro League S22", play: "G2 PK vs. M80", odds: -250, score: "2-1", game: "CS2" },
+  { date: "2026-03-02", tournament: "ESL Pro League S22", play: "Ninjas in Pyjamas PK vs. M80", odds: -115, score: "1-2", game: "CS2" },
+  { date: "2026-03-02", tournament: "ESL Pro League S22", play: "Astralis PK vs. HEROIC", odds: -125, score: "2-0", game: "CS2" },
+  { date: "2026-03-01", tournament: "VCT Americas", play: "Liquid PK vs. T1", odds: +130, score: "2-0", game: "VAL" },
+  { date: "2026-03-01", tournament: "ESL Pro League S22", play: "3DMAX PK vs. paiN", odds: -110, score: "1-2", game: "CS2" },
+  { date: "2026-03-01", tournament: "ESL Pro League S22", play: "Liquid PK vs. Passion UA", odds: -135, score: "0-2", game: "CS2" },
+  { date: "2026-03-01", tournament: "ESL Pro League S22", play: "FUT PK vs. M80", odds: -200, score: "2-1", game: "CS2" },
+  { date: "2026-02-20", tournament: "PGL Cluj-Napoca", play: "Natus Vincere PK vs. MOUZ", odds: +155, score: "1-2", game: "CS2" },
+  { date: "2026-02-18", tournament: "PGL Cluj-Napoca", play: "Aurora PK vs. Astralis", odds: -150, score: "2-0", game: "CS2" },
+  { date: "2026-02-16", tournament: "PGL Cluj-Napoca", play: "FaZe PK vs. PARIVISION", odds: +130, score: "1-2", game: "CS2" },
+  { date: "2026-02-15", tournament: "PGL Cluj-Napoca", play: "The MongolZ +1.5 vs. Vitality", odds: +135, score: "1-2", game: "CS2" },
+  { date: "2026-02-15", tournament: "PGL Cluj-Napoca", play: "3DMAX PK vs. Astralis", odds: +125, score: "0-2", game: "CS2" },
+  { date: "2026-02-14", tournament: "PGL Cluj-Napoca", play: "PARIVISION PK vs. MOUZ", odds: +155, score: "1-2", game: "CS2" },
+  { date: "2026-02-14", tournament: "PGL Cluj-Napoca", play: "B8 +1.5 vs. FURIA", odds: +125, score: "0-2", game: "CS2" },
+  { date: "2026-02-08", tournament: "IEM Krakow", play: "FURIA +1.5 vs. Vitality", odds: -110, score: "1-3", game: "CS2" },
+  { date: "2026-02-06", tournament: "CCT Season 3", play: "Ninjas in Pyjamas PK vs. Gentle Mates", odds: -125, score: "2-1", game: "CS2", extra: true },
+  { date: "2026-02-02", tournament: "IEM Krakow", play: "FURIA PK vs. Natus Vincere", odds: -130, score: "2-1", game: "CS2" },
+  { date: "2026-02-02", tournament: "IEM Krakow", play: "NRG +1.5 vs. Falcons", odds: +225, score: "1-2", game: "CS2" },
+  { date: "2026-02-02", tournament: "IEM Krakow", play: "MOUZ PK vs. Aurora", odds: -175, score: "0-2", game: "CS2" },
+  { date: "2026-02-02", tournament: "IEM Krakow", play: "FaZe PK vs. BC.Game", odds: -175, score: "2-1", game: "CS2" },
+  { date: "2026-02-01", tournament: "IEM Krakow", play: "FUT PK vs. G2", odds: +150, score: "1-2", game: "CS2" },
+  { date: "2026-02-01", tournament: "IEM Krakow", play: "Astralis +1.5 vs. PARIVISION", odds: -125, score: "2-1", game: "CS2" },
+  { date: "2026-02-01", tournament: "IEM Krakow", play: "MOUZ -1.5 vs. NRG", odds: -140, score: "2-0", game: "CS2" },
+  { date: "2026-02-01", tournament: "IEM Krakow", play: "Aurora +1.5 vs. Falcons", odds: -140, score: "2-1", game: "CS2" },
+  { date: "2026-01-31", tournament: "IEM Krakow", play: "3DMAX PK vs. FaZe", odds: +160, score: "2-0", game: "CS2" },
+  { date: "2026-01-30", tournament: "IEM Krakow", play: "FUT PK vs. Liquid", odds: -105, score: "2-0", game: "CS2" },
+  { date: "2026-01-29", tournament: "IEM Krakow", play: "Liquid PK vs. G2", odds: +180, score: "1-2", game: "CS2" },
+  { date: "2026-01-28", tournament: "IEM Krakow", play: "3DMAX PK vs. FUT", odds: +120, score: "2-1", game: "CS2" },
+  { date: "2026-01-28", tournament: "IEM Krakow", play: "Liquid PK vs. NiP", odds: +110, score: "2-0", game: "CS2" },
+  { date: "2026-01-28", tournament: "IEM Krakow", play: "Liquid PK vs. NiP", odds: -105, score: "2-0", game: "CS2" },
+  { date: "2026-01-23", tournament: "BLAST Bounty", play: "PARIVISION +1.5 vs. Spirit", odds: -110, score: "2-1", game: "CS2" },
+  { date: "2026-01-22", tournament: "BLAST Bounty", play: "FURIA -1.5 vs. HEROIC", odds: -110, score: "2-1", game: "CS2" },
+  { date: "2026-01-21", tournament: "CCT Season 3", play: "HOTU PK vs. Gentle Mates", odds: +150, score: "2-0", game: "CS2", extra: true },
+  { date: "2026-01-18", tournament: "BLAST Bounty", play: "Astralis PK vs. PARIVISION", odds: +140, score: "0-2", game: "CS2" },
+  { date: "2026-01-17", tournament: "BLAST Bounty", play: "HEROIC PK vs. paiN", odds: +125, score: "2-0", game: "CS2" },
+  { date: "2026-01-15", tournament: "BLAST Bounty", play: "Liquid PK vs. Ninjas in Pyjamas", odds: +115, score: "2-1", game: "CS2" },
+  { date: "2026-01-14", tournament: "BLAST Bounty", play: "Monte +1.5 vs. Natus Vincere", odds: +150, score: "2-1", game: "CS2" },
+  { date: "2026-01-14", tournament: "BLAST Bounty", play: "GamerLegion PK vs. Passion UA", odds: +105, score: "2-1", game: "CS2" },
+  { date: "2026-01-13", tournament: "BLAST Bounty", play: "OG PK vs. FUT", odds: +180, score: "0-2", game: "CS2" },
+];
+
+// ── Result detection (same logic as esports-2026) ─────────────────────────────
+function detectResult(play, score, odds) {
+  if (!score) return "pending";
+  const parts = score.split("-").map(Number);
+  if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1])) return "pending";
+  let s1 = parts[0], s2 = parts[1];
+  const hcap = play.match(/\s([+-]\d+\.?\d*)\s+vs\./);
+  if (hcap && !/\bPK\b/.test(play)) s1 += parseFloat(hcap[1]);
+  if (s1 > s2) return "won";
+  if (s1 < s2) return "lost";
+  return "push";
+}
+
+// ── Risk calculation (in units) ───────────────────────────────────────────────
+// extra bets are 0.5u, regular are 1u
+function calcRiskUnits(odds, isExtra) {
+  const base = isExtra ? 0.5 : 1.0;
+  return odds > 0 ? base * 100 / odds : base * Math.abs(odds) / 100;
+}
+
+// Build BETS array
+const BETS = RAW_PICKS.map(p => {
+  const isExtra = !!p.extra;
+  const result = detectResult(p.play, p.score, p.odds);
+  const riskUnits = calcRiskUnits(p.odds, isExtra);
+  return {
+    date: p.date,
+    tournament: p.tournament,
+    play: p.play,
+    odds: p.odds,
+    result,
+    game: p.game || null,
+    isExtra,
+    unitSize: UNIT_SIZE,
+    risk: riskUnits, // risk in units
+  };
+});
+
+const chronoBets = [...BETS].sort((a, b) => a.date.localeCompare(b.date) || a.play.localeCompare(b.play));
+const displayBets = [...BETS].sort((a, b) => b.date.localeCompare(a.date) || b.play.localeCompare(a.play));
+const betNums = new Map();
+chronoBets.forEach((b, i) => betNums.set(b, i + 1));
+
+const tournLastDate = {};
+BETS.forEach(b => {
+  const key = b.tournament + "|" + b.date.slice(0, 4);
+  if (!tournLastDate[key] || b.date > tournLastDate[key]) tournLastDate[key] = b.date;
+});
+const TOURNAMENT_ORDER = Object.keys(tournLastDate).sort((a, b) => tournLastDate[b].localeCompare(tournLastDate[a]));
+function tournDisplayName(key) { const [name, year] = key.split("|"); return name + " (" + year + ")"; }
+
+// ── Formatting ────────────────────────────────────────────────────────────────
+function stripTrailing(str) {
+  if (str.indexOf(".") === -1) return str;
+  return str.replace(/0+$/, "").replace(/\.$/, "");
+}
+
+function fmtAmerican(odds) { return odds >= 0 ? "+" + odds : "" + odds; }
+function fmtUnit(n, signed) { return (n < 0 ? "-" : signed ? "+" : "") + stripTrailing(Math.abs(n).toFixed(2)) + "u"; }
+function fmtUnitRisk(n) { return stripTrailing(Math.abs(n).toFixed(2)) + "u"; }
+
+function fmtPlayWithOdds(play, odds) {
+  const vsIdx = play.indexOf(" vs. ");
+  if (vsIdx === -1) return play + " (" + fmtAmerican(odds) + ")";
+  return play.slice(0, vsIdx) + " (" + fmtAmerican(odds) + ")" + play.slice(vsIdx);
+}
+
+function oddsImpliedProb(odds) {
+  const p = odds >= 0 ? 100 / (odds + 100) : Math.abs(odds) / (Math.abs(odds) + 100);
+  return stripTrailing((p * 100).toFixed(2));
+}
+function fmtOddsWithProb(odds) { return fmtAmerican(odds) + " (" + oddsImpliedProb(odds) + "%)"; }
+
+function avgAmericanOddsWithProb(bets) {
+  if (!bets.length) return "N/A";
+  const probs = bets.map(b => b.odds >= 0 ? 100 / (b.odds + 100) : Math.abs(b.odds) / (Math.abs(b.odds) + 100));
+  const avg = probs.reduce((s, v) => s + v, 0) / probs.length;
+  const raw = avg >= 0.5 ? avg / (1 - avg) * 100 : (1 - avg) / avg * 100;
+  return (avg >= 0.5 ? "-" : "+") + parseFloat(raw.toFixed(1)) + " (" + stripTrailing((avg * 100).toFixed(2)) + "%)";
+}
+
+function fmtDate(d) {
+  const dt = new Date(d + "T00:00:00");
+  return (dt.getMonth() + 1) + "/" + dt.getDate() + "/" + String(dt.getFullYear()).slice(2);
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+function pnlFromAmerican(odds, riskUnits, result) {
+  if (result === "pending") return null;
+  if (result === "lost") return -riskUnits;
+  if (result === "push") return 0;
+  return odds >= 0 ? riskUnits * (odds / 100) : riskUnits * (100 / Math.abs(odds));
+}
+
+const closed = chronoBets.filter(b => b.result !== "pending");
+const pendingBets = chronoBets.filter(b => b.result === "pending");
+const wins = closed.filter(b => b.result === "won");
+const losses = closed.filter(b => b.result === "lost");
+const pnls = closed.map(b => pnlFromAmerican(b.odds, b.risk, b.result));
+const totalPnlUnits = pnls.reduce((s, v) => s + v, 0);
+const totalVolumeUnitsAll = chronoBets.reduce((s, b) => s + b.risk, 0);
+const totalVolumeUnits = closed.reduce((s, b) => s + b.risk, 0);
+const grossWin = pnls.filter(v => v > 0).reduce((s, v) => s + v, 0);
+const grossLoss = Math.abs(pnls.filter(v => v < 0).reduce((s, v) => s + v, 0));
+const profitFactor = grossLoss > 0 ? stripTrailing((grossWin / grossLoss).toFixed(2)) : "∞";
+const roi = totalVolumeUnits > 0 ? (totalPnlUnits / totalVolumeUnits * 100) : 0;
+const n = wins.length + losses.length;
+const avgRiskUnitsAll = chronoBets.length ? totalVolumeUnitsAll / chronoBets.length : 0;
+const adjWins = n > 0 && totalVolumeUnits > 0 ? (n + totalPnlUnits / (totalVolumeUnits / closed.length)) / 2 : 0;
+const adjLosses = Math.max(n - adjWins, 0);
+const adjWinRate = (adjWins + adjLosses) > 0 ? adjWins / (adjWins + adjLosses) * 100 : 0;
+
+let peak = 0, maxDDUnits = 0, cum = 0;
+pnls.forEach(v => { cum += v; if (cum > peak) peak = cum; const dd = peak - cum; if (dd > maxDDUnits) maxDDUnits = dd; });
+
+// P-value
+function lnGamma(x) {
+  const c = [76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,1.208650973866179e-3,-5.395239384953e-6];
+  let y = x, tmp = x + 5.5;
+  tmp -= (x + 0.5) * Math.log(tmp);
+  let ser = 1.000000000190015;
+  for (let j = 0; j < 6; j++) ser += c[j] / ++y;
+  return -tmp + Math.log(2.5066282746310005 * ser / x);
+}
+function betaContFrac(x, a, b) {
+  const maxIter = 200, eps = 1e-8, tiny = 1e-30;
+  const qab = a+b, qap = a+1, qam = a-1;
+  let c=1, d=1-qab*x/qap;
+  if (Math.abs(d)<tiny) d=tiny; d=1/d; let h=d;
+  for (let m=1; m<=maxIter; m++) {
+    const m2=2*m;
+    let aa=m*(b-m)*x/((qam+m2)*(a+m2));
+    d=1+aa*d; if(Math.abs(d)<tiny)d=tiny;
+    c=1+aa/c; if(Math.abs(c)<tiny)c=tiny;
+    d=1/d; h*=d*c;
+    aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));
+    d=1+aa*d; if(Math.abs(d)<tiny)d=tiny;
+    c=1+aa/c; if(Math.abs(c)<tiny)c=tiny;
+    d=1/d; const del=d*c; h*=del;
+    if(Math.abs(del-1)<eps) break;
+  }
+  return h;
+}
+function regIncompleteBeta(x,a,b) {
+  if(x<=0) return 0; if(x>=1) return 1;
+  const lb=lnGamma(a)+lnGamma(b)-lnGamma(a+b);
+  const f=Math.exp(a*Math.log(x)+b*Math.log(1-x)-lb);
+  if(x<(a+1)/(a+b+2)) return f/a*betaContFrac(x,a,b);
+  return 1-f/b*betaContFrac(1-x,b,a);
+}
+function tDistOneTail(t,df) { if(t<=0) return 1; return 0.5*regIncompleteBeta(df/(df+t*t),df/2,0.5); }
+function calcPValue(bets) {
+  if (bets.length < 2) return null;
+  const nn = bets.length;
+  const decOdds = bets.map(b => b.odds>=0 ? b.odds/100+1 : 1+100/Math.abs(b.odds));
+  const avgDecimal = decOdds.reduce((s,d)=>s+d,0)/nn;
+  const totalRisk = bets.reduce((s,b)=>s+b.risk,0);
+  const pnlSum = bets.reduce((s,b)=>s+pnlFromAmerican(b.odds,b.risk,b.result),0);
+  const roiDecimal = totalRisk>0 ? pnlSum/totalRisk : 0;
+  const variance = (1+roiDecimal)*(avgDecimal-1-roiDecimal);
+  if(variance<=0||isNaN(variance)) return null;
+  const tStat = roiDecimal*Math.sqrt(nn)/Math.sqrt(variance);
+  if(tStat<=0) return null;
+  return tDistOneTail(tStat,nn-1);
+}
+const pVal = calcPValue(closed);
+const pValStr = pVal!==null && pVal<0.5 ? stripTrailing(pVal.toFixed(Math.ceil(-Math.log10(pVal))+1))+" (1-in-"+Math.round(1/pVal)+")" : "—";
+
+const dateRangeStart = new Date(chronoBets[0].date + "T00:00:00");
+const dateRangeEnd = new Date(chronoBets[chronoBets.length-1].date + "T00:00:00");
+const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+function getDateRange() {
+  const s = monthNames[dateRangeStart.getMonth()]+" "+dateRangeStart.getFullYear();
+  const e = monthNames[dateRangeEnd.getMonth()]+" "+dateRangeEnd.getFullYear();
+  return s===e ? s : s+" through "+e;
+}
+const dateRangeLabel = getDateRange();
+const daySpan = Math.max(1, Math.round((dateRangeEnd-dateRangeStart)/(1000*60*60*24))+1);
+const playsPerDay = BETS.length/daySpan;
+
+// ── Equity curve ──────────────────────────────────────────────────────────────
+const equityLabels = ["0"];
+const equityData = [0];
+const equityPlays = [""];
+let runningU = 0;
+closed.forEach((b,i) => {
+  runningU += pnls[i];
+  equityLabels.push(String(i+1));
+  equityData.push(runningU);
+  equityPlays.push(fmtPlayWithOdds(b.play, b.odds));
+});
+
+const shortMonths = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const monthBoundaries = [];
+let lastMonth = null;
+closed.forEach((b,i) => {
+  const [year, month] = b.date.split("-");
+  const key = year+"-"+month;
+  if(key!==lastMonth) { monthBoundaries.push({index:i+1, label:shortMonths[parseInt(month)-1]+" "+year}); lastMonth=key; }
+});
+
+const athData = [0];
+let ath = 0;
+for(let i=1; i<equityData.length; i++) {
+  if(equityData[i]>ath) ath=equityData[i];
+  athData.push(ath);
+}
+
+// ── Per-game equity series ────────────────────────────────────────────────────
+const GAME_COLORS = { "CS2": "rgb(96,165,250)", "VAL": "rgb(251,146,60)" };
+// Build one cumulative series per game, aligned to equityLabels (length = closed.length + 1)
+// Index 0 = "Start" point (null for games, since we don't know their start yet)
+const gameSeries = {}; // game → array of length equityData.length
+const gameCum2 = {};
+const firstGameIdx = {}; // game → index in closed[] where it first appears
+closed.forEach((b, i) => {
+  const g = b.game;
+  if (g && GAME_COLORS[g] && !(g in firstGameIdx)) firstGameIdx[g] = i;
+});
+Object.keys(firstGameIdx).forEach(g => {
+  gameCum2[g] = 0;
+  gameSeries[g] = []; // will be filled below
+});
+// Fill: one entry per equityData point (0..closed.length)
+for (let i = 0; i <= closed.length; i++) {
+  Object.keys(firstGameIdx).forEach(g => {
+    if (i < firstGameIdx[g]) {
+      gameSeries[g].push(null); // before this game started
+    } else if (i === firstGameIdx[g]) {
+      gameSeries[g].push(0); // baseline
+    } else {
+      gameSeries[g].push(gameCum2[g]); // carry value from previous step
+    }
+  });
+  // After recording the "before" snapshot, accumulate this bet
+  if (i < closed.length) {
+    const b = closed[i];
+    const g = b.game;
+    if (g && gameCum2[g] !== undefined) gameCum2[g] += pnls[i];
+  }
+}
+const betClasses = { pk:{wins:0,losses:0,pnl:0,risk:0}, hcap:{wins:0,losses:0,pnl:0,risk:0}, fav:{wins:0,losses:0,pnl:0,risk:0}, dog:{wins:0,losses:0,pnl:0,risk:0} };
+closed.forEach((b,i) => {
+  const pnl = pnls[i];
+  const isPK = /\bPK\b/.test(b.play);
+  const hcapMatch = b.play.match(/([+-]\d+\.?\d*)\s+vs\./);
+  const isHcap = !!hcapMatch && !isPK;
+  function acc(key) { betClasses[key].pnl+=pnl; betClasses[key].risk+=b.risk; if(b.result==="won") betClasses[key].wins++; else betClasses[key].losses++; }
+  if(isPK) acc("pk"); else if(isHcap) acc("hcap");
+  let isFav, isDog;
+  if(isHcap) { isFav=hcapMatch[1].startsWith("-"); isDog=hcapMatch[1].startsWith("+"); }
+  else { isFav=b.odds<0; isDog=b.odds>0; }
+  if(isFav) acc("fav"); else if(isDog) acc("dog");
+});
+Object.values(betClasses).forEach(d => {
+  const nn=d.wins+d.losses;
+  const avgR=nn>0?d.risk/nn:0;
+  const aw=nn>0&&avgR>0?(nn+d.pnl/avgR)/2:0;
+  d.adjWins=aw; d.adjLosses=Math.max(nn-aw,0);
+});
+
+// ── Tournament stats ──────────────────────────────────────────────────────────
+const tournMap = {};
+closed.forEach((b,i) => {
+  const key = b.tournament+"|"+b.date.slice(0,4);
+  if(!tournMap[key]) tournMap[key]={wins:0,losses:0,pnlUnits:0};
+  tournMap[key].pnlUnits+=pnls[i];
+  if(b.result==="won") tournMap[key].wins++; else tournMap[key].losses++;
+});
+const allTournStats = TOURNAMENT_ORDER.filter(t=>tournMap[t]).map(t=>({tournament:tournDisplayName(t),...tournMap[t]}));
+
+let tournPage = 0;
+const TOURN_PAGE_SIZE = 5;
+const totalTournPages = Math.ceil(allTournStats.length/TOURN_PAGE_SIZE);
+
+// ── Helper fns ────────────────────────────────────────────────────────────────
+function getPickTeam(play) {
+  if(/\bOver\b|\bUnder\b/.test(play)&&play.includes("/")) return null;
+  const match = play.match(/^(.+?)\s+(PK|[+-]\d)/);
+  return match ? match[1].trim() : null;
+}
+
+function logoPath(teamName) { return "logo/"+teamName.toLowerCase()+".png"; }
+function normalizeLogo(img) {
+  const r=img.naturalWidth/img.naturalHeight;
+  const scale=Math.min(Math.sqrt(Math.max(r,1/r)),1.8);
+  if(scale>1.01) img.style.transform="scale("+scale.toFixed(3)+")";
+}
+
+function gameClass(game) {
+  if(!game) return "";
+  const g = game.toLowerCase();
+  if(g==="cs2") return "cs2";
+  if(g==="val") return "val";
+  return "";
+}
+
+// ── Screenshot ────────────────────────────────────────────────────────────────
+function copyRecord() {
+  const btn = document.querySelector(".copy-record-btn");
+  const w = Math.round(adjWins), l = Math.round(adjLosses);
+  const pnlStr = fmtUnit(totalPnlUnits, true);
+  const text = `ytd record: ${w}-${l}, ${pnlStr}`;
+  navigator.clipboard.writeText(text).then(() => {
+    if (btn) { btn.textContent = "Copied!"; btn.classList.add("copied"); setTimeout(() => { btn.textContent = "Copy Record"; btn.classList.remove("copied"); }, 2000); }
+  }).catch(() => {
+    if (btn) { btn.textContent = "Failed"; setTimeout(() => { btn.textContent = "Copy Record"; }, 2000); }
+  });
+}
+
+let chartInstance = null;
+
+// ── Build HTML pieces ─────────────────────────────────────────────────────────
+function buildGeneralStatsHTML() {
+  return [
+    ["p-Value", pValStr, "var(--text-primary)"],
+    ["Profit Factor", profitFactor, "var(--text-primary)"],
+    ["Max Drawdown", fmtUnit(-maxDDUnits), "var(--red)"],
+    ["Average Odds", avgAmericanOddsWithProb(chronoBets), "var(--text-primary)"],
+    ["Average Risk", fmtUnitRisk(avgRiskUnitsAll), "var(--text-primary)"],
+  ].map(([l,v,c])=>`<div class="stat-row"><span class="stat-row-label">${l}</span><span class="stat-row-value" style="color:${c}">${v}</span></div>`).join("");
+}
+
+function buildStatsSubHTML() {
+  function item(label, cls) {
+    const d=betClasses[cls];
+    const pnlStr=fmtUnit(d.pnl,true);
+    const pnlColor=d.pnl>=0?"var(--green)":"var(--red)";
+    return `<div class="stats-sub-item">
+      <span class="stats-sub-label">${label}</span>
+      <span class="stats-sub-record">${Math.round(d.adjWins)}-${Math.round(d.adjLosses)}</span>
+      <span class="stats-sub-pnl" style="color:${pnlColor}">${pnlStr}</span>
+    </div>`;
+  }
+  const pkN=betClasses.pk.wins+betClasses.pk.losses;
+  const hcapN=betClasses.hcap.wins+betClasses.hcap.losses;
+  const favN=betClasses.fav.wins+betClasses.fav.losses;
+  const dogN=betClasses.dog.wins+betClasses.dog.losses;
+  const typeTotal=pkN+hcapN;
+  const sideTotal=favN+dogN;
+  const pkPct=typeTotal>0?pkN/typeTotal*100:50;
+  const favPct=sideTotal>0?favN/sideTotal*100:50;
+  function splitRow(labelA,countA,pctA,labelB,countB) {
+    return `<div class="split-row">
+      <span class="split-count">${labelA} <span style="color:var(--text-secondary)">${pctA.toFixed(0)}%</span></span>
+      <div class="split-track">
+        <div class="split-a" style="width:${pctA.toFixed(1)}%"></div>
+        <div class="split-b" style="width:${(100-pctA).toFixed(1)}%"></div>
+      </div>
+      <span class="split-count split-count-right"><span style="color:var(--text-secondary)">${(100-pctA).toFixed(0)}%</span> ${labelB}</span>
+    </div>`;
+  }
+  return `<div class="stats-sub">
+    ${item("Pick'ems","pk")}
+    ${item("Handicaps","hcap")}
+    ${item("Favourites","fav")}
+    ${item("Dogs","dog")}
+  </div>
+  <div class="stats-split">
+    ${splitRow("PK",pkN,pkPct,"HC",hcapN)}
+    ${splitRow("Fav",favN,favPct,"Dog",dogN)}
+  </div>`;
+}
+
+function buildBetTableHTML() {
+  return displayBets.map(b => {
+    const resultClass = b.result==="won"?"result-won":b.result==="lost"?"result-lost":b.result==="push"?"result-push":"result-pending";
+    const resultText = b.result==="won"?"Win":b.result==="lost"?"Loss":b.result==="push"?"Push":"Pending";
+    const pick = getPickTeam(b.play);
+    const logoHTML = pick ? `<span class="logo-slot"><img class="team-logo" src="${logoPath(pick)}" alt="" onerror="this.parentElement.style.display='none'" onload="normalizeLogo(this)"></span>` : "";
+    const gc = b.game ? gameClass(b.game) : "";
+    const pillHTML = gc ? `<span class="game-pill ${gc}">${b.game}</span>` : "";
+    return `<tr>
+      <td style="color:var(--text-muted)">${betNums.get(b)}</td>
+      <td>${fmtDate(b.date)}</td>
+      <td>${pillHTML}</td>
+      <td>${b.tournament}</td>
+      <td style="color:var(--text-primary)"><span class="play-cell">${logoHTML}${b.play}${b.isExtra?" <span style='font-size:10px;font-weight:600;padding:1px 6px;border-radius:3px;background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);flex-shrink:0'>Extra</span>":""}</span></td>
+      <td>${fmtOddsWithProb(b.odds)}</td>
+      <td>${fmtUnitRisk(b.risk)}</td>
+      <td><span class="result-badge ${resultClass}">${resultText}</span></td>
+    </tr>`;
+  }).join("");
+}
+
+function buildTournRowsHTML(page) {
+  return allTournStats.slice(page*TOURN_PAGE_SIZE,(page+1)*TOURN_PAGE_SIZE).map(c => {
+    return `<div class="cat-row">
+      <span class="cat-badge">${c.tournament}</span>
+      <span class="cat-pnl" style="color:${c.pnlUnits>=0?"var(--green)":"var(--red)"}">${c.wins}-${c.losses}, ${fmtUnit(c.pnlUnits,true)}</span>
+    </div>`;
+  }).join("");
+}
+
+function buildTournPaginationHTML(page) {
+  if(totalTournPages<=1) return "";
+  let btns="";
+  for(let i=0;i<totalTournPages;i++) btns+=`<button class="page-btn ${i===page?"active":""}" onclick="goToTournPage(${i})">${i+1}</button>`;
+  return `<div class="pagination">
+    <button class="page-btn" onclick="goToTournPage(${page-1})" ${page===0?"disabled":""}>◄</button>
+    ${btns}
+    <button class="page-btn" onclick="goToTournPage(${page+1})" ${page>=totalTournPages-1?"disabled":""}>►</button>
+  </div>`;
+}
+
+function goToTournPage(p) {
+  if(p<0||p>=totalTournPages) return;
+  tournPage=p;
+  document.getElementById("tournRows").innerHTML=buildTournRowsHTML(tournPage);
+  document.getElementById("tournPaginationWrap").innerHTML=buildTournPaginationHTML(tournPage);
+  requestAnimationFrame(resizeSeq);
+}
+
+function buildSeqHTML(count) {
+  return displayBets.slice(0,count).map(b => {
+    const cls=b.result==="won"?"seq-won":b.result==="lost"?"seq-lost":b.result==="push"?"seq-push":"seq-pending";
+    const lbl=b.result==="won"?"Win":b.result==="lost"?"Loss":b.result==="push"?"Push":"Pending";
+    return `<div class="seq-block ${cls}" title="#${betNums.get(b)} · ${fmtPlayWithOdds(b.play,b.odds)} · ${lbl}"></div>`;
+  }).join("");
+}
+
+function resizeSeq() {
+  const seqWrap=document.getElementById("seqWrap");
+  const seqLbl=document.getElementById("seqLabel");
+  if(!seqWrap) return;
+  const availH=seqWrap.clientHeight-20;
+  const blockSize=(seqWrap.clientWidth-28-36)/10;
+  const rows=Math.max(1,Math.floor((availH+4)/(blockSize+4)));
+  const count=Math.min(rows*10,totalTournPages<=1?100:displayBets.length);
+  seqWrap.innerHTML=buildSeqHTML(count);
+  if(seqLbl) seqLbl.textContent="Last "+count;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() {
+  const app = document.getElementById("app");
+  const statsHTML = buildGeneralStatsHTML();
+  app.innerHTML = `
+    <div class="header anim">
+      <div class="header-brand">
+        <span class="header-title">Esports 2026</span>
+        <a class="header-user" href="https://x.com/causticarrow" target="_blank">𝕏 @causticarrow</a>
+      </div>
+    </div>
+    <div class="top-stats">
+      <div style="display:flex;gap:32px;align-items:center">
+        <div>
+          <div class="pnl-label">Net Profit</div>
+          <div class="pnl-value ${totalPnlUnits>=0?"pnl-positive":"pnl-negative"}">${fmtUnit(totalPnlUnits,true)}</div>
+        </div>
+        <div>
+          <div class="pnl-label">ROI</div>
+          <div class="pnl-value ${roi>=0?"pnl-positive":"pnl-negative"}">${stripTrailing(roi.toFixed(1))}%</div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-item"><div class="stat-number" style="color:var(--green)">${adjWins.toFixed(1)}</div><div class="stat-label">Wins</div></div>
+        <div class="stat-item"><div class="stat-number" style="color:var(--red)">${adjLosses.toFixed(1)}</div><div class="stat-label">Losses</div></div>
+        <div class="stat-item"><div class="stat-number">${adjWinRate.toFixed(2)}%</div><div class="stat-label">Win Rate</div></div>
+        <div class="stat-item"><div class="stat-number">${fmtUnitRisk(totalVolumeUnitsAll)}</div><div class="stat-label">Net Risk</div></div>
+      </div>
+    </div>
+    <button class="copy-record-btn" onclick="copyRecord()">Copy Record</button>
+    <div class="main-grid">
+      <div class="left-col">
+        <div class="card anim d2">
+          <div class="card-header">
+            <span class="card-title">Net Profit Curve</span>
+            <span class="card-title" style="opacity:0.5">${dateRangeLabel}</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="equityChart"></canvas>
+            <div class="chart-tooltip" id="chartTooltip" style="opacity:0"></div>
+            <div id="chartLegend" style="position:absolute;top:10px;left:14px;display:flex;gap:10px;pointer-events:none"></div>
+          </div>
+        </div>
+        <div class="card anim d3">
+          <div class="card-header">
+            <span class="card-title">Bet Log</span>
+            <span class="card-title" style="opacity:0.5">${BETS.length} bets${pendingBets.length?" · "+pendingBets.length+" pending ("+fmtUnitRisk(pendingBets.reduce((s,b)=>s+b.risk,0))+"u risked)":""}</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <colgroup>
+                <col style="width:38px"><col style="width:72px"><col style="width:54px"><col style="width:170px"><col>
+                <col style="width:114px"><col style="width:72px"><col style="width:90px">
+              </colgroup>
+              <thead><tr><th>#</th><th>Date</th><th>Game</th><th>Tournament</th><th>Play</th><th>Odds</th><th>Risk</th><th>Result</th></tr></thead>
+              <tbody id="betTbody">${buildBetTableHTML()}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="right-col">
+        <div class="card anim d3">
+          <div class="card-header"><span class="card-title">Tournament Log</span></div>
+          <div class="card-body" id="tournRows">${buildTournRowsHTML(tournPage)}</div>
+          <div id="tournPaginationWrap">${buildTournPaginationHTML(tournPage)}</div>
+        </div>
+        <div class="card anim d4">
+          <div class="card-header">
+            <span class="card-title">Statistics</span>
+          </div>
+          <div id="statsSubSection">${buildStatsSubHTML()}</div>
+          <div class="stats-card-body" id="statsCardBody">${statsHTML}</div>
+        </div>
+        <div class="card seq-card anim d5">
+          <div class="card-header"><span class="card-title">Bet Sequence</span><span class="card-title" id="seqLabel" style="opacity:0.5"></span></div>
+          <div class="seq-wrap" id="seqWrap"></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  if(chartInstance) chartInstance.destroy();
+  const ctx = document.getElementById("equityChart").getContext("2d");
+
+  // Build legend
+  const legendEl = document.getElementById("chartLegend");
+  if (legendEl) {
+    const overallDot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:4px"></span>`;
+    let html = `<span style="display:flex;align-items:center;font-size:10px;font-weight:600;letter-spacing:1px;color:var(--text-muted)">${overallDot}Overall</span>`;
+    Object.keys(GAME_COLORS).filter(g => gameSeries[g]).forEach(g => {
+      const col = GAME_COLORS[g];
+      html += `<span style="display:flex;align-items:center;font-size:10px;font-weight:600;letter-spacing:1px;color:${col}"><span style="display:inline-block;width:8px;height:2px;background:${col};opacity:0.7;margin-right:4px;border-radius:1px"></span>${g}</span>`;
+    });
+    legendEl.innerHTML = html;
+  }
+
+  const gameDatasets = Object.entries(GAME_COLORS)
+    .filter(([g]) => gameSeries[g])
+    .map(([g, col]) => ({
+      label: g,
+      data: gameSeries[g],
+      borderColor: col,
+      borderWidth: 1.5,
+      borderDash: [4, 3],
+      fill: false,
+      tension: 0,
+      pointRadius: 0,
+      pointHoverRadius: 0,
+      spanGaps: true,
+    }));
+
+  chartInstance = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: equityLabels,
+      datasets: [
+        { label: "Overall", data: equityData, borderColor:"transparent", borderWidth:2.5, fill:false, tension:0, pointRadius:0, pointHoverRadius:0 },
+        ...gameDatasets
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { intersect:false, mode:"index" },
+      plugins: {
+        legend: { display:false },
+        tooltip: {
+          enabled: false,
+          external: function(context) {
+            const tooltipEl = document.getElementById("chartTooltip");
+            const tooltipModel = context.tooltip;
+            if(tooltipModel.opacity===0) { tooltipEl.style.opacity="0"; return; }
+            const idx = tooltipModel.dataPoints?.[0]?.dataIndex;
+            if(idx===undefined) return;
+            const val = equityData[idx];
+            const playText = idx===0 ? "Start" : (equityPlays[idx]||"Bet #"+idx);
+            const valColor = val===0?"#64748b":val>0?"#10b981":"#ef4444";
+            const valText = val===0?fmtUnit(0):fmtUnit(val,true);
+            // per-game lines
+            let gameLines = "";
+            Object.entries(GAME_COLORS).filter(([g]) => gameSeries[g]).forEach(([g, col]) => {
+              const gv = gameSeries[g][idx];
+              if (gv === null || gv === undefined) return;
+              const gColor = gv===0?"#64748b":gv>0?col:col;
+              gameLines += `<div style="font-size:11px;font-weight:600;color:${col};margin-top:2px">${g}: ${fmtUnit(gv,true)}</div>`;
+            });
+            tooltipEl.innerHTML=`<div class="chart-tooltip-play">${playText}</div><div class="chart-tooltip-value" style="color:${valColor}">${valText}</div>${gameLines}`;
+            const chartArea=context.chart.chartArea;
+            const tipWidth=tooltipEl.offsetWidth, tipHeight=tooltipEl.offsetHeight;
+            let left=tooltipModel.caretX+12;
+            if(left+tipWidth>chartArea.right+18) left=tooltipModel.caretX-tipWidth-12;
+            let top=tooltipModel.caretY-tipHeight/2;
+            if(top<chartArea.top) top=chartArea.top;
+            if(top+tipHeight>chartArea.bottom) top=chartArea.bottom-tipHeight;
+            tooltipEl.style.opacity="1";
+            tooltipEl.style.left=left+"px";
+            tooltipEl.style.top=top+"px";
+          }
+        }
+      },
+      scales: {
+        x: { grid:{display:false}, ticks:{color:"#64748b",font:{family:"Inter",size:10}}, border:{display:false} },
+        y: { position:"right", grid:{color:"rgba(30,41,59,0.4)",lineWidth:1}, ticks:{color:"#64748b",font:{family:"Inter",size:10},callback:v=>fmtUnit(v),padding:6}, border:{display:false} }
+      }
+    },
+    plugins: [{
+      beforeDatasetsDraw(chart) {
+        const {ctx,chartArea,scales:{y:yScale}}=chart;
+        const zeroY=Math.min(Math.max(yScale.getPixelForValue(0),chartArea.top),chartArea.bottom);
+        const points=chart.getDatasetMeta(0).data;
+        if(!points.length) return;
+        ctx.save();
+        ctx.beginPath(); ctx.rect(chartArea.left,chartArea.top,chartArea.width,chartArea.height); ctx.clip();
+        function buildLinePath() {
+          ctx.beginPath();
+          for(let i=0;i<points.length;i++) { i===0?ctx.moveTo(points[i].x,points[i].y):ctx.lineTo(points[i].x,points[i].y); }
+        }
+        ctx.save(); ctx.beginPath(); ctx.rect(chartArea.left,chartArea.top,chartArea.width,zeroY-chartArea.top); ctx.clip();
+        buildLinePath();
+        ctx.lineTo(points[points.length-1].x,zeroY); ctx.lineTo(points[0].x,zeroY); ctx.closePath();
+        const greenGrad=ctx.createLinearGradient(0,chartArea.top,0,zeroY);
+        greenGrad.addColorStop(0,"rgba(16,185,129,0.3)"); greenGrad.addColorStop(1,"rgba(16,185,129,0.02)");
+        ctx.fillStyle=greenGrad; ctx.fill(); ctx.restore();
+        ctx.save(); ctx.beginPath(); ctx.rect(chartArea.left,zeroY,chartArea.width,chartArea.bottom-zeroY); ctx.clip();
+        buildLinePath();
+        ctx.lineTo(points[points.length-1].x,zeroY); ctx.lineTo(points[0].x,zeroY); ctx.closePath();
+        const redGrad=ctx.createLinearGradient(0,zeroY,0,chartArea.bottom);
+        redGrad.addColorStop(0,"rgba(239,68,68,0.02)"); redGrad.addColorStop(1,"rgba(239,68,68,0.3)");
+        ctx.fillStyle=redGrad; ctx.fill(); ctx.restore();
+        ctx.lineWidth=1; ctx.setLineDash([3,4]);
+        ctx.strokeStyle="rgba(100,116,139,0.3)";
+        ctx.beginPath(); ctx.moveTo(chartArea.left,zeroY); ctx.lineTo(chartArea.right,zeroY); ctx.stroke();
+        ctx.strokeStyle="rgba(100,116,139,0.25)";
+        monthBoundaries.forEach((b,i) => {
+          if(i===0) return;
+          const pt=points[b.index];
+          if(!pt) return;
+          ctx.beginPath(); ctx.moveTo(pt.x,chartArea.top); ctx.lineTo(pt.x,chartArea.bottom); ctx.stroke();
+        });
+        const athVal=athData[athData.length-1];
+        if(athVal>0) {
+          const athY=Math.round(Math.min(Math.max(yScale.getPixelForValue(athVal),chartArea.top),chartArea.bottom))+0.5;
+          ctx.strokeStyle="rgba(245,158,11,0.5)";
+          ctx.beginPath(); ctx.moveTo(chartArea.left,athY); ctx.lineTo(chartArea.right,athY); ctx.stroke();
+        }
+        const currentVal=equityData[athData.length-1];
+        if(currentVal!==undefined&&currentVal!==0) {
+          const currentY=Math.round(Math.min(Math.max(yScale.getPixelForValue(currentVal),chartArea.top),chartArea.bottom))+0.5;
+          ctx.strokeStyle=currentVal>=0?"rgba(16,185,129,0.5)":"rgba(239,68,68,0.5)";
+          ctx.beginPath(); ctx.moveTo(chartArea.left,currentY); ctx.lineTo(chartArea.right,currentY); ctx.stroke();
+        }
+        ctx.setLineDash([]); ctx.restore();
+      },
+      afterDatasetsDraw(chart) {
+        const {ctx,chartArea,scales:{y:yScale}}=chart;
+        const points=chart.getDatasetMeta(0).data;
+        if(points.length<2) return;
+        const zeroY=Math.min(Math.max(yScale.getPixelForValue(0),chartArea.top),chartArea.bottom);
+        ctx.save(); ctx.lineWidth=2.5; ctx.lineJoin="round"; ctx.lineCap="round";
+        ctx.beginPath(); ctx.rect(chartArea.left,chartArea.top,chartArea.width,chartArea.height); ctx.clip();
+        for(let i=1;i<points.length;i++) {
+          const p0=points[i-1],p1=points[i];
+          const y0=equityData[i-1],y1=equityData[i];
+          if((y0>=0)===(y1>=0)) {
+            ctx.strokeStyle=y0>=0?"#10b981":"#ef4444";
+            ctx.beginPath(); ctx.moveTo(p0.x,p0.y); ctx.lineTo(p1.x,p1.y); ctx.stroke();
+          } else {
+            const t=Math.abs(y0)/(Math.abs(y0)+Math.abs(y1));
+            const crossX=p0.x+t*(p1.x-p0.x);
+            ctx.strokeStyle=y0>=0?"#10b981":"#ef4444";
+            ctx.beginPath(); ctx.moveTo(p0.x,p0.y); ctx.lineTo(crossX,zeroY); ctx.stroke();
+            ctx.strokeStyle=y1>=0?"#10b981":"#ef4444";
+            ctx.beginPath(); ctx.moveTo(crossX,zeroY); ctx.lineTo(p1.x,p1.y); ctx.stroke();
+          }
+        }
+        ctx.restore();
+      },
+      afterDraw(chart) {
+        const {ctx,chartArea}=chart;
+        const points=chart.getDatasetMeta(0).data;
+        if(!points.length) return;
+        ctx.save();
+        ctx.font="500 9px Inter"; ctx.textBaseline="top"; ctx.textAlign="left"; ctx.fillStyle="rgba(100,116,139,0.6)";
+        monthBoundaries.forEach((b,i) => {
+          if(i===0) return;
+          const pt=points[b.index];
+          if(!pt) return;
+          const x=pt.x+3;
+          const maxW=chartArea.right-x;
+          if(maxW<10) return;
+          ctx.save(); ctx.beginPath(); ctx.rect(x,chartArea.top,maxW,14); ctx.clip();
+          ctx.fillText(b.label,x,chartArea.top+3); ctx.restore();
+        });
+        ctx.restore();
+      }
+    }]
+  });
+
+  requestAnimationFrame(()=>requestAnimationFrame(resizeSeq));
+}
+
+render();
+document.fonts.ready.then(()=>{ if(chartInstance) chartInstance.update(); setTimeout(resizeSeq,50); });
+</script>
+</body>
+</html>
