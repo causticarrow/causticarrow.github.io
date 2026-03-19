@@ -761,7 +761,7 @@ function render() {
         <div class="card anim d3">
           <div class="card-header">
             <span class="card-title">Log</span>
-            <span class="card-title" style="opacity:0.5">${BETS.length} plays${pendingBets.length?" · "+pendingBets.length+" pending ("+fmtUnitRisk(pendingBets.reduce((s,b)=>s+b.risk,0))+"u risked)":""}</span>
+            <span class="card-title" style="opacity:0.5">${BETS.length} plays${pendingBets.length?" · "+pendingBets.length+" pending ("+fmtUnitRisk(pendingBets.reduce((s,b)=>s+b.risk,0))+" risked)":""}</span>
           </div>
           <div class="table-wrap">
             <div class="table-body-scroll">
