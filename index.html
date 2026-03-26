@@ -28,7 +28,7 @@
   body { background: var(--bg-primary); color: var(--text-primary); font-family: var(--font); overflow: hidden; }
   .dashboard { max-width: 1400px; margin: 0 auto; padding: 12px; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-  .footer { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 4px; border-top: 1px solid var(--border); flex-shrink: 0; }
+  .footer { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 4px; flex-shrink: 0; }
   .footer-link { font-size: 11px; font-weight: 500; color: var(--text-muted); text-decoration: none; letter-spacing: 0.5px; transition: color 0.15s; }
   .footer-link:hover { color: var(--text-secondary); }
   .footer-disclaimer { font-size: 10px; color: var(--text-muted); opacity: 0.5; }
@@ -73,7 +73,8 @@
   .stat-row-value { font-size: 12px; font-weight: 600; }
 
   .table-wrap { overflow: hidden; display: flex; flex-direction: column; }
-  .table-body-scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: auto; scrollbar-width: thin; scrollbar-color: rgba(42,63,92,0.85) transparent; }
+  .table-body-scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: auto; scrollbar-width: thin; scrollbar-color: rgba(42,63,92,0.85) transparent; position: relative; scroll-snap-type: y mandatory; }
+  .table-body-scroll tbody tr { scroll-snap-align: start; }
   .table-body-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
   .table-body-scroll::-webkit-scrollbar-track { background: transparent; }
   .table-body-scroll::-webkit-scrollbar-thumb { background: rgba(42,63,92,0.85); border-radius: 4px; }
@@ -96,11 +97,14 @@
 
   table { width: 100%; border-collapse: collapse; table-layout: auto; }
   th { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; padding: 7px 12px; text-align: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
-  td { padding: 7px 12px; border-bottom: 1px solid rgba(29,45,69,0.3); font-size: 12px; color: var(--text-secondary); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  td { padding: 9.5px 12px; border-bottom: 1px solid rgba(29,45,69,0.3); font-size: 12px; color: var(--text-secondary); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   th:nth-child(4), td:nth-child(4) { text-align: left; }
   th.col-play, td.col-play { text-align: left; }
   th.col-tourn, td.col-tourn { text-align: left; }
   tr:hover td { background: var(--bg-hover); }
+  .dd-row { background: rgba(239,68,68,0.03); }
+  .dd-row td { background: transparent; border-bottom-color: transparent; }
+  tr.dd-row:hover td { background: rgba(239,68,68,0.08); }
 
   .result-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 5px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid transparent; display: inline-block; }
   .result-won { background: rgba(16,185,129,0.1); color: #34d399; border-color: rgba(16,185,129,0.25); }
@@ -138,7 +142,7 @@
 
   .game-pill { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 3px; flex-shrink: 0; }
   .game-pill.cs2 { color: rgb(96,165,250); background: rgba(48,82,125,0.6); }
-  .game-pill.val { color: rgb(251,146,60); background: rgba(125,73,30,0.6); }
+  .game-pill.val { color: #e879f9; background: rgba(134,25,143,0.35); }
 
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -380,8 +384,10 @@ const adjWins = n > 0 ? (1.1 * n + totalPnlUnits) / 2.1 : 0;
 const adjLosses = Math.max(n - adjWins, 0);
 const adjWinRate = (adjWins + adjLosses) > 0 ? adjWins / (adjWins + adjLosses) * 100 : 0;
 
-let peak = 0, maxDDUnits = 0, cum = 0;
-pnls.forEach(v => { cum += v; if (cum > peak) peak = cum; const dd = peak - cum; if (dd > maxDDUnits) maxDDUnits = dd; });
+let peak = 0, maxDDUnits = 0, cum = 0, _peakIdx = 0, maxDDPeakIdx = 0, maxDDTroughIdx = 0;
+pnls.forEach((v, i) => { cum += v; if (cum > peak) { peak = cum; _peakIdx = i + 1; } const dd = peak - cum; if (dd > maxDDUnits) { maxDDUnits = dd; maxDDPeakIdx = _peakIdx; maxDDTroughIdx = i + 1; } });
+const ddBets = new Set();
+for (let i = maxDDPeakIdx; i < maxDDTroughIdx; i++) { if (closed[i]) ddBets.add(closed[i]); }
 
 function normCDF(z) {
   const x = Math.abs(z) / Math.SQRT2;
@@ -469,7 +475,7 @@ for(let i=1; i<equityData.length; i++) {
   athData.push(ath);
 }
 
-const GAME_COLORS = { "CS2": "rgb(96,165,250)", "VAL": "rgb(251,146,60)" };
+const GAME_COLORS = { "CS2": "rgb(96,165,250)", "VAL": "#e879f9" };
 
 const gameSeries = {};
 const gameCum2 = {};
@@ -653,6 +659,9 @@ function buildStatsSubHTML() {
 }
 
 function buildBetTableHTML() {
+  const ddVisible = displayBets.filter(b => ddBets.has(b));
+  const ddFirst = ddVisible.length ? ddVisible[0] : null;
+  const ddLast = ddVisible.length ? ddVisible[ddVisible.length - 1] : null;
   return displayBets.map(b => {
     const resultClass = b.result==="won"?"result-won":b.result==="lost"?"result-lost":b.result==="push"?"result-push":"result-pending";
     const resultFull = b.result==="won"?"Win":b.result==="lost"?"Loss":b.result==="push"?"Push":"Pending";
@@ -661,7 +670,9 @@ function buildBetTableHTML() {
     const logoHTML = pick ? `<span class="logo-slot"><img class="team-logo" src="${logoPath(pick)}" alt="" onerror="this.parentElement.style.display='none'" onload="normalizeLogo(this)"></span>` : "";
     const gc = b.game ? gameClass(b.game) : "";
     const pillHTML = gc ? `<span class="game-pill ${gc}">${b.game}</span>` : "";
-    return `<tr>
+    const inDD = ddBets.has(b);
+    const ddCls = inDD ? `dd-row${b === ddFirst ? " dd-top" : ""}${b === ddLast ? " dd-bottom" : ""}` : "";
+    return `<tr${ddCls ? ` class="${ddCls}"` : ""}>
       <td class="col-num" style="color:var(--text-muted)">${betNums.get(b)}</td>
       <td class="col-date">${fmtDate(b.date)}</td>
       <td class="col-game">${pillHTML}</td>
@@ -710,6 +721,51 @@ function buildSeqHTML(count) {
   }).join("");
 }
 
+function snapTableRows() {
+  const scroll = document.querySelector('.table-body-scroll');
+  if (!scroll) return;
+  const card = scroll.closest('.card');
+  scroll.style.maxHeight = '';
+  if (card) card.style.maxHeight = '';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const bodyRows = scroll.querySelectorAll('tbody tr');
+    if (!bodyRows.length) return;
+    const thead = scroll.querySelector('thead tr');
+    const theadH = thead ? thead.offsetHeight : 0;
+    scroll.style.scrollPaddingTop = theadH + 'px';
+    const targetRow = bodyRows[Math.min(11, bodyRows.length) - 1];
+    const scrollTop = scroll.getBoundingClientRect().top;
+    const rowBottom = targetRow.getBoundingClientRect().bottom;
+    scroll.style.maxHeight = (rowBottom - scrollTop) + 'px';
+    if (card) card.style.maxHeight = (rowBottom - card.getBoundingClientRect().top + 1) + 'px';
+    updateDDOverlay();
+  }));
+}
+
+function updateDDOverlay() {
+  const scroll = document.querySelector('.table-body-scroll');
+  if (!scroll) return;
+  const topRow = scroll.querySelector('tr.dd-top');
+  const bottomRow = scroll.querySelector('tr.dd-bottom');
+  let overlay = document.getElementById('dd-overlay');
+  if (!topRow || !bottomRow) {
+    if (overlay) overlay.style.display = 'none';
+    return;
+  }
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'dd-overlay';
+    overlay.style.cssText = 'position:absolute;pointer-events:none;border:1px solid rgba(239,68,68,0.35);z-index:1;box-sizing:border-box;left:0;right:0;';
+    scroll.appendChild(overlay);
+  }
+  overlay.style.display = 'block';
+  const scrollRect = scroll.getBoundingClientRect();
+  const topRect = topRow.getBoundingClientRect();
+  const bottomRect = bottomRow.getBoundingClientRect();
+  overlay.style.top = (topRect.top - scrollRect.top + scroll.scrollTop) + 'px';
+  overlay.style.height = (bottomRect.bottom - topRect.top) + 'px';
+}
+
 function resizeSeq() {
   const seqWrap=document.getElementById("seqWrap");
   const seqLbl=document.getElementById("seqLabel");
@@ -749,13 +805,12 @@ function render() {
       <div class="left-col">
         <div class="card anim d2">
           <div class="card-header">
-            <span class="card-title"><span class="chart-title-full">Net Profit Curve</span><span class="chart-title-short">Chart</span></span>
+            <div id="chartLegend" style="display:flex;gap:6px;align-items:center"></div>
             <span class="card-title" style="opacity:0.5"><span class="date-range-full">${dateRangeLabel}</span><span class="date-range-short">${shortDateRangeLabel}</span></span>
           </div>
           <div class="chart-wrap">
             <canvas id="equityChart"></canvas>
             <div class="chart-tooltip" id="chartTooltip" style="opacity:0"></div>
-            <div id="chartLegend" style="position:absolute;top:10px;left:14px;display:flex;gap:10px;pointer-events:none"></div>
           </div>
         </div>
         <div class="card anim d3">
@@ -801,7 +856,7 @@ function render() {
         <a class="footer-link" href="https://x.com/causticarrow" target="_blank">𝕏 @causticarrow</a>
         <a class="footer-link" href="https://discord.gg/hammer" target="_blank">Discord</a>
       </div>
-      <span class="footer-disclaimer">Team logos are property of their respective organizations. Personal, non-commercial recordkeeping site.</span>
+      <span class="footer-disclaimer">Team logos are property of their respective organizations. This is a personal, non-commercial recordkeeping site.</span>
     </div>
   `;
 
@@ -810,13 +865,16 @@ function render() {
 
   const legendEl = document.getElementById("chartLegend");
   if (legendEl) {
-    const overallDot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:4px"></span>`;
-    let html = `<span style="display:flex;align-items:center;font-size:10px;font-weight:600;letter-spacing:1px;color:var(--text-muted)">${overallDot}Overall</span>`;
+    const pillStyle = (col, bg, border) => `display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;letter-spacing:0.8px;padding:2px 8px;border-radius:3px;background:${bg};border:1px solid ${border};color:${col}`;
+    let html = `<span style="${pillStyle('#10b981','rgba(16,185,129,0.08)','rgba(16,185,129,0.2)')}"><span style="width:10px;height:2px;background:#10b981;border-radius:1px;flex-shrink:0"></span>OVERALL</span>`;
     Object.keys(GAME_COLORS).filter(g => gameSeries[g]).forEach(g => {
       const col = GAME_COLORS[g];
-      html += `<span style="display:flex;align-items:center;font-size:10px;font-weight:600;letter-spacing:1px;color:${col}"><span style="display:inline-block;width:8px;height:2px;background:${col};opacity:0.7;margin-right:4px;border-radius:1px"></span>${g}</span>`;
+      const rgb = col.startsWith('rgb') ? col.match(/[\d.]+/g).slice(0,3).join(',') : col;
+      const bg = col.startsWith('#') ? col+'14' : `rgba(${rgb},0.08)`;
+      const border = col.startsWith('#') ? col+'33' : `rgba(${rgb},0.2)`;
+      html += `<span style="${pillStyle(col, bg, border)}"><span style="width:10px;height:0;border-top:2px dashed ${col};flex-shrink:0"></span>${g}</span>`;
     });
-    legendEl.innerHTML = html;
+legendEl.innerHTML = html;
   }
 
   const gameDatasets = Object.entries(GAME_COLORS)
@@ -922,6 +980,33 @@ function render() {
           if(!pt) return;
           ctx.beginPath(); ctx.moveTo(pt.x,chartArea.top); ctx.lineTo(pt.x,chartArea.bottom); ctx.stroke();
         });
+        if (maxDDUnits > 0 && maxDDPeakIdx < points.length && maxDDTroughIdx < points.length) {
+          const _peakY = Math.min(Math.max(yScale.getPixelForValue(equityData[maxDDPeakIdx]), chartArea.top), chartArea.bottom);
+          const _peakPt = points[maxDDPeakIdx];
+          const _troughPt = points[maxDDTroughIdx];
+          ctx.save();
+          ctx.beginPath(); ctx.rect(chartArea.left, chartArea.top, chartArea.width, chartArea.height); ctx.clip();
+          ctx.beginPath();
+          ctx.moveTo(_peakPt.x, _peakY);
+          ctx.lineTo(_troughPt.x, _peakY);
+          ctx.lineTo(_troughPt.x, _troughPt.y);
+          for (let _i = maxDDTroughIdx; _i >= maxDDPeakIdx; _i--) ctx.lineTo(points[_i].x, points[_i].y);
+          ctx.closePath();
+          ctx.fillStyle = "rgba(239,68,68,0.13)";
+          ctx.fill();
+          ctx.strokeStyle = "rgba(239,68,68,0.7)";
+          ctx.lineWidth = 1;
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          ctx.moveTo(_troughPt.x, _peakY);
+          ctx.lineTo(_troughPt.x, _troughPt.y);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(_troughPt.x - 4, _peakY);
+          ctx.lineTo(_troughPt.x + 4, _peakY);
+          ctx.stroke();
+          ctx.restore();
+        }
         const athVal=athData[athData.length-1];
         if(athVal>0) {
           const athY=Math.round(Math.min(Math.max(yScale.getPixelForValue(athVal),chartArea.top),chartArea.bottom))+0.5;
@@ -985,10 +1070,13 @@ function render() {
   });
 
   requestAnimationFrame(()=>requestAnimationFrame(resizeSeq));
+  requestAnimationFrame(()=>requestAnimationFrame(snapTableRows));
 }
 
 render();
-document.fonts.ready.then(()=>{ if(chartInstance) chartInstance.update(); setTimeout(resizeSeq,50); });
+document.fonts.ready.then(()=>{ if(chartInstance) chartInstance.update(); setTimeout(resizeSeq,50); setTimeout(snapTableRows,50); });
+requestAnimationFrame(()=>requestAnimationFrame(snapTableRows));
+window.addEventListener('resize', snapTableRows);
 </script>
 </body>
 </html>
