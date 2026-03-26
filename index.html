@@ -384,6 +384,7 @@ const adjWins = n > 0 ? (1.1 * n + totalPnlUnits) / 2.1 : 0;
 const adjLosses = Math.max(n - adjWins, 0);
 const adjWinRate = (adjWins + adjLosses) > 0 ? adjWins / (adjWins + adjLosses) * 100 : 0;
 
+
 let peak = 0, maxDDUnits = 0, cum = 0, _peakIdx = 0, maxDDPeakIdx = 0, maxDDTroughIdx = 0;
 pnls.forEach((v, i) => { cum += v; if (cum > peak) { peak = cum; _peakIdx = i + 1; } const dd = peak - cum; if (dd > maxDDUnits) { maxDDUnits = dd; maxDDPeakIdx = _peakIdx; maxDDTroughIdx = i + 1; } });
 const ddBets = new Set();
@@ -506,7 +507,8 @@ for (let i = 0; i <= closed.length; i++) {
     if (g && gameCum2[g] !== undefined) gameCum2[g] += pnls[i];
   }
 }
-const betClasses = { pk:{wins:0,losses:0,pnl:0,risk:0}, hcap:{wins:0,losses:0,pnl:0,risk:0}, fav:{wins:0,losses:0,pnl:0,risk:0}, dog:{wins:0,losses:0,pnl:0,risk:0} };
+
+const betClasses = { pk:{wins:0,losses:0,pnl:0,risk:0}, hcap:{wins:0,losses:0,pnl:0,risk:0}, sides:{wins:0,losses:0,pnl:0,risk:0}, extras:{wins:0,losses:0,pnl:0,risk:0}, fav:{wins:0,losses:0,pnl:0,risk:0}, dog:{wins:0,losses:0,pnl:0,risk:0} };
 closed.forEach((b,i) => {
   const pnl = pnls[i];
   const isPK = /\bPK\b/.test(b.play);
@@ -514,6 +516,8 @@ closed.forEach((b,i) => {
   const isHcap = !!hcapMatch && !isPK;
   function acc(key) { betClasses[key].pnl+=pnl; betClasses[key].risk+=b.risk; if(b.result==="won") betClasses[key].wins++; else betClasses[key].losses++; }
   if(isPK) acc("pk"); else if(isHcap) acc("hcap");
+  if(b.isExtra) acc("extras");
+  else if(isPK || isHcap) acc("sides");
   let isFav, isDog;
   if(isHcap) { isFav=hcapMatch[1].startsWith("-"); isDog=hcapMatch[1].startsWith("+"); }
   else { isFav=b.odds<0; isDog=b.odds>0; }
@@ -646,9 +650,10 @@ function buildStatsSubHTML() {
       <span class="split-count split-count-right"><span style="color:var(--text-secondary)">${(100-pctA).toFixed(0)}%</span> ${labelB}</span>
     </div>`;
   }
+  const extrasN=betClasses.extras.wins+betClasses.extras.losses;
   return `<div class="stats-sub">
-    ${item("Pick'ems","pk")}
-    ${item("Handicaps","hcap")}
+    ${item("Sides","sides")}
+    ${extrasN>0?item("Extras","extras"):""}
     ${item("Favourites","fav")}
     ${item("Dogs","dog")}
   </div>
@@ -677,7 +682,7 @@ function buildBetTableHTML() {
       <td class="col-date">${fmtDate(b.date)}</td>
       <td class="col-game">${pillHTML}</td>
       <td class="col-tourn">${b.tournament}</td>
-      <td class="col-play" style="color:var(--text-primary)"><span class="play-cell">${logoHTML}<span class="play-full">${b.play}${b.isExtra?" <span style='font-size:10px;font-weight:600;padding:1px 6px;border-radius:3px;background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);flex-shrink:0'>Extra</span>":""}</span><span class="play-short">${shortenPlay(b.play)}${b.isExtra?" <span style='font-size:10px;font-weight:600;padding:1px 6px;border-radius:3px;background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);flex-shrink:0'>Extra</span>":""}</span></span></td>
+      <td class="col-play" style="color:var(--text-primary)"><span class="play-cell">${logoHTML}<span class="play-full">${b.play}</span><span class="play-short">${shortenPlay(b.play)}</span>${b.isExtra?"<span style='font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px;background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);flex-shrink:0;letter-spacing:0.5px'>EXTRA</span>":""}</span></td>
       <td class="col-odds"><span class="odds-full">${fmtOddsWithProb(b.odds)}</span><span class="odds-short">${fmtAmerican(b.odds)}</span></td>
       <td class="col-risk">${fmtUnitRisk(b.risk)}</td>
       <td class="col-result"><span class="result-badge ${resultClass} result-full">${resultFull}</span><span class="result-badge ${resultClass} result-short">${resultShort}</span></td>
@@ -874,7 +879,7 @@ function render() {
       const border = col.startsWith('#') ? col+'33' : `rgba(${rgb},0.2)`;
       html += `<span style="${pillStyle(col, bg, border)}"><span style="width:10px;height:0;border-top:2px dashed ${col};flex-shrink:0"></span>${g}</span>`;
     });
-legendEl.innerHTML = html;
+    legendEl.innerHTML = html;
   }
 
   const gameDatasets = Object.entries(GAME_COLORS)
@@ -1065,6 +1070,7 @@ legendEl.innerHTML = html;
         ctx.font="600 11px Inter, system-ui, sans-serif"; ctx.textBaseline="bottom"; ctx.textAlign="right";
         ctx.fillStyle="rgba(143,172,196,0.18)";
         ctx.fillText("causticarrow.com", chartArea.right - 6, chartArea.bottom - 6);
+
         ctx.restore();
       }
     }]
