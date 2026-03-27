@@ -1,0 +1,236 @@
+.left-col .card:first-child {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.left-col .card:first-child .chart-wrap {
+  flex: 0 0 auto;
+  height: 300px;
+  min-height: 300px;
+}
+.left-col .card:last-child {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.left-col .table-wrap {
+  flex: 1;
+  min-height: 0;
+}
+.left-col .table-body-scroll {
+  max-height: none;
+  flex: 1;
+  min-height: 0;
+}
+
+.top-stats {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 22px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-card);
+  flex-shrink: 0;
+  animation: caustic-fade-up 0.4s 0.05s ease forwards;
+  opacity: 0;
+}
+
+.main-grid { gap: 12px; }
+.left-col { gap: 12px; }
+.left-col .card:last-child {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.right-col { gap: 12px; }
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 4px;
+  flex-shrink: 0;
+}
+.footer-link {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: color 0.15s;
+}
+.footer-link:hover { color: var(--text-secondary); }
+.footer-disclaimer { font-size: 10px; color: var(--text-muted); opacity: 0.5; }
+
+.split-a { background: rgba(136, 192, 208, 0.42); }
+.split-b { background: rgba(136, 192, 208, 0.12); }
+
+.top-stats .pnl-label { margin-bottom: 2px; }
+
+.copy-record-btn {
+  position: fixed;
+  top: 10px;
+  right: 14px;
+  z-index: 1000;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  cursor: pointer;
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s, border-color 0.15s;
+}
+.copy-record-btn:hover { opacity: 1; }
+.copy-record-btn.copied {
+  opacity: 1;
+  color: var(--green);
+  border-color: rgba(63, 162, 102, 0.4);
+}
+
+.game-pill {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  border: 1px solid transparent;
+}
+.game-pill.cs2 {
+  color: var(--game-cs2-text);
+  background: rgba(var(--game-cs2-rgb), 0.12);
+  border-color: rgba(var(--game-cs2-rgb), 0.3);
+}
+.game-pill.val {
+  color: var(--game-val-text);
+  background: rgba(var(--game-val-rgb), 0.12);
+  border-color: rgba(var(--game-val-rgb), 0.3);
+}
+
+#statsCardBody.stats-card-body {
+  height: auto;
+  max-height: none;
+}
+
+col.col-num { width: 38px; }
+col.col-date { width: 72px; }
+col.col-game { width: 54px; }
+col.col-tourn { width: 140px; }
+col.col-play { }
+col.col-odds { width: 114px; }
+col.col-risk { width: 72px; }
+col.col-result { width: 90px; }
+
+table { table-layout: auto; }
+
+th.col-play,
+td.col-play {
+  text-align: left;
+}
+.left-col .table-body-scroll td.col-play {
+  overflow: visible;
+}
+
+.extra-pill {
+  display: inline-block;
+  font-size: 8px;
+  font-weight: 600;
+  margin-left: 8px;
+  padding: 0 4px;
+  line-height: 1.35;
+  border-radius: 3px;
+  background: rgba(241, 180, 103, 0.12);
+  color: #f5cb8a;
+  border: 1px solid rgba(241, 180, 103, 0.3);
+  flex-shrink: 0;
+  letter-spacing: 0.2px;
+  vertical-align: 0.05em;
+}
+
+.seq-block { border-radius: var(--radius-sm); }
+
+@keyframes caustic-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim { animation: caustic-fade-up 0.4s ease forwards; opacity: 0; }
+.d1 { animation-delay: 0.05s; }
+.d2 { animation-delay: 0.1s; }
+.d3 { animation-delay: 0.15s; }
+.d4 { animation-delay: 0.2s; }
+.d5 { animation-delay: 0.25s; }
+
+.play-short { display: none; }
+.pnl-label-short { display: none; }
+.result-short { display: none; }
+.odds-short { display: none; }
+.chart-title-short { display: none; }
+.date-range-short { display: none; }
+
+@media (max-width: 768px) {
+  .footer-links { display: none !important; }
+  .footer { justify-content: center; }
+  .footer-disclaimer { opacity: 0.4; text-align: center; }
+  body { overflow: auto; }
+  .dashboard { height: auto; overflow: visible; padding: 8px; }
+  .header { display: none; }
+  .top-stats { padding: 10px 12px; margin-bottom: 8px; }
+  .pnl-value { font-size: 20px; }
+  .stat-number { font-size: 15px; }
+  .stats-grid { gap: 10px; }
+  .stat-label { font-size: 9px; letter-spacing: 1px; }
+  .stat-hide-mobile { display: none; }
+  .pnl-label-full { display: none; }
+  .pnl-label-short { display: inline; }
+  .chart-title-full { display: none; }
+  .chart-title-short { display: inline; }
+  .date-range-full { display: none; }
+  .date-range-short { display: inline; }
+  .main-grid { grid-template-columns: 1fr; gap: 8px; flex: none; }
+  .right-col { display: none; }
+  .table-wrap { display: block; overflow: visible; }
+  .table-body-scroll { overflow: visible; height: auto; min-height: unset; flex: none; }
+    .left-col .card:last-child { flex: none; }
+    .left-col .card:first-child .chart-wrap {
+      min-height: 200px;
+      height: 200px;
+      padding: 8px 10px;
+    }
+  .copy-record-btn { display: none; }
+
+  .col-num, .col-game, .col-tourn, .col-risk { display: none; }
+
+  table { table-layout: auto; width: 100%; }
+  .col-date { white-space: nowrap; }
+  .col-play {
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 0;
+    width: 100%;
+  }
+  .col-odds { white-space: nowrap; }
+  .col-result { white-space: nowrap; }
+  td { font-size: 11px; padding: 5px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  th { font-size: 9px; padding: 5px 6px; white-space: nowrap; overflow: hidden; }
+  .logo-slot { display: inline-flex; }
+  .team-logo { width: 14px; height: 14px; }
+  .play-full { display: none; }
+  .play-short { display: inline; }
+  .result-full { display: none; }
+  .result-short { display: inline; }
+  .odds-full { display: none; }
+  .odds-short { display: inline; }
+  .result-badge { padding: 3px 7px; font-size: 10px; letter-spacing: 0; }
+}
