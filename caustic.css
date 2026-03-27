@@ -141,6 +141,15 @@ td.col-play {
   overflow: visible;
 }
 
+.left-col .table-body-scroll thead th,
+.left-col .table-body-scroll tbody td {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.left-col .play-cell {
+  min-height: 26px;
+}
+
 .extra-pill {
   display: inline-block;
   font-size: 8px;
