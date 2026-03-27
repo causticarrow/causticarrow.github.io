@@ -549,8 +549,9 @@ function snapTableRows() {
     const targetRow = bodyRows[Math.min(11, bodyRows.length) - 1];
     const scrollTop = scroll.getBoundingClientRect().top;
     const rowBottom = targetRow.getBoundingClientRect().bottom;
-    scroll.style.maxHeight = (rowBottom - scrollTop) + 'px';
-    if (card) card.style.maxHeight = (rowBottom - card.getBoundingClientRect().top + 1) + 'px';
+    const bleedPx = 8;
+    scroll.style.maxHeight = (rowBottom - scrollTop - bleedPx) + 'px';
+    if (card) card.style.maxHeight = (rowBottom - card.getBoundingClientRect().top + 1 - bleedPx) + 'px';
     updateDDOverlay();
   }));
 }
