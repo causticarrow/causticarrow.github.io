@@ -204,17 +204,35 @@ td.col-play {
   .chart-title-full { display: none; }
   .chart-title-short { display: inline; }
   .date-range-full { display: none; }
-  .date-range-short { display: inline; }
+  .date-range-short { display: none; }
   .main-grid { grid-template-columns: 1fr; gap: 8px; flex: none; }
   .right-col { display: none; }
-  .table-wrap { display: block; overflow: visible; }
-  .table-body-scroll { overflow: visible; height: auto; min-height: unset; flex: none; }
-    .left-col .card:last-child { flex: none; }
-    .left-col .card:first-child .chart-wrap {
-      min-height: 200px;
-      height: 200px;
-      padding: 8px 10px;
-    }
+  /* Base .left-col .table-wrap { flex:1 } was trapping height + clipping the log under .card overflow:hidden */
+  .left-col .table-wrap {
+    display: block;
+    overflow: visible;
+    flex: none;
+    min-height: 0;
+  }
+  .left-col .card:last-child {
+    flex: none;
+    overflow: visible;
+  }
+  .left-col .table-body-scroll {
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: none;
+    height: auto;
+    min-height: 0;
+    flex: none;
+    max-height: min(70vh, 520px);
+  }
+  .left-col .card:first-child .chart-wrap {
+    min-height: 200px;
+    height: 200px;
+    padding: 8px 10px;
+  }
   .copy-record-btn { display: none; }
 
   .col-num, .col-game, .col-tourn, .col-risk { display: none; }

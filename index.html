@@ -540,6 +540,11 @@ function snapTableRows() {
   const card = scroll.closest('.card');
   scroll.style.maxHeight = '';
   if (card) card.style.maxHeight = '';
+  if (window.matchMedia("(max-width: 768px)").matches) {
+    scroll.style.scrollPaddingTop = "";
+    updateDDOverlay();
+    return;
+  }
   requestAnimationFrame(() => requestAnimationFrame(() => {
     const bodyRows = scroll.querySelectorAll('tbody tr');
     if (!bodyRows.length) return;
@@ -790,12 +795,14 @@ function render() {
         ctx.strokeStyle=PAL.lineMuted;
         ctx.beginPath(); ctx.moveTo(chartArea.left,zeroY); ctx.lineTo(chartArea.right,zeroY); ctx.stroke();
         ctx.strokeStyle=PAL.lineMutedSoft;
-        monthBoundaries.forEach((b,i) => {
-          if(i===0) return;
-          const pt=points[b.index];
-          if(!pt) return;
-          ctx.beginPath(); ctx.moveTo(pt.x,chartArea.top); ctx.lineTo(pt.x,chartArea.bottom); ctx.stroke();
-        });
+        if (!window.matchMedia("(max-width: 768px)").matches) {
+          monthBoundaries.forEach((b,i) => {
+            if(i===0) return;
+            const pt=points[b.index];
+            if(!pt) return;
+            ctx.beginPath(); ctx.moveTo(pt.x,chartArea.top); ctx.lineTo(pt.x,chartArea.bottom); ctx.stroke();
+          });
+        }
         if (maxDDUnits > 0 && maxDDPeakIdx < points.length && maxDDTroughIdx < points.length) {
           const _peakY = Math.min(Math.max(yScale.getPixelForValue(equityData[maxDDPeakIdx]), chartArea.top), chartArea.bottom);
           const _peakPt = points[maxDDPeakIdx];
@@ -867,16 +874,18 @@ function render() {
         if(!points.length) return;
         ctx.save();
         ctx.font="500 9px Inter"; ctx.textBaseline="top"; ctx.textAlign="left"; ctx.fillStyle=PAL.lineLabel;
-        monthBoundaries.forEach((b,i) => {
-          if(i===0) return;
-          const pt=points[b.index];
-          if(!pt) return;
-          const x=pt.x+3;
-          const maxW=chartArea.right-x;
-          if(maxW<10) return;
-          ctx.save(); ctx.beginPath(); ctx.rect(x,chartArea.top,maxW,14); ctx.clip();
-          ctx.fillText(b.label,x,chartArea.top+3); ctx.restore();
-        });
+        if (!window.matchMedia("(max-width: 768px)").matches) {
+          monthBoundaries.forEach((b,i) => {
+            if(i===0) return;
+            const pt=points[b.index];
+            if(!pt) return;
+            const x=pt.x+3;
+            const maxW=chartArea.right-x;
+            if(maxW<10) return;
+            ctx.save(); ctx.beginPath(); ctx.rect(x,chartArea.top,maxW,14); ctx.clip();
+            ctx.fillText(b.label,x,chartArea.top+3); ctx.restore();
+          });
+        }
         ctx.font="600 11px Inter, system-ui, sans-serif"; ctx.textBaseline="bottom"; ctx.textAlign="right";
         ctx.fillStyle="rgba(130,130,130,0.14)";
         ctx.fillText("causticarrow.com", chartArea.right - 6, chartArea.bottom - 6);
