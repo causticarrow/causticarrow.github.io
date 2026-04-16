@@ -35,6 +35,13 @@ function playLogoImgHTML(teamName) {
   return `<span class="logo-slot"><img class="team-logo" src="${logoPath(teamName)}" alt="" data-logo-cache="${key}" style="${st}" width="36" height="24" decoding="sync" onload="normalizeLogo(this)" onerror="this.parentElement.style.display='none'"></span>`;
 }
 
+function statsLogoImgHTML(teamName) {
+  if (!teamName) return "";
+  const key = statsLogoCacheKey(teamName);
+  const st = cachedStatsLogoInlineStyle(key);
+  return `<span class="logo-slot"><img class="team-logo" src="${logoPath(teamName)}" alt="" data-logo-cache="${key}" style="${st}" width="16" height="16" decoding="sync" onload="normalizeLogo(this)" onerror="this.parentElement.style.display='none'"></span>`;
+}
+
 function resolveLogoSlot(img) {
   if (img.closest(".stats-card-body")) return { maxW: 16, maxH: 16 };
   if (img.closest(".play-cell") || img.closest(".bet-search-drop-item")) return { maxW: 48, maxH: 24 };

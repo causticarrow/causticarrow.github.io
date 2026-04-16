@@ -36,11 +36,13 @@
   --shadow-card: 0 1px 0 rgba(228, 228, 228, 0.04) inset, 0 4px 24px rgba(0, 0, 0, 0.45);
   --shadow-float: 0 8px 32px rgba(0, 0, 0, 0.55);
   --font: 'Inter', system-ui, sans-serif;
-  /* Caustic CS2 / VAL: same badge recipe as .result-won / .result-lost (base rgb + soft label text) */
-  --game-cs2-rgb: 56, 208, 240;
-  --game-cs2-text: #5ec8dc;
-  --game-val-rgb: 208, 112, 248;
-  --game-val-text: #e898f0;
+  /* Game accents: tuned to similar perceived saturation/value on the dark UI */
+  --game-cs2-rgb: 209, 135, 49;
+  --game-cs2-text: #efb76a;
+  --game-val-rgb: 179, 94, 214;
+  --game-val-text: #dea2f0;
+  --game-lol-rgb: 48, 147, 164;
+  --game-lol-text: #7dc5d1;
 }
 
 html { color-scheme: dark; }
@@ -176,8 +178,7 @@ body {
   line-height: 1.35;
 }
 .right-col { display: flex; flex-direction: column; gap: 12px; min-height: 0; height: 100%; }
-.right-col .seq-card { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.right-col .seq-card .seq-wrap { flex: 1; min-height: 0; height: auto !important; }
+.right-col .stats-card { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 
 .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card); }
 .card-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--border); }
@@ -198,6 +199,10 @@ body {
 .stat-row:last-child { border-bottom: none; }
 .stat-row-label { font-size: 12px; color: var(--text-secondary); }
 .stat-row-value { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat-team-value { display: inline-flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 0; max-width: 66%; }
+.stat-team-ident { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.stat-team-name { color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat-team-pnl { flex-shrink: 0; }
 
 .table-wrap { overflow: hidden; display: flex; flex-direction: column; }
 .table-header-wrap { overflow-y: scroll; scrollbar-width: thin; scrollbar-color: transparent transparent; }
@@ -237,6 +242,7 @@ tr.dd-row:hover td { background: rgba(184, 77, 98, 0.15); }
 .result-push { background: rgba(241, 180, 103, 0.12); color: #f5cb8a; border-color: rgba(241, 180, 103, 0.3); }
 
 .stats-card-body { padding: 6px 14px; height: 174px; overflow: hidden; }
+.stats-card .stats-card-body { flex: 1; overflow: auto; }
 /* Team statistics tab only: compact logos so rows match General (text-only) row height */
 .stats-card-body .stat-row-value .logo-slot {
   flex: 0 0 16px;

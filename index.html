@@ -122,7 +122,7 @@ const RAW_PICKS = [
   { date: "2026-01-18", tournament: "BLAST Bounty", play: "Astralis PK vs. PARIVISION", odds: +140, score: "0-2", game: "CS2" },
   { date: "2026-01-17", tournament: "BLAST Bounty", play: "HEROIC PK vs. paiN", odds: +125, score: "2-0", game: "CS2" },
   { date: "2026-01-15", tournament: "BLAST Bounty", play: "Liquid PK vs. Ninjas in Pyjamas", odds: +115, score: "2-1", game: "CS2" },
-  { date: "2026-01-14", tournament: "LCK", play: "Dplus -10.5 vs. BRION", odds: +120, score: "27-7", game: "League of Legends" },
+  { date: "2026-01-14", tournament: "LCK", play: "Dplus -10.5 vs. BRION", odds: +120, score: "27-7", game: "LoL", detail: "Map 2" },
   { date: "2026-01-14", tournament: "BLAST Bounty", play: "Monte +1.5 vs. Natus Vincere", odds: +150, score: "2-1", game: "CS2" },
   { date: "2026-01-14", tournament: "BLAST Bounty", play: "GamerLegion PK vs. Passion UA", odds: +105, score: "2-1", game: "CS2" },
   { date: "2026-01-13", tournament: "BLAST Bounty", play: "OG PK vs. FUT", odds: +180, score: "0-2", game: "CS2" },
@@ -156,6 +156,7 @@ const BETS = RAW_PICKS.map(p => {
     odds: p.odds,
     result,
     game: p.game || null,
+    detail: p.detail || null,
     isExtra,
     unitSize: UNIT_SIZE,
     risk: riskUnits,
@@ -286,7 +287,55 @@ function getShortDateRange() {
 }
 const shortDateRangeLabel = getShortDateRange();
 const daySpan = Math.max(1, Math.round((dateRangeEnd-dateRangeStart)/(1000*60*60*24))+1);
-const playsPerDay = BETS.length/daySpan;
+const playsPerDay = BETS.length / daySpan;
+const annualRunRate = Math.round(playsPerDay * 365);
+
+function summarizeTeams(teamGetter) {
+  const stats = Object.create(null);
+  closed.forEach((b, i) => {
+    const team = teamGetter(b.play);
+    if (!team) return;
+    if (!stats[team]) stats[team] = { team, pnl: 0, count: 0 };
+    stats[team].pnl += pnls[i];
+    stats[team].count += 1;
+  });
+  const items = Object.values(stats);
+  if (!items.length) return { best: null, worst: null };
+  const byBest = [...items].sort((a, b) => b.pnl - a.pnl || b.count - a.count || a.team.localeCompare(b.team));
+  const byWorst = [...items].sort((a, b) => a.pnl - b.pnl || b.count - a.count || a.team.localeCompare(b.team));
+  return { best: byBest[0], worst: byWorst[0] };
+}
+
+function mostFrequentTeam(teamSummary) {
+  const items = Object.values(teamSummary || {});
+  if (!items.length) return null;
+  return [...items].sort((a, b) => b.count - a.count || b.pnl - a.pnl || a.team.localeCompare(b.team))[0];
+}
+
+const pickedTeamStats = summarizeTeams(getPickTeam);
+const againstTeamStats = summarizeTeams(getAgainstTeam);
+const mostBackedTeam = mostFrequentTeam((() => {
+  const stats = Object.create(null);
+  closed.forEach((b, i) => {
+    const team = getPickTeam(b.play);
+    if (!team) return;
+    if (!stats[team]) stats[team] = { team, pnl: 0, count: 0 };
+    stats[team].pnl += pnls[i];
+    stats[team].count += 1;
+  });
+  return stats;
+})());
+const mostLaidTeam = mostFrequentTeam((() => {
+  const stats = Object.create(null);
+  closed.forEach((b, i) => {
+    const team = getAgainstTeam(b.play);
+    if (!team) return;
+    if (!stats[team]) stats[team] = { team, pnl: 0, count: 0 };
+    stats[team].pnl += pnls[i];
+    stats[team].count += 1;
+  });
+  return stats;
+})());
 
 const yearStart = dateRangeStart.getFullYear();
 const yearEnd = dateRangeEnd.getFullYear();
@@ -326,8 +375,8 @@ for(let i=1; i<equityData.length; i++) {
   athData.push(ath);
 }
 
-const GAME_COLORS = { CS2: "rgb(56, 208, 240)", VAL: "rgb(208, 112, 248)" };
-const GAME_LABEL_TEXT = { CS2: "#5ec8dc", VAL: "#e898f0" };
+const GAME_COLORS = { CS2: "rgb(209, 135, 49)", LoL: "rgb(48, 147, 164)", VAL: "rgb(179, 94, 214)" };
+const GAME_LABEL_TEXT = { CS2: "#efb76a", VAL: "#dea2f0", LoL: "#7dc5d1" };
 
 const gameSeries = {};
 const gameCum2 = {};
@@ -404,6 +453,12 @@ function getPickTeam(play) {
   return match ? match[1].trim() : null;
 }
 
+function getAgainstTeam(play) {
+  const vsIdx = play.indexOf(" vs. ");
+  if (vsIdx === -1) return null;
+  return play.slice(vsIdx + 5).trim() || null;
+}
+
 const TEAM_ABBR = {
   "Shopify Rebellion":"SR","Nongshim RedForce":"NS","Ninjas in Pyjamas":"NIP",
   "FunPlus Phoenix":"FPX","Rex Regum Qeon":"RRQ","Natus Vincere":"NAVI",
@@ -438,6 +493,7 @@ function gameClass(game) {
   const g = game.toLowerCase();
   if(g==="cs2") return "cs2";
   if(g==="val") return "val";
+  if(g==="lol") return "lol";
   return "";
 }
 
@@ -456,13 +512,46 @@ function copyRecord() {
 let chartInstance = null;
 
 function buildGeneralStatsHTML() {
+  function statRow(label, value, color) {
+    return `<div class="stat-row"><span class="stat-row-label">${label}</span><span class="stat-row-value" style="color:${color}">${value}</span></div>`;
+  }
+  function teamCountRow(label, item) {
+    if (!item) return statRow(label, "—", "var(--text-muted)");
+    const teamLabel = TEAM_ABBR[item.team] || item.team;
+    return `<div class="stat-row">
+      <span class="stat-row-label">${label}</span>
+      <span class="stat-row-value stat-team-value">
+        <span class="stat-team-ident">${statsLogoImgHTML(item.team)}<span class="stat-team-name">${teamLabel}</span></span>
+        <span class="stat-team-pnl" style="color:var(--text-primary)">(${item.count})</span>
+      </span>
+    </div>`;
+  }
+  function teamStatRow(label, item) {
+    if (!item) return statRow(label, "—", "var(--text-muted)");
+    const pnlColor = item.pnl >= 0 ? "var(--green)" : "var(--red)";
+    const teamLabel = TEAM_ABBR[item.team] || item.team;
+    return `<div class="stat-row">
+      <span class="stat-row-label">${label}</span>
+      <span class="stat-row-value stat-team-value">
+        <span class="stat-team-ident">${statsLogoImgHTML(item.team)}<span class="stat-team-name">${teamLabel}</span></span>
+        <span class="stat-team-pnl" style="color:${pnlColor}">${fmtUnit(item.pnl, true)}</span>
+      </span>
+    </div>`;
+  }
   return [
-    ["p (vig-adjusted)", pValStr, "var(--text-primary)"],
-    ["Profit Factor", profitFactor, "var(--text-primary)"],
-    ["Max Drawdown", fmtUnit(-maxDDUnits), "var(--red)"],
-    ["Average Odds", avgAmericanOddsWithProb(chronoBets), "var(--text-primary)"],
-    ["Average Risk", fmtUnitRisk(avgRiskUnitsAll), "var(--text-primary)"],
-  ].map(([l,v,c])=>`<div class="stat-row"><span class="stat-row-label">${l}</span><span class="stat-row-value" style="color:${c}">${v}</span></div>`).join("");
+    statRow("p (vig-adjusted)", pValStr, "var(--text-primary)"),
+    statRow("Profit Factor", profitFactor, "var(--text-primary)"),
+    statRow("Max Drawdown", fmtUnit(-maxDDUnits), "var(--red)"),
+    teamCountRow("Most Backed", mostBackedTeam),
+    teamCountRow("Most Laid", mostLaidTeam),
+    teamStatRow("Best Team", pickedTeamStats.best),
+    teamStatRow("Worst Team", pickedTeamStats.worst),
+    teamStatRow("Best Team Against", againstTeamStats.best),
+    teamStatRow("Worst Team Against", againstTeamStats.worst),
+    statRow("Average Odds", avgAmericanOddsWithProb(chronoBets), "var(--text-primary)"),
+    statRow("Average Risk", fmtUnitRisk(avgRiskUnitsAll), "var(--text-primary)"),
+    statRow("Annual Run Rate", "~" + annualRunRate + " plays", "var(--text-primary)"),
+  ].join("");
 }
 
 function buildStatsSubHTML() {
@@ -526,7 +615,7 @@ function buildBetTableHTML() {
       <td class="col-date">${fmtDate(b.date)}</td>
       <td class="col-game">${pillHTML}</td>
       <td class="col-tourn">${b.tournament}</td>
-      <td class="col-play" style="color:var(--text-primary)"><span class="play-cell">${logoHTML}<span class="play-cell-text"><span class="play-full">${b.play}</span><span class="play-short">${shortenPlay(b.play)}</span>${b.isExtra?'<span class="extra-pill">EXTRA</span>':""}</span></span></td>
+      <td class="col-play" style="color:var(--text-primary)"><span class="play-cell">${logoHTML}<span class="play-cell-text"><span class="play-full">${b.play}</span><span class="play-short">${shortenPlay(b.play)}</span>${b.detail?`<span class="play-detail-pill">${b.detail}</span>`:""}${b.isExtra?'<span class="extra-pill">EXTRA</span>':""}</span></span></td>
       <td class="col-odds"><span class="odds-full">${fmtOddsWithProb(b.odds)}</span><span class="odds-short">${fmtAmerican(b.odds)}</span></td>
       <td class="col-risk">${fmtUnitRisk(b.risk)}</td>
       <td class="col-result"><span class="result-badge ${resultClass} result-full">${resultFull}</span><span class="result-badge ${resultClass} result-short">${resultShort}</span></td>
@@ -559,7 +648,6 @@ function goToTournPage(p) {
   tournPage=p;
   document.getElementById("tournRows").innerHTML=buildTournRowsHTML(tournPage);
   document.getElementById("tournPaginationWrap").innerHTML=buildTournPaginationHTML(tournPage);
-  requestAnimationFrame(resizeSeq);
 }
 
 function buildSeqHTML(count) {
@@ -693,16 +781,12 @@ function render() {
           <div class="card-body" id="tournRows">${buildTournRowsHTML(tournPage)}</div>
           <div id="tournPaginationWrap">${buildTournPaginationHTML(tournPage)}</div>
         </div>
-        <div class="card anim d4">
+        <div class="card stats-card anim d4">
           <div class="card-header">
             <span class="card-title">Statistics</span>
           </div>
           <div id="statsSubSection">${buildStatsSubHTML()}</div>
           <div class="stats-card-body" id="statsCardBody">${statsHTML}</div>
-        </div>
-        <div class="card seq-card anim d5">
-          <div class="card-header"><span class="card-title">Play Sequence</span><span class="card-title" id="seqLabel" style="opacity:0.5"></span></div>
-          <div class="seq-wrap" id="seqWrap"></div>
         </div>
       </div>
     </div>
@@ -931,12 +1015,11 @@ function render() {
     }]
   });
 
-  requestAnimationFrame(()=>requestAnimationFrame(resizeSeq));
   requestAnimationFrame(()=>requestAnimationFrame(snapTableRows));
 }
 
 render();
-document.fonts.ready.then(()=>{ if(chartInstance) chartInstance.update(); setTimeout(resizeSeq,50); setTimeout(snapTableRows,50); });
+document.fonts.ready.then(()=>{ if(chartInstance) chartInstance.update(); setTimeout(snapTableRows,50); });
 requestAnimationFrame(()=>requestAnimationFrame(snapTableRows));
 window.addEventListener('resize', snapTableRows);
 </script>
