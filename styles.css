@@ -39,6 +39,8 @@
   /* Game accents: tuned to similar perceived saturation/value on the dark UI */
   --game-cs2-rgb: 209, 135, 49;
   --game-cs2-text: #efb76a;
+  --game-dota-rgb: 188, 78, 78;
+  --game-dota-text: #e3a0a0;
   --game-val-rgb: 179, 94, 214;
   --game-val-text: #dea2f0;
   --game-lol-rgb: 48, 147, 164;

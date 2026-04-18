@@ -111,6 +111,11 @@
   background: rgba(var(--game-cs2-rgb), 0.12);
   border-color: rgba(var(--game-cs2-rgb), 0.3);
 }
+.game-pill.dota2 {
+  color: var(--game-dota-text);
+  background: rgba(var(--game-dota-rgb), 0.12);
+  border-color: rgba(var(--game-dota-rgb), 0.3);
+}
 .game-pill.val {
   color: var(--game-val-text);
   background: rgba(var(--game-val-rgb), 0.12);

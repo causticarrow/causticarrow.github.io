@@ -377,8 +377,8 @@ for(let i=1; i<equityData.length; i++) {
   athData.push(ath);
 }
 
-const GAME_COLORS = { CS2: "rgb(209, 135, 49)", LoL: "rgb(48, 147, 164)", VAL: "rgb(179, 94, 214)" };
-const GAME_LABEL_TEXT = { CS2: "#efb76a", VAL: "#dea2f0", LoL: "#7dc5d1" };
+const GAME_COLORS = { CS2: "rgb(209, 135, 49)", "Dota 2": "rgb(188, 78, 78)", LoL: "rgb(48, 147, 164)", VAL: "rgb(179, 94, 214)" };
+const GAME_LABEL_TEXT = { CS2: "#efb76a", "Dota 2": "#e3a0a0", LoL: "#7dc5d1", VAL: "#dea2f0" };
 
 const gameSeries = {};
 const gameCum2 = {};
@@ -494,6 +494,7 @@ function gameClass(game) {
   if(!game) return "";
   const g = game.toLowerCase();
   if(g==="cs2") return "cs2";
+  if(g==="dota 2") return "dota2";
   if(g==="val") return "val";
   if(g==="lol") return "lol";
   return "";
