@@ -34,10 +34,10 @@ const PAL = {
 };
 
 const RAW_PICKS = [
-  { date: "2026-04-22", tournament: "PGL Wallachia", play: "Xtreme PK vs. Spirit", odds: -120, score: "", game: "Dota2", detail: "Map 2" },
+  { date: "2026-04-22", tournament: "PGL Wallachia", play: "Xtreme PK vs. Spirit", odds: -120, score: "", game: "Dota 2", detail: "Map 2" },
   { date: "2026-04-19", tournament: "IEM Rio", play: "Falcons PK vs. FURIA", odds: -110, score: "2-0", game: "CS2" },
-  { date: "2026-04-18", tournament: "PGL Wallachia", play: "Xtreme PK vs. Natus Vincere", odds: +100, score: "1-0", game: "Dota2", detail: "Map 2" },
-  { date: "2026-04-18", tournament: "PGL Wallachia", play: "Spirit PK vs. Vici", odds: -120, score: "1-0", game: "Dota2", detail: "Map 2" },
+  { date: "2026-04-18", tournament: "PGL Wallachia", play: "Xtreme PK vs. Natus Vincere", odds: +100, score: "1-0", game: "Dota 2", detail: "Map 2" },
+  { date: "2026-04-18", tournament: "PGL Wallachia", play: "Spirit PK vs. Vici", odds: -120, score: "1-0", game: "Dota 2", detail: "Map 2" },
   { date: "2026-04-17", tournament: "IEM Rio", play: "MOUZ PK vs. Spirit", odds: +140, score: "0-2", game: "CS2" },
   { date: "2026-04-15", tournament: "IEM Rio", play: "Spirit PK vs. G2", odds: -135, score: "2-0", game: "CS2" },
   { date: "2026-04-15", tournament: "IEM Rio", play: "FURIA PK vs. MOUZ", odds: +110, score: "2-0", game: "CS2" },
@@ -380,8 +380,8 @@ for(let i=1; i<equityData.length; i++) {
   athData.push(ath);
 }
 
-const GAME_COLORS = { CS2: "rgb(209, 135, 49)", "Dota2": "rgb(188, 78, 78)", LoL: "rgb(48, 147, 164)", VAL: "rgb(179, 94, 214)" };
-const GAME_LABEL_TEXT = { CS2: "#efb76a", "Dota2": "#e3a0a0", LoL: "#7dc5d1", VAL: "#dea2f0" };
+const GAME_COLORS = { CS2: "rgb(209, 135, 49)", "Dota 2": "rgb(188, 78, 78)", LoL: "rgb(48, 147, 164)", VAL: "rgb(179, 94, 214)" };
+const GAME_LABEL_TEXT = { CS2: "#efb76a", "Dota 2": "#e3a0a0", LoL: "#7dc5d1", VAL: "#dea2f0" };
 
 const gameSeries = {};
 const gameCum2 = {};
@@ -497,7 +497,7 @@ function gameClass(game) {
   if(!game) return "";
   const g = game.toLowerCase();
   if(g==="cs2") return "cs2";
-  if(g==="Dota2") return "dota2";
+  if(g==="dota 2") return "dota2";
   if(g==="val") return "val";
   if(g==="lol") return "lol";
   return "";
