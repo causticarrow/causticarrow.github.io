@@ -147,9 +147,15 @@ th.col-play,
 td.col-play {
   text-align: left;
 }
+th.col-tourn,
+td.col-tourn {
+  text-align: center;
+}
 .left-col .table-body-scroll td.col-play {
   overflow: visible;
 }
+
+.game-label-short { display: none; }
 
 .left-col .table-body-scroll thead th,
 .left-col .table-body-scroll tbody td {
@@ -282,6 +288,8 @@ td.col-play {
   .team-logo { width: 14px; height: 14px; }
   .play-full { display: none; }
   .play-short { display: inline; }
+  .game-label-full { display: none; }
+  .game-label-short { display: inline; }
   .result-full { display: none; }
   .result-short { display: inline; }
   .odds-full { display: none; }

@@ -197,7 +197,7 @@ body {
 .cat-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: var(--radius-sm); white-space: nowrap; color: var(--text-secondary); background: rgba(136, 192, 208, 0.08); border: 1px solid rgba(136, 192, 208, 0.16); }
 .cat-pnl { font-size: 13px; font-weight: 600; margin-left: auto; text-align: right; font-variant-numeric: tabular-nums; }
 
-.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--border-faint); min-height: 28px; }
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--border-faint); min-height: 27px; }
 .stat-row:last-child { border-bottom: none; }
 .stat-row-label { font-size: 12px; color: var(--text-secondary); }
 .stat-row-value { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -243,7 +243,7 @@ tr.dd-row:hover td { background: rgba(184, 77, 98, 0.15); }
 .result-pending { background: rgba(228, 228, 228, 0.04); color: var(--text-secondary); border-color: var(--border-faint); }
 .result-push { background: rgba(241, 180, 103, 0.12); color: #f5cb8a; border-color: rgba(241, 180, 103, 0.3); }
 
-.stats-card-body { padding: 6px 14px; height: 174px; overflow: hidden; }
+.stats-card-body { padding: 6px 14px 5px; height: 174px; overflow: hidden; }
 .stats-card .stats-card-body { flex: 1; overflow: auto; }
 /* Team statistics tab only: compact logos so rows match General (text-only) row height */
 .stats-card-body .stat-row-value .logo-slot {

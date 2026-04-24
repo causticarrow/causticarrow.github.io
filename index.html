@@ -385,6 +385,40 @@ for(let i=1; i<equityData.length; i++) {
 
 const GAME_COLORS = { CS2: "rgb(209, 135, 49)", "Dota 2": "rgb(188, 78, 78)", LoL: "rgb(48, 147, 164)", VAL: "rgb(179, 94, 214)" };
 const GAME_LABEL_TEXT = { CS2: "#efb76a", "Dota 2": "#e3a0a0", LoL: "#7dc5d1", VAL: "#dea2f0" };
+function displayGameLabel(game, short) {
+  if (!game) return "";
+  if (game === "Dota 2") return short ? "D2" : "Dota 2";
+  if (game === "LoL") return "LoL";
+  if (game === "VAL") return "Val";
+  return game;
+}
+function displayResultsGameLabel(game, short) {
+  if (!game) return "";
+  if (game === "Dota 2") return short ? "D2" : "Dota 2";
+  if (game === "LoL") return short ? "LoL" : "League of Legends";
+  if (game === "VAL") return short ? "Val" : "Valorant";
+  return game;
+}
+
+function parseLocalDate(dateStr) {
+  return new Date(dateStr + "T00:00:00");
+}
+
+function getRollingResults(days) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = new Date(today);
+  start.setDate(start.getDate() - (days - 1));
+  let wins = 0, losses = 0, pnlUnits = 0;
+  closed.forEach((b, i) => {
+    const betDate = parseLocalDate(b.date);
+    if (betDate < start || betDate > today) return;
+    pnlUnits += pnls[i];
+    if (b.result === "won") wins++;
+    else if (b.result === "lost") losses++;
+  });
+  return { wins, losses, pnlUnits };
+}
 
 const gameSeries = {};
 const gameCum2 = {};
@@ -437,23 +471,22 @@ Object.values(betClasses).forEach(d => {
   d.adjWins=aw; d.adjLosses=Math.max(nn-aw,0);
 });
 
-const tournMap = {};
-closed.forEach((b,i) => {
-  const key = b.tournament+"|"+b.date.slice(0,4);
-  if(!tournMap[key]) tournMap[key]={wins:0,losses:0,pnlUnits:0};
-  tournMap[key].pnlUnits+=pnls[i];
-  if(b.result==="won") tournMap[key].wins++; else tournMap[key].losses++;
+const gameResultMap = {};
+closed.forEach((b, i) => {
+  const key = (b.game || "").trim();
+  if (!key) return;
+  if (!gameResultMap[key]) gameResultMap[key] = { game: key, wins: 0, losses: 0, pnlUnits: 0 };
+  gameResultMap[key].pnlUnits += pnls[i];
+  if (b.result === "won") gameResultMap[key].wins++;
+  else if (b.result === "lost") gameResultMap[key].losses++;
 });
-const allTournStats = TOURNAMENT_ORDER.filter(t=>tournMap[t]).map(t=>{
-  const d = tournMap[t];
-  const n = d.wins + d.losses;
-  const aw = n > 0 ? (1.1 * n + d.pnlUnits) / 2.1 : 0;
-  return { tournament: tournDisplayName(t), ...d, adjWins: Math.round(aw), adjLosses: Math.round(Math.max(n - aw, 0)) };
-});
+const allGameStats = Object.values(gameResultMap).sort((a, b) =>
+  displayGameLabel(a.game).localeCompare(displayGameLabel(b.game)) || b.pnlUnits - a.pnlUnits
+);
 
 let tournPage = 0;
 const TOURN_PAGE_SIZE = 5;
-const totalTournPages = Math.ceil(allTournStats.length/TOURN_PAGE_SIZE);
+const totalTournPages = Math.ceil(allGameStats.length/TOURN_PAGE_SIZE);
 
 function getPickTeam(play) {
   if (/\bOver\b|\bUnder\b/.test(play) && play.includes("/")) return null;
@@ -524,6 +557,10 @@ function buildGeneralStatsHTML() {
   function statRow(label, value, color) {
     return `<div class="stat-row"><span class="stat-row-label">${label}</span><span class="stat-row-value" style="color:${color}">${value}</span></div>`;
   }
+  function recordRow(label, stats) {
+    const pnlColor = stats.pnlUnits > 0 ? "var(--green)" : stats.pnlUnits < 0 ? "var(--red)" : "var(--text-muted)";
+    return statRow(label, `${stats.wins}-${stats.losses}, ${fmtUnit(stats.pnlUnits, true)}`, pnlColor);
+  }
   function teamCountRow(label, item) {
     if (!item) return statRow(label, "—", "var(--text-muted)");
     const teamLabel = TEAM_ABBR[item.team] || item.team;
@@ -547,6 +584,9 @@ function buildGeneralStatsHTML() {
       </span>
     </div>`;
   }
+  const last30 = getRollingResults(30);
+  const last60 = getRollingResults(60);
+  const last90 = getRollingResults(90);
   return [
     statRow("p (vig-adjusted)", pValStr, "var(--text-primary)"),
     statRow("Profit Factor", profitFactor, "var(--text-primary)"),
@@ -560,6 +600,9 @@ function buildGeneralStatsHTML() {
     statRow("Average Odds", avgAmericanOddsWithProb(chronoBets), "var(--text-primary)"),
     statRow("Average Risk", fmtUnitRisk(avgRiskUnitsAll), "var(--text-primary)"),
     statRow("Annual Run Rate", "~" + annualRunRate + " plays", "var(--text-primary)"),
+    recordRow("Last 30 Days", last30),
+    recordRow("Last 60 Days", last60),
+    recordRow("Last 90 Days", last90),
   ].join("");
 }
 
@@ -616,7 +659,7 @@ function buildBetTableHTML() {
     const pick = getPickTeam(b.play);
     const logoHTML = playLogoImgHTML(pick);
     const gc = b.game ? gameClass(b.game) : "";
-    const pillHTML = gc ? `<span class="game-pill ${gc}">${b.game}</span>` : "";
+    const pillHTML = gc ? `<span class="game-pill ${gc}"><span class="game-label-full">${displayGameLabel(b.game)}</span><span class="game-label-short">${displayGameLabel(b.game, true)}</span></span>` : "";
     const inDD = ddBets.has(b);
     const ddCls = inDD ? `dd-row${b === ddFirst ? " dd-top" : ""}${b === ddLast ? " dd-bottom" : ""}` : "";
     return `<tr${ddCls ? ` class="${ddCls}"` : ""}>
@@ -633,10 +676,10 @@ function buildBetTableHTML() {
 }
 
 function buildTournRowsHTML(page) {
-  return allTournStats.slice(page*TOURN_PAGE_SIZE,(page+1)*TOURN_PAGE_SIZE).map(c => {
+  return allGameStats.slice(page*TOURN_PAGE_SIZE,(page+1)*TOURN_PAGE_SIZE).map(c => {
     return `<div class="cat-row">
-      <span class="cat-badge">${c.tournament}</span>
-      <span class="cat-pnl" style="color:${c.pnlUnits>0?"var(--green)":c.pnlUnits<0?"var(--red)":"var(--text-muted)"}">${c.adjWins}-${c.adjLosses}, ${fmtUnit(c.pnlUnits,true)}</span>
+      <span class="cat-badge">${displayResultsGameLabel(c.game)}</span>
+      <span class="cat-pnl" style="color:${c.pnlUnits>0?"var(--green)":c.pnlUnits<0?"var(--red)":"var(--text-muted)"}">${c.wins}-${c.losses}, ${fmtUnit(c.pnlUnits,true)}</span>
     </div>`;
   }).join("");
 }
@@ -786,7 +829,7 @@ function render() {
       </div>
       <div class="right-col">
         <div class="card anim d3">
-          <div class="card-header"><span class="card-title">Tournament Log</span></div>
+          <div class="card-header"><span class="card-title">Results</span></div>
           <div class="card-body" id="tournRows">${buildTournRowsHTML(tournPage)}</div>
           <div id="tournPaginationWrap">${buildTournPaginationHTML(tournPage)}</div>
         </div>
@@ -814,6 +857,7 @@ function render() {
   const legendEl = document.getElementById("chartLegend");
   if (legendEl) {
     const pillStyle = (col, bg, border) => `display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;letter-spacing:0.8px;padding:2px 8px;border-radius:3px;background:${bg};border:1px solid ${border};color:${col}`;
+    const mobile = window.matchMedia("(max-width: 768px)").matches;
     let html = `<span style="${pillStyle(PAL.winText, PAL.g(0.12), PAL.g(0.3))}"><span style="width:10px;height:2px;background:${PAL.green};border-radius:1px;flex-shrink:0"></span>OVERALL</span>`;
     Object.keys(GAME_COLORS).filter(g => gameSeries[g]).forEach(g => {
       const lineCol = GAME_COLORS[g];
@@ -821,7 +865,7 @@ function render() {
       const bg = `rgba(${rgb}, 0.12)`;
       const border = `rgba(${rgb}, 0.3)`;
       const label = GAME_LABEL_TEXT[g];
-      html += `<span style="${pillStyle(label, bg, border)}"><span style="width:10px;height:0;border-top:2px dashed ${lineCol};flex-shrink:0"></span>${g}</span>`;
+      html += `<span style="${pillStyle(label, bg, border)}"><span style="width:10px;height:0;border-top:2px dashed ${lineCol};flex-shrink:0"></span>${displayGameLabel(g, mobile)}</span>`;
     });
     legendEl.innerHTML = html;
   }
@@ -829,7 +873,7 @@ function render() {
   const gameDatasets = Object.entries(GAME_COLORS)
     .filter(([g]) => gameSeries[g])
     .map(([g, col]) => ({
-      label: g,
+      label: displayGameLabel(g),
       data: gameSeries[g],
       borderColor: col,
       borderWidth: 1.5,
@@ -875,7 +919,7 @@ function render() {
               const gv = gameSeries[g][idx];
               if (gv === null || gv === undefined) return;
               const gColor = gv === 0 ? PAL.tick : GAME_LABEL_TEXT[g] || col;
-              gameLines += `<div style="font-size:11px;font-weight:600;color:${gColor};margin-top:2px">${g}: ${fmtUnit(gv,true)}</div>`;
+              gameLines += `<div style="font-size:11px;font-weight:600;color:${gColor};margin-top:2px">${displayGameLabel(g, window.matchMedia("(max-width: 768px)").matches)}: ${fmtUnit(gv,true)}</div>`;
             });
             tooltipEl.innerHTML=`<div class="chart-tooltip-play">${playText}</div><div class="chart-tooltip-value" style="color:${valColor}">${valText}</div>${gameLines}`;
             const chartArea=context.chart.chartArea;
