@@ -254,7 +254,10 @@ function renderBetRow(bet) {
   return `
     <article class="bet-row ${gameClass(bet.game)} ${bet.isExtra ? "is-extra" : ""} ${bet.result === "won" ? "is-won" : bet.result === "lost" ? "is-lost" : ""}">
       <div>
-        <div class="event-title">${bet.event}</div>
+        <div class="bet-topline">
+          <div class="event-title">${bet.event}</div>
+          <time class="bet-date" datetime="${bet.date}">${formatDate(bet.date)}</time>
+        </div>
         <div class="event-line">
           <span class="event-meta">${displayGameLabel(bet.game)}</span>
           ${bet.isExtra ? `<span class="extra-badge">Extra</span>` : ""}
