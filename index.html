@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>@causticarrow · esports</title>
+  <meta name="theme-color" content="#101318">
+  <link rel="preload" href="https://cdn.steamstatic.com/apps/dota2/fonts/radiance.woff" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="https://cdn.steamstatic.com/apps/dota2/fonts/radiance-semibold.woff" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="https://cdn.steamstatic.com/apps/dota2/fonts/radiance-bold.woff" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="https://cdn.steamstatic.com/apps/dota2/fonts/Reaver-Bold.woff" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="goudytrajan-regular-pro-webfont.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    html:not(.fonts-ready) body { visibility: hidden; }
+  </style>
+  <script>
+    (function () {
+      function ready() { document.documentElement.classList.add("fonts-ready"); }
+      if (document.fonts && document.fonts.ready) {
+        Promise.all([
+          document.fonts.load('400 1em Radiance'),
+          document.fonts.load('700 1em Radiance'),
+          document.fonts.load('900 1em Radiance'),
+          document.fonts.load('700 1em Reaver')
+        ]).then(ready).catch(ready);
+        setTimeout(ready, 2500);
+      } else {
+        ready();
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="page-shell">
+    <main class="tracker-panel">
+      <section class="panel-titlebar" aria-labelledby="tracker-title">
+        <h1 id="tracker-title" class="panel-brand">causticarrow</h1>
+        <div class="panel-actions">
+          <nav class="top-tabs" aria-label="Tracker views">
+            <button class="tab is-active" data-filter="all" type="button">All</button>
+            <button class="tab" data-filter="CS2" type="button">CS2</button>
+            <button class="tab" data-filter="Dota 2" type="button">Dota 2</button>
+            <button class="tab" data-filter="LoL" type="button">LoL</button>
+            <button class="tab" data-filter="VAL" type="button">Val</button>
+          </nav>
+          <div class="record-pill" id="recordPill">0-0</div>
+        </div>
+      </section>
+
+      <section class="summary-grid" aria-label="Tracker summary">
+        <article class="summary-card">
+          <span>Net Profit</span>
+          <strong id="netProfit">+0.00u</strong>
+        </article>
+        <article class="summary-card">
+          <span>ROI</span>
+          <strong id="roi">0.0%</strong>
+        </article>
+        <article class="summary-card">
+          <span>Win Rate</span>
+          <strong id="winRate">0.0%</strong>
+        </article>
+        <article class="summary-card">
+          <span>Risked</span>
+          <strong id="risked">0.00u</strong>
+        </article>
+      </section>
+
+      <button class="copy-record-btn" type="button" onclick="copyRecord()">Copy Record</button>
+
+      <section class="bet-feed" id="betFeed" aria-label="Bet list"></section>
+    </main>
+    <footer class="site-footer">
+      Team logos and trademarks are property of their respective owners. Logos are used for identification only; no affiliation or endorsement is implied.
+    </footer>
+  </div>
+
+  <script src="raw-picks.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

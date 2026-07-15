@@ -1,0 +1,764 @@
+@font-face {
+  font-family: "Goudy Trajan";
+  src: url("goudytrajan-regular-pro-webfont.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Radiance";
+  src: url("https://cdn.steamstatic.com/apps/dota2/fonts/radiance.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Radiance";
+  src: url("https://cdn.steamstatic.com/apps/dota2/fonts/radiance-semibold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Radiance";
+  src: url("https://cdn.steamstatic.com/apps/dota2/fonts/radiance-bold.woff") format("woff");
+  font-weight: 900;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Reaver";
+  src: url("https://cdn.steamstatic.com/apps/dota2/fonts/Reaver-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Reaver";
+  src: url("https://cdn.steamstatic.com/apps/dota2/fonts/Reaver-SemiBold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Reaver";
+  src: url("https://cdn.steamstatic.com/apps/dota2/fonts/Reaver-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
+:root {
+  --bg: #121416;
+  --panel: #151d25;
+  --panel-2: #1d2028;
+  --panel-3: #20242d;
+  --line: rgba(167, 190, 205, 0.13);
+  --line-strong: rgba(214, 229, 238, 0.22);
+  --text: #f1eee9;
+  --muted: #aab5bd;
+  --dim: #74828c;
+  --ember: #b64a24;
+  --ember-hot: #e16d37;
+  --gold: #d5b46d;
+  --green: #4bb17a;
+  --red: #ca5363;
+  --blue: #78a4c5;
+  --game-cs2: #6fa9cf;
+  --game-cs2-rgb: 111, 169, 207;
+  --game-dota: #c95e50;
+  --game-dota-rgb: 201, 94, 80;
+  --game-lol: #4fb79d;
+  --game-lol-rgb: 79, 183, 157;
+  --game-val: #e06b8a;
+  --game-val-rgb: 224, 107, 138;
+  --shadow: 0 28px 70px rgba(0, 0, 0, 0.48);
+  --display-font: "Reaver", "Goudy Trajan";
+  --body-font: "Radiance";
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--bg);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--text);
+  font-family: var(--body-font);
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 0%, rgba(95, 139, 164, 0.1), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 80% 100%, rgba(213, 180, 109, 0.05), transparent 50%),
+    radial-gradient(ellipse at center, #161b22 0%, var(--bg) 72%);
+  overflow-x: hidden;
+}
+
+button {
+  font: inherit;
+}
+
+.page-shell {
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 16px 0 46px;
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--display-font);
+  letter-spacing: 0;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.7);
+}
+
+.panel-brand {
+  color: var(--gold);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.top-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  background: rgba(40, 45, 55, 0.88);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 150ms ease;
+}
+
+.tab {
+  padding: 8px 14px;
+}
+
+.tab:hover,
+.tab.is-active {
+  border-color: rgba(225, 109, 55, 0.58);
+  background: linear-gradient(180deg, rgba(116, 50, 28, 0.95), rgba(45, 34, 31, 0.92));
+  color: #fff6ee;
+}
+
+.tracker-panel {
+  overflow: hidden;
+  border: 1px solid rgba(95, 139, 164, 0.22);
+  background:
+    linear-gradient(125deg, rgba(10, 22, 32, 0.96), rgba(18, 31, 42, 0.92) 48%, rgba(10, 14, 18, 0.97)),
+    var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.panel-titlebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 34px 13px;
+  background:
+    linear-gradient(90deg, rgba(195, 71, 24, 0.72), rgba(89, 34, 24, 0.54) 34%, rgba(22, 23, 27, 0.78)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.panel-actions {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  gap: 14px;
+}
+
+.record-pill {
+  min-width: 112px;
+  padding: 10px 14px;
+  border: 1px solid rgba(213, 180, 109, 0.38);
+  color: var(--gold);
+  background: rgba(9, 12, 15, 0.46);
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid var(--line);
+  background: rgba(4, 10, 15, 0.28);
+}
+
+.summary-card {
+  padding: 18px 22px;
+  border-right: 1px solid var(--line);
+}
+
+.summary-card:last-child {
+  border-right: 0;
+}
+
+.summary-card span {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--dim);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.summary-card strong {
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.copy-record-btn {
+  position: fixed;
+  top: 10px;
+  right: 14px;
+  z-index: 1000;
+  min-height: 32px;
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  background: rgba(40, 45, 55, 0.88);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 150ms ease, border-color 150ms ease, background 150ms ease, color 150ms ease;
+}
+
+.copy-record-btn:focus-visible,
+.copy-record-btn:hover,
+.copy-record-btn.copied {
+  opacity: 1;
+  border-color: rgba(225, 109, 55, 0.58);
+  background: linear-gradient(180deg, rgba(116, 50, 28, 0.95), rgba(45, 34, 31, 0.92));
+  color: #fff6ee;
+}
+
+.bet-feed {
+  min-height: 540px;
+}
+
+.site-footer {
+  margin-top: 18px;
+  color: var(--dim);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  opacity: 0.55;
+}
+
+.day-group + .day-group {
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.day-heading {
+  padding: 12px 34px;
+  background: rgba(38, 41, 49, 0.86);
+  color: #c9d3da;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.bet-row {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) minmax(210px, 1.25fr) 96px minmax(210px, 1.25fr) minmax(170px, 1fr);
+  align-items: start;
+  min-height: 92px;
+  gap: 0;
+  padding: 15px 34px;
+  background: rgba(29, 32, 40, 0.9);
+  border-top: 6px solid rgba(8, 10, 14, 0.72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.bet-row:hover {
+  background: rgba(36, 40, 50, 0.94);
+}
+
+.bet-row.game-cs2 {
+  box-shadow: inset 3px 0 0 rgba(var(--game-cs2-rgb), 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.bet-row.game-dota {
+  box-shadow: inset 3px 0 0 rgba(var(--game-dota-rgb), 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.bet-row.game-lol {
+  box-shadow: inset 3px 0 0 rgba(var(--game-lol-rgb), 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.bet-row.game-val {
+  box-shadow: inset 3px 0 0 rgba(var(--game-val-rgb), 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.bet-row.is-won {
+  background:
+    linear-gradient(270deg, rgba(75, 177, 122, 0.16), transparent 22%),
+    rgba(31, 34, 42, 0.94);
+}
+
+.bet-row.is-won:hover {
+  background:
+    linear-gradient(270deg, rgba(75, 177, 122, 0.22), transparent 24%),
+    rgba(38, 42, 51, 0.96);
+}
+
+.bet-row.is-lost {
+  background:
+    linear-gradient(270deg, rgba(202, 83, 99, 0.16), transparent 22%),
+    rgba(31, 34, 42, 0.94);
+}
+
+.bet-row.is-lost:hover {
+  background:
+    linear-gradient(270deg, rgba(202, 83, 99, 0.22), transparent 24%),
+    rgba(38, 42, 51, 0.96);
+}
+
+.bet-row.is-extra {
+  background:
+    linear-gradient(90deg, rgba(213, 180, 109, 0.16), transparent 22%),
+    rgba(31, 34, 42, 0.94);
+  outline: 1px solid rgba(213, 180, 109, 0.2);
+  outline-offset: -1px;
+}
+
+.bet-row.is-extra:hover {
+  background:
+    linear-gradient(90deg, rgba(213, 180, 109, 0.22), transparent 24%),
+    rgba(38, 42, 51, 0.96);
+}
+
+.bet-row.is-extra.is-won {
+  background:
+    linear-gradient(270deg, rgba(75, 177, 122, 0.16), transparent 22%),
+    linear-gradient(90deg, rgba(213, 180, 109, 0.16), transparent 22%),
+    rgba(31, 34, 42, 0.94);
+}
+
+.bet-row.is-extra.is-won:hover {
+  background:
+    linear-gradient(270deg, rgba(75, 177, 122, 0.22), transparent 24%),
+    linear-gradient(90deg, rgba(213, 180, 109, 0.22), transparent 24%),
+    rgba(38, 42, 51, 0.96);
+}
+
+.bet-row.is-extra.is-lost {
+  background:
+    linear-gradient(270deg, rgba(202, 83, 99, 0.16), transparent 22%),
+    linear-gradient(90deg, rgba(213, 180, 109, 0.16), transparent 22%),
+    rgba(31, 34, 42, 0.94);
+}
+
+.bet-row.is-extra.is-lost:hover {
+  background:
+    linear-gradient(270deg, rgba(202, 83, 99, 0.22), transparent 24%),
+    linear-gradient(90deg, rgba(213, 180, 109, 0.22), transparent 24%),
+    rgba(38, 42, 51, 0.96);
+}
+
+.event-title {
+  color: #fff;
+  font-family: var(--display-font);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.event-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.event-meta,
+.team-record,
+.market-note {
+  color: var(--dim);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.event-meta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 3px 8px;
+  border: 1px solid rgba(116, 130, 140, 0.28);
+  background: rgba(116, 130, 140, 0.1);
+  line-height: 1;
+}
+
+.extra-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  padding: 2px 7px;
+  border: 1px solid rgba(213, 180, 109, 0.42);
+  background: rgba(213, 180, 109, 0.14);
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.4px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.game-cs2 .event-meta {
+  border-color: rgba(var(--game-cs2-rgb), 0.45);
+  background: rgba(var(--game-cs2-rgb), 0.13);
+  color: var(--game-cs2);
+}
+
+.game-dota .event-meta {
+  border-color: rgba(var(--game-dota-rgb), 0.45);
+  background: rgba(var(--game-dota-rgb), 0.13);
+  color: var(--game-dota);
+}
+
+.game-lol .event-meta {
+  border-color: rgba(var(--game-lol-rgb), 0.45);
+  background: rgba(var(--game-lol-rgb), 0.13);
+  color: var(--game-lol);
+}
+
+.game-val .event-meta {
+  border-color: rgba(var(--game-val-rgb), 0.45);
+  background: rgba(var(--game-val-rgb), 0.13);
+  color: var(--game-val);
+}
+
+.team {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.team.away {
+  justify-content: end;
+  text-align: right;
+  padding-right: 18px;
+}
+
+.team.home {
+  justify-content: start;
+  padding-left: 18px;
+}
+
+.team-name {
+  overflow: hidden;
+  color: #f6f0eb;
+  font-family: var(--display-font);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.logo-box {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+}
+
+.logo-box img {
+  max-width: 44px;
+  max-height: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.62));
+}
+
+.score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  align-self: start;
+  gap: 4px;
+  color: #d8e2e8;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.market-note {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 5px 8px;
+  border: 1px solid rgba(241, 238, 233, 0.16);
+  background: rgba(241, 238, 233, 0.055);
+  color: #f1eee9;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1.35px;
+  line-height: 1.15;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+.market-detail {
+  display: block;
+  margin-top: 3px;
+  color: var(--gold);
+  text-shadow: 0 0 12px rgba(213, 180, 109, 0.32);
+}
+
+.market-detail.is-live {
+  color: var(--green);
+  text-shadow: 0 0 12px rgba(75, 177, 122, 0.32);
+}
+
+.stat-stack {
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+  text-align: right;
+}
+
+.stat-label {
+  color: var(--dim);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  color: #f4f0ea;
+  font-size: 16px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  align-self: center;
+  justify-self: end;
+  min-width: 124px;
+  padding: 9px 12px;
+  border: 1px solid var(--line-strong);
+  background: #6f7b88;
+  color: #f6f7f8;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.6px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.status.won {
+  border-color: rgba(75, 177, 122, 0.45);
+  background: rgba(37, 103, 69, 0.74);
+}
+
+.status.lost {
+  border-color: rgba(202, 83, 99, 0.45);
+  background: rgba(117, 39, 47, 0.76);
+}
+
+.status.pending {
+  border-color: rgba(120, 164, 197, 0.34);
+  background: rgba(73, 91, 106, 0.72);
+}
+
+.positive {
+  color: var(--green);
+}
+
+.negative {
+  color: var(--red);
+}
+
+.neutral {
+  color: var(--muted);
+}
+
+.empty-state {
+  padding: 70px 34px;
+  color: var(--muted);
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+@media (max-width: 920px) {
+  .panel-titlebar {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .panel-actions {
+    justify-content: start;
+    flex-wrap: wrap;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .summary-card:nth-child(2) {
+    border-right: 0;
+  }
+
+  .summary-card:nth-child(-n+2) {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bet-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .team.away,
+  .team.home,
+  .stat-stack {
+    justify-content: start;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .team.away,
+  .team.home {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .score {
+    align-items: start;
+  }
+
+  .status {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 560px) {
+  .copy-record-btn {
+    display: none;
+  }
+
+  .page-shell {
+    width: 100%;
+    padding-top: 16px;
+  }
+
+  .tracker-panel {
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .panel-titlebar,
+  .day-heading,
+  .bet-row {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .summary-card {
+    padding: 16px 18px;
+  }
+
+  .summary-card strong {
+    font-size: 23px;
+  }
+
+  .bet-row {
+    grid-template-columns: minmax(0, 1fr) 58px minmax(0, 1fr);
+    gap: 13px 0;
+  }
+
+  .bet-row > div:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .team.away {
+    grid-column: 1;
+    justify-content: end;
+    text-align: right;
+    padding-right: 10px;
+  }
+
+  .team.home {
+    grid-column: 3;
+    justify-content: start;
+    text-align: left;
+    padding-left: 10px;
+  }
+
+  .team-name {
+    font-size: 12px;
+    letter-spacing: 1.2px;
+  }
+
+  .logo-box {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .logo-box img {
+    max-width: 36px;
+    max-height: 36px;
+  }
+
+  .score {
+    grid-column: 2;
+    align-items: center;
+    text-align: center;
+    font-size: 15px;
+  }
+
+  .stat-stack {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .status {
+    grid-column: 1 / -1;
+    align-self: end;
+    justify-self: end;
+  }
+}
