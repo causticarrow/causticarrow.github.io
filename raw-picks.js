@@ -1,5 +1,5 @@
 ﻿window.RAW_PICKS = [
-  { date: "2026-07-15", tournament: "STAKE Ranked", play: "HEROIC PK vs. 3DMAX", odds: -155, score: "", game: "CS2", extra: true },
+  { date: "2026-07-15", tournament: "STAKE Ranked", play: "HEROIC PK vs. 3DMAX", odds: -155, score: "2-1", game: "CS2", extra: true },
   { date: "2026-07-12", tournament: "XSE Pro League", play: "PARIVISION PK vs. 9z", odds: +100, score: "0-3", game: "CS2" },
   { date: "2026-07-11", tournament: "XSE Pro League", play: "PARIVISION PK vs. FaZe", odds: +110, score: "2-1", game: "CS2" },
   { date: "2026-06-06", tournament: "IEM Cologne", play: "Monte PK vs. BIG", odds: +100, score: "13-8", game: "CS2" },
