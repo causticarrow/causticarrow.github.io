@@ -697,6 +697,26 @@ h1 {
     padding-right: 18px;
   }
 
+  .panel-actions {
+    gap: 0;
+  }
+
+  .top-tabs {
+    gap: 4px;
+    flex-wrap: nowrap;
+  }
+
+  .tab {
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 10px;
+    letter-spacing: 1.2px;
+  }
+
+  .record-pill {
+    display: none;
+  }
+
   .summary-card {
     padding: 16px 18px;
   }
@@ -729,8 +749,7 @@ h1 {
   }
 
   .team-name {
-    font-size: 12px;
-    letter-spacing: 1.2px;
+    display: none;
   }
 
   .logo-box {
