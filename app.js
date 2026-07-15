@@ -81,7 +81,7 @@ function logoSlug(name) {
     geng: "gen.g",
     navi: "natus vincere",
     nip: "ninjas in pyjamas",
-    pain: "pain",
+    pain: "paiN",
     "team spirit": "spirit",
     "xtreme gaming": "xtreme"
   };
@@ -166,12 +166,16 @@ function formatPickLabelHTML(bet) {
   }
 
   const detailIndex = label.indexOf(" - ");
-  if (detailIndex === -1) return `${label} ${moneyline(bet.odds)}`;
+  const market = detailIndex === -1 ? label : label.slice(0, detailIndex);
+  const detail = detailIndex === -1 ? "" : label.slice(detailIndex + 3);
+  const details = detail
+    ? detail.split(/\s+-\s+/).map((part) => {
+        const detailClass = part.toLowerCase() === "live" ? "market-detail is-live" : "market-detail";
+        return `<span class="${detailClass}">${part}</span>`;
+      }).join("")
+    : "";
 
-  const market = label.slice(0, detailIndex);
-  const detail = label.slice(detailIndex + 3);
-  const detailClass = detail.toLowerCase() === "live" ? "market-detail is-live" : "market-detail";
-  return `${market} ${moneyline(bet.odds)}<span class="${detailClass}">${detail}</span>`;
+  return `<span class="market-type">${market}</span><span class="market-odds">${moneyline(bet.odds)}</span>${details}`;
 }
 
 function updateSummary(items) {

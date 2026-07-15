@@ -540,6 +540,10 @@ h1 {
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
 }
 
+.market-odds {
+  margin-left: 0.35em;
+}
+
 .market-detail {
   display: block;
   margin-top: 3px;
@@ -750,6 +754,21 @@ h1 {
 
   .team-name {
     display: none;
+  }
+
+  .market-note {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+
+  .market-odds {
+    margin-left: 0;
+  }
+
+  .market-detail {
+    margin-top: 0;
   }
 
   .logo-box {
