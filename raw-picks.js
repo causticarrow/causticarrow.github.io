@@ -1,5 +1,5 @@
 ﻿window.RAW_PICKS = [
-  { date: "2026-07-18", tournament: "STAKE Ranked", play: "Ninjas in Pyjamas PK vs. K27", odds: -170, score: "", game: "CS2" },
+  { date: "2026-07-18", tournament: "STAKE Ranked", play: "Ninjas in Pyjamas PK vs. K27", odds: -170, score: "1-2", game: "CS2", extra: true },
   { date: "2026-07-17", tournament: "STAKE Ranked", play: "HEROIC PK vs. Ninjas in Pyjamas", odds: +170, score: "2-1", game: "CS2", extra: true },
   { date: "2026-07-17", tournament: "STAKE Ranked", play: "3DMAX PK vs. Gentle Mates", odds: -110, score: "2-0", game: "CS2", extra: true },
   { date: "2026-07-15", tournament: "STAKE Ranked", play: "HEROIC PK vs. 3DMAX", odds: -155, score: "2-1", game: "CS2", extra: true },
