@@ -1,4 +1,7 @@
-﻿window.RAW_PICKS = [
+window.RAW_PICKS = [
+  { date: "2026-07-23", tournament: "BLAST Bounty", play: "paiN PK vs. Gentle Mates", odds: -135, score: "", game: "CS2" },
+  { date: "2026-07-22", tournament: "StarLadder StarSeries", play: "Ninjas in Pyjamas PK vs. 100 Thieves", odds: -125, score: "2-1", game: "CS2" },
+  { date: "2026-07-22", tournament: "BLAST Bounty", play: "FaZe -1.5 vs. EYEBALLERS", odds: +100, score: "2-0", game: "CS2" },
   { date: "2026-07-21", tournament: "StarLadder StarSeries", play: "3DMAX PK vs. Gentle Mates", odds: -150, score: "4-13", game: "CS2", detail: "Map 2", extra: true },
   { date: "2026-07-18", tournament: "STAKE Ranked", play: "K27 PK vs. HEROIC", odds: +160, score: "11-13", game: "CS2", detail: "Map 2", extra: true },
   { date: "2026-07-18", tournament: "STAKE Ranked", play: "Ninjas in Pyjamas PK vs. K27", odds: -170, score: "1-2", game: "CS2", extra: true },
