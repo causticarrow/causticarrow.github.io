@@ -33,3 +33,4 @@ there is no hot reload or bundler.
   button work.
 - The `document.fonts.load(...)` gate in `index.html` hides the body until fonts load
   (with a 2.5s fallback), so a brief blank flash on first paint is expected.
+<!-- ghost:fd99eb4185c3a843 -->

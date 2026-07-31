@@ -143,3 +143,4 @@ window.RAW_PICKS = [
   { date: "2026-01-14", tournament: "BLAST Bounty", play: "GamerLegion PK vs. Passion UA", odds: +105, score: "2-1", game: "CS2"},
   { date: "2026-01-13", tournament: "BLAST Bounty", play: "OG PK vs. FUT", odds: +180, score: "0-2", game: "CS2"},
 ];
+/* ghost:fd99eb4185c3a843 */
