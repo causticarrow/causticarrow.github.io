@@ -82,10 +82,11 @@ function powerFairDecimal(decimals, sideIndex = 0) {
 }
 
 /**
- * No-vig CLV edge vs close: taken decimal / fair-close decimal - 1.
- * Closing line assumes -110/-110 vig; other side inferred from overround.
+ * No-vig close fair probability for our side.
+ * Closing line assumes -110/-110 vig; other side inferred from overround,
+ * then power de-vig: Σ(1/Oᵢ)^c = 1, Oᶠ = Oᵢ^c, p = 1/Oᶠ.
  */
-function clvEdge(takenAmerican, closeAmerican) {
+function fairCloseProb(closeAmerican) {
   if (closeAmerican == null || closeAmerican === "" || Number.isNaN(Number(closeAmerican))) {
     return null;
   }
@@ -93,7 +94,22 @@ function clvEdge(takenAmerican, closeAmerican) {
   if (!market) return null;
   const fair = powerFairDecimal(market, 0);
   if (!(fair > 1)) return null;
-  return americanToDecimal(takenAmerican) / fair - 1;
+  return 1 / fair;
+}
+
+/**
+ * CLV metrics vs no-vig close:
+ * - probEdge: p_fair − p_taken (percentage points) → No-Vig CLV
+ * - roiEdge: D_taken * p_fair − 1 → Expected ROI / EV
+ */
+function clvMetrics(takenAmerican, closeAmerican) {
+  const pFair = fairCloseProb(closeAmerican);
+  if (pFair == null) return null;
+  const takenDec = americanToDecimal(takenAmerican);
+  return {
+    probEdge: pFair - 1 / takenDec,
+    roiEdge: takenDec * pFair - 1
+  };
 }
 
 function maxDrawdownPct(items) {
@@ -220,7 +236,7 @@ function loadBets() {
     };
   });
   bets.forEach((bet) => {
-    bet.clvEdge = clvEdge(bet.odds, bet.close);
+    bet.clv = clvMetrics(bet.odds, bet.close);
   });
 }
 
@@ -278,11 +294,11 @@ function updateSummary(items) {
   const lastYear = sortedDates.length ? new Date(`${sortedDates[sortedDates.length - 1]}T12:00:00`).getFullYear() : firstYear;
   const seasonLabel = firstYear === lastYear ? "ytd" : `${firstYear}-${String(lastYear).slice(2)}`;
 
-  const withClv = items.filter((bet) => bet.clvEdge != null);
+  const withClv = items.filter((bet) => bet.clv != null);
   const clvRisk = withClv.reduce((sum, bet) => sum + bet.risk, 0);
-  const clvEv = withClv.reduce((sum, bet) => sum + bet.risk * bet.clvEdge, 0);
+  const clvEv = withClv.reduce((sum, bet) => sum + bet.risk * bet.clv.roiEdge, 0);
   const clvAvg = withClv.length
-    ? withClv.reduce((sum, bet) => sum + bet.clvEdge, 0) / withClv.length * 100
+    ? withClv.reduce((sum, bet) => sum + bet.clv.probEdge, 0) / withClv.length * 100
     : null;
   const expectedRoiValue = clvRisk > 0 ? clvEv / clvRisk * 100 : null;
   const mdd = maxDrawdownPct(items);
