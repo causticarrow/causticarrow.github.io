@@ -1,12 +1,4 @@
 @font-face {
-  font-family: "Goudy Trajan";
-  src: url("goudytrajan-regular-pro-webfont.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: block;
-}
-
-@font-face {
   font-family: "Radiance";
   src: url("https://cdn.steamstatic.com/apps/dota2/fonts/radiance.woff") format("woff");
   font-weight: 400;
@@ -79,7 +71,7 @@
   --game-val: #e06b8a;
   --game-val-rgb: 224, 107, 138;
   --shadow: 0 28px 70px rgba(0, 0, 0, 0.48);
-  --display-font: "Reaver", "Goudy Trajan";
+  --display-font: "Reaver", Georgia, serif;
   --body-font: "Radiance";
   color-scheme: dark;
 }
@@ -776,6 +768,13 @@ h1 {
     min-width: 0;
   }
 
+  .team {
+    /* Keep logos top-aligned with each other + the score.
+       Without this, multi-line pick labels (Map 2 / Live / etc.)
+       vertically center the away logo and leave the opponent high. */
+    align-items: flex-start;
+  }
+
   .team.away {
     grid-column: 1;
     justify-content: end;
@@ -823,6 +822,9 @@ h1 {
   .score {
     grid-column: 2;
     align-items: center;
+    justify-content: center;
+    align-self: start;
+    min-height: 38px;
     text-align: center;
     font-size: 15px;
   }
