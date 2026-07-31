@@ -9,10 +9,6 @@ const netProfit = document.querySelector("#netProfit");
 const roi = document.querySelector("#roi");
 const winRate = document.querySelector("#winRate");
 const risked = document.querySelector("#risked");
-const noVigClvEl = document.querySelector("#noVigClv");
-const expectedRoiEl = document.querySelector("#expectedRoi");
-const expectedEvEl = document.querySelector("#expectedEv");
-const maxDrawdownEl = document.querySelector("#maxDrawdown");
 let currentCopyText = "";
 
 function moneyline(odds) {
@@ -294,33 +290,16 @@ function updateSummary(items) {
   const lastYear = sortedDates.length ? new Date(`${sortedDates[sortedDates.length - 1]}T12:00:00`).getFullYear() : firstYear;
   const seasonLabel = firstYear === lastYear ? "ytd" : `${firstYear}-${String(lastYear).slice(2)}`;
 
-  const withClv = items.filter((bet) => bet.clv != null);
-  const clvRisk = withClv.reduce((sum, bet) => sum + bet.risk, 0);
-  const clvEv = withClv.reduce((sum, bet) => sum + bet.risk * bet.clv.roiEdge, 0);
-  const clvAvg = withClv.length
-    ? withClv.reduce((sum, bet) => sum + bet.clv.probEdge, 0) / withClv.length * 100
-    : null;
-  const expectedRoiValue = clvRisk > 0 ? clvEv / clvRisk * 100 : null;
-  const mdd = maxDrawdownPct(items);
-
   recordPill.textContent = `${Math.round(adjWins)}-${Math.round(adjLosses)}`;
   netProfit.textContent = units(pnl, true);
   roi.textContent = `${roiValue.toFixed(1)}%`;
   winRate.textContent = `${rate.toFixed(1)}%`;
   risked.textContent = units(risk);
-  noVigClvEl.textContent = clvAvg == null ? "—" : pct(clvAvg, true);
-  expectedRoiEl.textContent = expectedRoiValue == null ? "—" : pct(expectedRoiValue, true);
-  expectedEvEl.textContent = withClv.length ? units(clvEv, true) : "—";
-  maxDrawdownEl.textContent = pct(mdd);
   currentCopyText = `${seasonLabel} record: ${Math.round(adjWins)}-${Math.round(adjLosses)}, ${units(pnl, true)} // [archive](https://causticarrow.com)`;
   window.currentCopyText = currentCopyText;
 
   netProfit.className = pnl > 0 ? "positive" : pnl < 0 ? "negative" : "neutral";
   roi.className = pnl > 0 ? "positive" : pnl < 0 ? "negative" : "neutral";
-  noVigClvEl.className = clvAvg == null ? "neutral" : clvAvg > 0 ? "positive" : clvAvg < 0 ? "negative" : "neutral";
-  expectedRoiEl.className = expectedRoiValue == null ? "neutral" : expectedRoiValue > 0 ? "positive" : expectedRoiValue < 0 ? "negative" : "neutral";
-  expectedEvEl.className = !withClv.length ? "neutral" : clvEv > 0 ? "positive" : clvEv < 0 ? "negative" : "neutral";
-  maxDrawdownEl.className = mdd > 0 ? "negative" : "neutral";
 }
 
 function copyRecord() {
