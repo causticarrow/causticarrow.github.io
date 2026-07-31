@@ -10,25 +10,6 @@
   <link rel="preload" href="https://cdn.steamstatic.com/apps/dota2/fonts/radiance-bold.woff" as="font" type="font/woff" crossorigin>
   <link rel="preload" href="https://cdn.steamstatic.com/apps/dota2/fonts/Reaver-Bold.woff" as="font" type="font/woff" crossorigin>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    html:not(.fonts-ready) body { visibility: hidden; }
-  </style>
-  <script>
-    (function () {
-      function ready() { document.documentElement.classList.add("fonts-ready"); }
-      if (document.fonts && document.fonts.ready) {
-        Promise.all([
-          document.fonts.load('400 1em Radiance'),
-          document.fonts.load('700 1em Radiance'),
-          document.fonts.load('900 1em Radiance'),
-          document.fonts.load('700 1em Reaver')
-        ]).then(ready).catch(ready);
-        setTimeout(ready, 2500);
-      } else {
-        ready();
-      }
-    })();
-  </script>
 </head>
 <body>
   <div class="page-shell">
@@ -43,26 +24,45 @@
             <button class="tab" data-filter="LoL" type="button">LoL</button>
             <button class="tab" data-filter="VAL" type="button">Val</button>
           </nav>
-          <div class="record-pill" id="recordPill">0-0</div>
+          <div class="record-pill" id="recordPill"></div>
         </div>
       </section>
 
       <section class="summary-grid" aria-label="Tracker summary">
         <article class="summary-card">
           <span>Net Profit</span>
-          <strong id="netProfit">+0.00u</strong>
+          <strong id="netProfit"></strong>
         </article>
         <article class="summary-card">
           <span>ROI</span>
-          <strong id="roi">0.0%</strong>
+          <strong id="roi"></strong>
         </article>
         <article class="summary-card">
           <span>Win Rate</span>
-          <strong id="winRate">0.0%</strong>
+          <strong id="winRate"></strong>
         </article>
         <article class="summary-card">
           <span>Risked</span>
-          <strong id="risked">0.00u</strong>
+          <strong id="risked"></strong>
+        </article>
+      </section>
+
+      <section class="summary-grid summary-grid-secondary" aria-label="CLV summary">
+        <article class="summary-card">
+          <span>No-Vig CLV</span>
+          <strong id="noVigClv"></strong>
+        </article>
+        <article class="summary-card">
+          <span>Expected ROI</span>
+          <strong id="expectedRoi"></strong>
+        </article>
+        <article class="summary-card">
+          <span>EV</span>
+          <strong id="expectedEv"></strong>
+        </article>
+        <article class="summary-card">
+          <span>Max Drawdown</span>
+          <strong id="maxDrawdown"></strong>
         </article>
       </section>
 

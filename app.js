@@ -9,6 +9,10 @@ const netProfit = document.querySelector("#netProfit");
 const roi = document.querySelector("#roi");
 const winRate = document.querySelector("#winRate");
 const risked = document.querySelector("#risked");
+const noVigClvEl = document.querySelector("#noVigClv");
+const expectedRoiEl = document.querySelector("#expectedRoi");
+const expectedEvEl = document.querySelector("#expectedEv");
+const maxDrawdownEl = document.querySelector("#maxDrawdown");
 let currentCopyText = "";
 
 function moneyline(odds) {
@@ -24,6 +28,11 @@ function units(value, signed = false) {
   return `${sign}${stripTrailing(value)}u`;
 }
 
+function pct(value, signed = false) {
+  const sign = value > 0 && signed ? "+" : "";
+  return `${sign}${value.toFixed(1)}%`;
+}
+
 function riskForOdds(odds, isExtra) {
   const base = isExtra ? 0.5 : 1;
   return odds > 0 ? base * 100 / odds : base * Math.abs(odds) / 100;
@@ -34,6 +43,77 @@ function profitForBet(bet) {
   if (bet.result === "lost") return -bet.risk;
   if (bet.odds > 0) return bet.risk * bet.odds / 100;
   return bet.risk * 100 / Math.abs(bet.odds);
+}
+
+function americanToDecimal(american) {
+  return american > 0 ? 1 + american / 100 : 1 + 100 / Math.abs(american);
+}
+
+/** -110/-110 overround (22/21). Infer the other side of a 2-way close. */
+function closeMarketDecimals(closeAmerican) {
+  const overround = 22 / 21;
+  const ours = americanToDecimal(closeAmerican);
+  const otherProb = overround - 1 / ours;
+  if (!(otherProb > 0 && otherProb < 1)) return null;
+  return [ours, 1 / otherProb];
+}
+
+/** Power/log de-vig: solve Σ(1/Oᵢ)^c = 1, fair Oᶠ = Oᵢ^c. */
+function powerFairDecimal(decimals, sideIndex = 0) {
+  const inv = decimals.map((d) => 1 / d);
+  const sumAt = (c) => inv.reduce((sum, x) => sum + x ** c, 0);
+  if (Math.abs(sumAt(1) - 1) < 1e-12) return decimals[sideIndex];
+
+  let lo = 1;
+  let hi = 2;
+  while (sumAt(hi) > 1 && hi < 1e6) hi *= 2;
+  if (sumAt(1) < 1) {
+    lo = 0;
+    hi = 1;
+    while (sumAt(lo) < 1 && lo > 1e-12) lo /= 2;
+  }
+  for (let i = 0; i < 80; i += 1) {
+    const mid = (lo + hi) / 2;
+    if (sumAt(mid) > 1) lo = mid;
+    else hi = mid;
+  }
+  const c = (lo + hi) / 2;
+  return decimals[sideIndex] ** c;
+}
+
+/**
+ * No-vig CLV edge vs close: taken decimal / fair-close decimal - 1.
+ * Closing line assumes -110/-110 vig; other side inferred from overround.
+ */
+function clvEdge(takenAmerican, closeAmerican) {
+  if (closeAmerican == null || closeAmerican === "" || Number.isNaN(Number(closeAmerican))) {
+    return null;
+  }
+  const market = closeMarketDecimals(Number(closeAmerican));
+  if (!market) return null;
+  const fair = powerFairDecimal(market, 0);
+  if (!(fair > 1)) return null;
+  return americanToDecimal(takenAmerican) / fair - 1;
+}
+
+function maxDrawdownPct(items) {
+  const settled = items
+    .map((bet, index) => ({ bet, index }))
+    .filter(({ bet }) => bet.result !== "pending" && bet.result !== "push")
+    .sort((a, b) => a.bet.date.localeCompare(b.bet.date) || a.index - b.index);
+
+  let equity = 0;
+  let peak = 0;
+  let maxDd = 0;
+  settled.forEach(({ bet }) => {
+    equity += profitForBet(bet);
+    if (equity > peak) peak = equity;
+    const dd = peak - equity;
+    if (dd > maxDd) maxDd = dd;
+  });
+
+  const risk = items.reduce((sum, bet) => sum + bet.risk, 0);
+  return risk > 0 ? maxDd / risk * 100 : 0;
 }
 
 function formatDate(dateString) {
@@ -132,11 +212,15 @@ function loadBets() {
       homeLogo: logoSlug(parsed.home),
       pick: raw.detail ? `${parsed.pick} - ${raw.detail}` : parsed.pick,
       odds: raw.odds,
+      close: raw.close == null || raw.close === "" ? null : Number(raw.close),
       risk: riskForOdds(raw.odds, !!raw.extra),
       isExtra: !!raw.extra,
       score: raw.score || "",
       result
     };
+  });
+  bets.forEach((bet) => {
+    bet.clvEdge = clvEdge(bet.odds, bet.close);
   });
 }
 
@@ -194,16 +278,33 @@ function updateSummary(items) {
   const lastYear = sortedDates.length ? new Date(`${sortedDates[sortedDates.length - 1]}T12:00:00`).getFullYear() : firstYear;
   const seasonLabel = firstYear === lastYear ? "ytd" : `${firstYear}-${String(lastYear).slice(2)}`;
 
+  const withClv = items.filter((bet) => bet.clvEdge != null);
+  const clvRisk = withClv.reduce((sum, bet) => sum + bet.risk, 0);
+  const clvEv = withClv.reduce((sum, bet) => sum + bet.risk * bet.clvEdge, 0);
+  const clvAvg = withClv.length
+    ? withClv.reduce((sum, bet) => sum + bet.clvEdge, 0) / withClv.length * 100
+    : null;
+  const expectedRoiValue = clvRisk > 0 ? clvEv / clvRisk * 100 : null;
+  const mdd = maxDrawdownPct(items);
+
   recordPill.textContent = `${Math.round(adjWins)}-${Math.round(adjLosses)}`;
   netProfit.textContent = units(pnl, true);
   roi.textContent = `${roiValue.toFixed(1)}%`;
   winRate.textContent = `${rate.toFixed(1)}%`;
   risked.textContent = units(risk);
+  noVigClvEl.textContent = clvAvg == null ? "—" : pct(clvAvg, true);
+  expectedRoiEl.textContent = expectedRoiValue == null ? "—" : pct(expectedRoiValue, true);
+  expectedEvEl.textContent = withClv.length ? units(clvEv, true) : "—";
+  maxDrawdownEl.textContent = pct(mdd);
   currentCopyText = `${seasonLabel} record: ${Math.round(adjWins)}-${Math.round(adjLosses)}, ${units(pnl, true)} // [archive](https://causticarrow.com)`;
   window.currentCopyText = currentCopyText;
 
   netProfit.className = pnl > 0 ? "positive" : pnl < 0 ? "negative" : "neutral";
   roi.className = pnl > 0 ? "positive" : pnl < 0 ? "negative" : "neutral";
+  noVigClvEl.className = clvAvg == null ? "neutral" : clvAvg > 0 ? "positive" : clvAvg < 0 ? "negative" : "neutral";
+  expectedRoiEl.className = expectedRoiValue == null ? "neutral" : expectedRoiValue > 0 ? "positive" : expectedRoiValue < 0 ? "negative" : "neutral";
+  expectedEvEl.className = !withClv.length ? "neutral" : clvEv > 0 ? "positive" : clvEv < 0 ? "negative" : "neutral";
+  maxDrawdownEl.className = mdd > 0 ? "negative" : "neutral";
 }
 
 function copyRecord() {
