@@ -201,10 +201,6 @@ h1 {
   background: rgba(4, 10, 15, 0.28);
 }
 
-.summary-grid-secondary {
-  background: rgba(4, 10, 15, 0.18);
-}
-
 .summary-card {
   padding: 18px 22px;
   border-right: 1px solid var(--line);
