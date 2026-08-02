@@ -1,4 +1,5 @@
 window.RAW_PICKS = [
+  { date: "2026-08-02", tournament: "BLAST Bounty", play: "MOUZ +1.5 vs. Spirit", odds: +150, score: "", game: "CS2" },
   { date: "2026-08-01", tournament: "BLAST Bounty", play: "Astralis +1.5 vs. MOUZ", odds: -140, score: "1-2", game: "CS2", result: "won" },
   { date: "2026-08-01", tournament: "BLAST Bounty", play: "FaZe +1.5 vs. Spirit", odds: +115, score: "1-2", game: "CS2", result: "won" },
   { date: "2026-07-31", tournament: "BLAST Bounty", play: "Astralis PK vs. paiN", odds: -135, score: "2-1", game: "CS2" },
