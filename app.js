@@ -10,7 +10,6 @@ const roi = document.querySelector("#roi");
 const winRate = document.querySelector("#winRate");
 const risked = document.querySelector("#risked");
 const equityChart = document.querySelector("#equityChart");
-const equityEnd = document.querySelector("#equityEnd");
 let currentCopyText = "";
 
 function moneyline(odds) {
@@ -296,10 +295,6 @@ function renderEquityChart(items) {
 
   const points = equitySeries(items);
   const last = points[points.length - 1]?.equity || 0;
-  if (equityEnd) {
-    equityEnd.textContent = units(last, true);
-    equityEnd.className = last > 0 ? "positive" : last < 0 ? "negative" : "neutral";
-  }
 
   const width = Math.max(equityChart.clientWidth || 640, 280);
   const height = Math.max(equityChart.clientHeight || 132, 96);
