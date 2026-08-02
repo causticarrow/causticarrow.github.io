@@ -227,6 +227,88 @@ h1 {
   font-variant-numeric: tabular-nums;
 }
 
+.equity-panel {
+  padding: 14px 34px 18px;
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(4, 10, 15, 0.2), rgba(29, 32, 40, 0.55));
+}
+
+.equity-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.equity-meta span {
+  color: var(--dim);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.equity-meta strong {
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.4px;
+}
+
+.equity-chart {
+  display: block;
+  width: 100%;
+  height: 132px;
+  overflow: visible;
+}
+
+.equity-chart .equity-grid {
+  stroke: rgba(167, 190, 205, 0.1);
+  stroke-width: 1;
+}
+
+.equity-chart .equity-zero {
+  stroke: rgba(214, 229, 238, 0.22);
+  stroke-width: 1;
+  stroke-dasharray: 4 5;
+}
+
+.equity-chart .equity-fill {
+  fill: url(#equityFill);
+}
+
+.equity-chart .equity-line {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.equity-chart .equity-line.is-neg {
+  stroke: var(--red);
+}
+
+.equity-chart .equity-dot {
+  fill: var(--gold);
+  stroke: rgba(10, 14, 18, 0.9);
+  stroke-width: 2;
+}
+
+.equity-chart .equity-dot.is-neg {
+  fill: var(--red);
+}
+
+.equity-chart .equity-axis {
+  fill: var(--dim);
+  font-family: var(--body-font);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
 .copy-record-btn {
   position: fixed;
   top: 10px;
@@ -699,9 +781,14 @@ h1 {
   }
 
   .panel-titlebar,
-  .bet-row {
+  .bet-row,
+  .equity-panel {
     padding-left: 18px;
     padding-right: 18px;
+  }
+
+  .equity-chart {
+    height: 112px;
   }
 
   .day-heading {

@@ -9,6 +9,8 @@ const netProfit = document.querySelector("#netProfit");
 const roi = document.querySelector("#roi");
 const winRate = document.querySelector("#winRate");
 const risked = document.querySelector("#risked");
+const equityChart = document.querySelector("#equityChart");
+const equityEnd = document.querySelector("#equityEnd");
 let currentCopyText = "";
 
 function moneyline(odds) {
@@ -274,6 +276,85 @@ function formatPickLabelHTML(bet) {
   return `<span class="market-type">${market}</span><span class="market-odds">${moneyline(bet.odds)}</span>${details}`;
 }
 
+function equitySeries(items) {
+  const settled = items
+    .map((bet, index) => ({ bet, index }))
+    .filter(({ bet }) => bet.result !== "pending" && bet.result !== "push")
+    .sort((a, b) => a.bet.date.localeCompare(b.bet.date) || a.index - b.index);
+
+  const points = [{ date: settled[0]?.bet.date || "", equity: 0 }];
+  let equity = 0;
+  settled.forEach(({ bet }) => {
+    equity += profitForBet(bet);
+    points.push({ date: bet.date, equity });
+  });
+  return points;
+}
+
+function renderEquityChart(items) {
+  if (!equityChart) return;
+
+  const points = equitySeries(items);
+  const last = points[points.length - 1]?.equity || 0;
+  if (equityEnd) {
+    equityEnd.textContent = units(last, true);
+    equityEnd.className = last > 0 ? "positive" : last < 0 ? "negative" : "neutral";
+  }
+
+  const width = Math.max(equityChart.clientWidth || 640, 280);
+  const height = Math.max(equityChart.clientHeight || 132, 96);
+  const pad = { top: 10, right: 12, bottom: 22, left: 44 };
+  const innerW = width - pad.left - pad.right;
+  const innerH = height - pad.top - pad.bottom;
+
+  let min = Math.min(0, ...points.map((p) => p.equity));
+  let max = Math.max(0, ...points.map((p) => p.equity));
+  if (min === max) {
+    min -= 1;
+    max += 1;
+  }
+  const span = max - min;
+  min -= span * 0.08;
+  max += span * 0.08;
+
+  const xAt = (i) => pad.left + (points.length <= 1 ? innerW / 2 : (i / (points.length - 1)) * innerW);
+  const yAt = (v) => pad.top + (max - v) / (max - min) * innerH;
+  const zeroY = yAt(0);
+  const neg = last < 0;
+  const lineClass = neg ? "equity-line is-neg" : "equity-line";
+  const dotClass = neg ? "equity-dot is-neg" : "equity-dot";
+  const fillTop = neg ? "rgba(202, 83, 99, 0.28)" : "rgba(213, 180, 109, 0.34)";
+  const fillBot = neg ? "rgba(202, 83, 99, 0.02)" : "rgba(213, 180, 109, 0.02)";
+
+  const line = points.map((p, i) => `${i === 0 ? "M" : "L"}${xAt(i).toFixed(2)},${yAt(p.equity).toFixed(2)}`).join(" ");
+  const area = `${line} L${xAt(points.length - 1).toFixed(2)},${zeroY.toFixed(2)} L${xAt(0).toFixed(2)},${zeroY.toFixed(2)} Z`;
+
+  const yTicks = [max, 0, min].filter((v, i, arr) => arr.indexOf(v) === i);
+  const startDate = points.find((p) => p.date)?.date;
+  const endDate = [...points].reverse().find((p) => p.date)?.date;
+
+  equityChart.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  equityChart.innerHTML = `
+    <defs>
+      <linearGradient id="equityFill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${fillTop}"></stop>
+        <stop offset="100%" stop-color="${fillBot}"></stop>
+      </linearGradient>
+    </defs>
+    ${yTicks.map((v) => {
+      const y = yAt(v);
+      const isZero = Math.abs(v) < 1e-9;
+      return `<line class="${isZero ? "equity-zero" : "equity-grid"}" x1="${pad.left}" y1="${y.toFixed(2)}" x2="${(width - pad.right).toFixed(2)}" y2="${y.toFixed(2)}"></line>
+        <text class="equity-axis" x="${pad.left - 8}" y="${(y + 3.5).toFixed(2)}" text-anchor="end">${stripTrailing(v)}</text>`;
+    }).join("")}
+    <path class="equity-fill" d="${area}"></path>
+    <path class="${lineClass}" d="${line}"></path>
+    <circle class="${dotClass}" cx="${xAt(points.length - 1).toFixed(2)}" cy="${yAt(last).toFixed(2)}" r="3.5"></circle>
+    <text class="equity-axis" x="${pad.left}" y="${(height - 6).toFixed(2)}" text-anchor="start">${startDate ? formatDate(startDate) : ""}</text>
+    <text class="equity-axis" x="${(width - pad.right).toFixed(2)}" y="${(height - 6).toFixed(2)}" text-anchor="end">${endDate ? formatDate(endDate) : ""}</text>
+  `;
+}
+
 function updateSummary(items) {
   const settled = items.filter((bet) => bet.result !== "pending" && bet.result !== "push");
   const wins = settled.filter((bet) => bet.result === "won").length;
@@ -300,6 +381,7 @@ function updateSummary(items) {
 
   netProfit.className = pnl > 0 ? "positive" : pnl < 0 ? "negative" : "neutral";
   roi.className = pnl > 0 ? "positive" : pnl < 0 ? "negative" : "neutral";
+  renderEquityChart(items);
 }
 
 function copyRecord() {
@@ -410,6 +492,10 @@ document.querySelectorAll(".tab").forEach((button) => {
     gameFilter = button.dataset.filter;
     render();
   });
+});
+
+window.addEventListener("resize", () => {
+  if (bets.length) renderEquityChart(filteredBets());
 });
 
 function revealWhenReady() {
