@@ -241,41 +241,54 @@ h1 {
   overflow: visible;
 }
 
-.equity-chart .equity-grid {
-  stroke: rgba(167, 190, 205, 0.1);
-  stroke-width: 1;
-}
-
 .equity-chart .equity-zero {
   stroke: rgba(214, 229, 238, 0.22);
   stroke-width: 1;
   stroke-dasharray: 4 5;
 }
 
-.equity-chart .equity-fill {
-  fill: url(#equityFill);
+.equity-chart .equity-fill.is-pos {
+  fill: rgba(75, 177, 122, 0.2);
+}
+
+.equity-chart .equity-fill.is-neg {
+  fill: rgba(202, 83, 99, 0.2);
 }
 
 .equity-chart .equity-line {
   fill: none;
-  stroke: var(--gold);
   stroke-width: 2.25;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.equity-chart .equity-line.is-pos {
+  stroke: var(--green);
 }
 
 .equity-chart .equity-line.is-neg {
   stroke: var(--red);
 }
 
+.equity-chart .equity-line.is-zero {
+  stroke: var(--muted);
+}
+
 .equity-chart .equity-dot {
-  fill: var(--gold);
   stroke: rgba(10, 14, 18, 0.9);
   stroke-width: 2;
 }
 
+.equity-chart .equity-dot.is-pos {
+  fill: var(--green);
+}
+
 .equity-chart .equity-dot.is-neg {
   fill: var(--red);
+}
+
+.equity-chart .equity-dot.is-zero {
+  fill: var(--muted);
 }
 
 .equity-chart .equity-axis {
