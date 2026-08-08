@@ -522,7 +522,7 @@ function render() {
   updateSummary(items);
 
   if (!items.length) {
-    feed.innerHTML = `<div class="empty-state">No bets match the current filters.</div>`;
+    feed.innerHTML = `<div class="empty-state">...</div>`;
     return;
   }
 
