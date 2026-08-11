@@ -1,4 +1,13 @@
 window.RAW_PICKS = [
+  { date: "2026-08-12", tournament: "EWC", play: "BIG +2.5 vs. Aurora", odds: +105, score: "", game: "CS2" },
+  { date: "2026-08-12", tournament: "EWC", play: "Wildcard +5.5 vs. FURIA", odds: +100, score: "", game: "CS2" },
+  { date: "2026-08-12", tournament: "EWC", play: "Ninjas in Pyjamas +2.5 vs. Legacy", odds: +100, score: "", game: "CS2" },
+  { date: "2026-08-12", tournament: "EWC", play: "Lynn Vision +4.5 vs. MOUZ", odds: +105, score: "", game: "CS2" },
+  { date: "2026-08-12", tournament: "EWC", play: "BetBoom PK vs. FaZe", odds: +105, score: "", game: "CS2" },
+  { date: "2026-08-12", tournament: "EWC", play: "B8 PK vs. PARIVISION", odds: +120, score: "", game: "CS2" },
+  { date: "2026-08-12", tournament: "EWC", play: "100 Thieves +4.5 vs. Vitality", odds: -115, score: "", game: "CS2" },
+  { date: "2026-08-12", tournament: "EWC", play: "9z -3.5 vs. paiN", odds: +105, score: "", game: "CS2" },
+  { date: "2026-08-12", tournament: "EWC", play: "3DMAX +5.5 vs. Natus Vincere", odds: -115, score: "", game: "CS2" },
   { date: "2026-08-08", tournament: "EWC OQ", play: "OG PK vs. Echo", odds: -110, score: "1-2", game: "CS2", extra: true },
   { date: "2026-08-02", tournament: "BLAST Bounty", play: "MOUZ +1.5 vs. Spirit", odds: +150, score: "3-1", game: "CS2" },
   { date: "2026-08-01", tournament: "BLAST Bounty", play: "Astralis +1.5 vs. MOUZ", odds: -140, score: "1-2", game: "CS2", result: "won" },
