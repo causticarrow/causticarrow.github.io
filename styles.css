@@ -563,6 +563,7 @@ h1 {
 .team-copy {
   position: relative;
   min-width: 0;
+  max-width: 190px;
 }
 
 .team.away .team-copy {
@@ -571,15 +572,16 @@ h1 {
 }
 
 .team-name {
-  overflow: hidden;
   color: #f6f0eb;
   font-family: var(--display-font);
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 2px;
-  text-overflow: ellipsis;
+  line-height: 1.12;
+  overflow-wrap: normal;
+  text-wrap: balance;
   text-transform: uppercase;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .logo-box {
