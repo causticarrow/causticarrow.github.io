@@ -118,7 +118,7 @@ function clvMetrics(takenAmerican, closeAmerican) {
 }
 
 function maxDrawdownPct(items) {
-  const settled = orderedSettledBets(items);
+  const settled = chartSettledBets(items);
   let equity = 0;
   let peak = 0;
   let maxDd = 0;
@@ -259,8 +259,14 @@ function displayBetComparator(a, b) {
   return b.date.localeCompare(a.date) || compareSelectedTeamDesc(a, b);
 }
 
-function orderedSettledBets(items) {
-  return items.filter((bet) => bet.result !== "pending" && bet.result !== "push");
+function chartBetComparator(a, b) {
+  return a.date.localeCompare(b.date) || compareSelectedTeamDesc(a, b);
+}
+
+function chartSettledBets(items) {
+  return items
+    .filter((bet) => bet.result !== "pending" && bet.result !== "push")
+    .sort(chartBetComparator);
 }
 
 function gameClass(game) {
@@ -299,8 +305,8 @@ function formatPickLabelHTML(bet) {
 }
 
 function equitySeries(items) {
-  const settled = orderedSettledBets(items);
-  const points = [];
+  const settled = chartSettledBets(items);
+  const points = [{ date: settled[0]?.date || "", equity: 0, isBaseline: true }];
   let equity = 0;
   settled.forEach((bet) => {
     equity += profitForBet(bet);
@@ -412,7 +418,7 @@ function renderEquityChart(items) {
     return `${line} L${lastPt.x.toFixed(2)},${zeroY.toFixed(2)} L${firstPt.x.toFixed(2)},${zeroY.toFixed(2)} Z`;
   };
   const tooltipFor = (point, index) => {
-    if (!point.bet) return "";
+    if (point.isBaseline) return "";
     const x = xAt(index);
     const y = yAt(point.equity);
     const tooltipW = 112;
