@@ -560,6 +560,16 @@ h1 {
   padding-left: 18px;
 }
 
+.team-copy {
+  position: relative;
+  min-width: 0;
+}
+
+.team.away .team-copy {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .team-name {
   overflow: hidden;
   color: #f6f0eb;
@@ -602,12 +612,17 @@ h1 {
 }
 
 .market-note {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
   display: flex;
   align-items: baseline;
-  justify-content: center;
+  justify-content: flex-end;
   flex-wrap: wrap;
   gap: 0.35em;
-  margin-top: 4px;
+  width: max-content;
+  max-width: 220px;
+  margin-top: 0;
   padding: 0;
   color: rgba(241, 238, 233, 0.78);
   font-size: 13px;
@@ -870,9 +885,16 @@ h1 {
     display: none;
   }
 
+  .team-copy {
+    position: static;
+  }
+
   .market-note {
+    position: static;
     flex-direction: column;
     align-items: center;
+    width: auto;
+    max-width: none;
     gap: 2px;
   }
 
