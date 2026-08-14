@@ -602,10 +602,14 @@ h1 {
 }
 
 .market-note {
-  display: inline-block;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.35em;
   margin-top: 4px;
   padding: 0;
-  color: rgba(241, 238, 233, 0.88);
+  color: rgba(241, 238, 233, 0.78);
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 1.35px;
@@ -614,12 +618,12 @@ h1 {
 }
 
 .market-type {
-  color: rgba(241, 238, 233, 0.78);
+  color: rgba(241, 238, 233, 0.68);
 }
 
 .market-odds {
-  margin-left: 0.35em;
-  color: rgba(241, 238, 233, 0.96);
+  color: rgba(255, 252, 246, 0.98);
+  text-shadow: 0 0 10px rgba(241, 238, 233, 0.18), 0 1px 0 rgba(0, 0, 0, 0.7);
 }
 
 .market-detail {
@@ -848,13 +852,6 @@ h1 {
     min-width: 0;
   }
 
-  .team {
-    /* Keep logos top-aligned with each other + the score.
-       Without this, multi-line pick labels (Map 2 / Live / etc.)
-       vertically center the away logo and leave the opponent high. */
-    align-items: flex-start;
-  }
-
   .team.away {
     grid-column: 1;
     justify-content: end;
@@ -874,14 +871,9 @@ h1 {
   }
 
   .market-note {
-    display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: center;
     gap: 2px;
-  }
-
-  .market-odds {
-    margin-left: 0;
   }
 
   .market-detail {

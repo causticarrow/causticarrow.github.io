@@ -500,12 +500,12 @@ function renderBetRow(bet) {
       <div class="team away">
         <div>
           <div class="team-name">${bet.away}</div>
-          <div class="market-note">${formatPickLabelHTML(bet)}</div>
         </div>
         <span class="logo-box"><img src="${logoPath(bet.awayLogo)}" alt="" width="44" height="44" loading="lazy" decoding="async" onerror="this.style.display='none'"></span>
       </div>
       <div class="score">
         <span>${score}</span>
+        <div class="market-note">${formatPickLabelHTML(bet)}</div>
       </div>
       <div class="team home">
         <span class="logo-box"><img src="${logoPath(bet.homeLogo)}" alt="" width="44" height="44" loading="lazy" decoding="async" onerror="this.style.display='none'"></span>
