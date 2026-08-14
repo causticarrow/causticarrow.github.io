@@ -350,9 +350,30 @@ h1 {
 .equity-chart .equity-tooltip text {
   fill: var(--text);
   font-family: var(--body-font);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.35px;
+  letter-spacing: 0.45px;
+}
+
+.equity-chart .equity-tooltip-date {
+  fill: var(--muted);
+}
+
+.equity-chart .equity-tooltip-units {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.equity-chart .equity-point.is-pos .equity-tooltip-units {
+  fill: var(--green);
+}
+
+.equity-chart .equity-point.is-neg .equity-tooltip-units {
+  fill: var(--red);
+}
+
+.equity-chart .equity-point.is-zero .equity-tooltip-units {
+  fill: var(--text);
 }
 
 .copy-record-btn {

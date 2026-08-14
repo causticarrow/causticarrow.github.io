@@ -423,14 +423,13 @@ function renderEquityChart(items) {
     if (!point.bet) return "";
     const x = xAt(index);
     const y = yAt(point.equity);
-    const tooltipW = 138;
-    const tooltipH = 40;
+    const tooltipW = 112;
+    const tooltipH = 48;
     const tx = Math.min(Math.max(x - tooltipW / 2, pad.left), width - pad.right - tooltipW);
     const ty = y - tooltipH - 10 < pad.top ? y + 10 : y - tooltipH - 10;
     const leftBound = index === 0 ? pad.left : (xAt(index - 1) + x) / 2;
     const rightBound = index === points.length - 1 ? width - pad.right : (x + xAt(index + 1)) / 2;
     const signClass = equitySignClass(equitySign(point.equity));
-    const title = `${formatDate(point.date)} ${selectedTeamName(point.bet)}`;
     return `
       <g class="equity-point ${signClass}">
         <rect class="equity-hover-target" x="${leftBound.toFixed(2)}" y="${pad.top}" width="${(rightBound - leftBound).toFixed(2)}" height="${innerH.toFixed(2)}"></rect>
@@ -438,8 +437,8 @@ function renderEquityChart(items) {
         <circle class="equity-hover-dot" cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="4.5"></circle>
         <g class="equity-tooltip" transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)})">
           <rect width="${tooltipW}" height="${tooltipH}" rx="4"></rect>
-          <text x="8" y="15">${escapeHTML(title)}</text>
-          <text x="8" y="31">${escapeHTML(units(point.equity, true))}</text>
+          <text class="equity-tooltip-date" x="10" y="18">${escapeHTML(formatDate(point.date))}</text>
+          <text class="equity-tooltip-units" x="10" y="38">${escapeHTML(units(point.equity, true))}</text>
         </g>
       </g>
     `;
