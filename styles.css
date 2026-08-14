@@ -604,10 +604,8 @@ h1 {
 .market-note {
   display: inline-block;
   margin-top: 4px;
-  padding: 5px 8px;
-  border: 1px solid rgba(241, 238, 233, 0.16);
-  background: rgba(241, 238, 233, 0.055);
-  color: #f1eee9;
+  padding: 0;
+  color: rgba(241, 238, 233, 0.88);
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 1.35px;
@@ -615,8 +613,13 @@ h1 {
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
 }
 
+.market-type {
+  color: rgba(241, 238, 233, 0.78);
+}
+
 .market-odds {
   margin-left: 0.35em;
+  color: rgba(241, 238, 233, 0.96);
 }
 
 .market-detail {
