@@ -1,6 +1,6 @@
 window.RAW_PICKS = [
   { date: "2026-08-14", tournament: "EWC", play: "PARIVISION PK vs. 100 Thieves", odds: -125, score: "", game: "CS2" },
-  { date: "2026-08-14", tournament: "EWC", play: "Ninjas in Pyjamas +1.5 vs. BetBoom", odds: -175, score: "", game: "CS2" },
+  { date: "2026-08-14", tournament: "EWC", play: "Ninjas in Pyjamas +1.5 vs. BetBoom", odds: -175, score: "2-0", game: "CS2" },
   { date: "2026-08-13", tournament: "EWC", play: "FaZe PK vs. Legacy", odds: -110, score: "2-0", game: "CS2" },
   { date: "2026-08-13", tournament: "EWC", play: "Astralis +1.5 vs. Falcons", odds: +105, score: "0-2", game: "CS2" },
   { date: "2026-08-12", tournament: "EWC", play: "Wildcard +5.5 vs. FURIA", odds: +100, score: "10-13", game: "CS2" },
