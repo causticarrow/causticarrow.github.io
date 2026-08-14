@@ -310,7 +310,13 @@ function equitySeries(items) {
   let equity = 0;
   settled.forEach((bet) => {
     equity += profitForBet(bet);
-    points.push({ date: bet.date, equity, bet });
+    const lastPoint = points[points.length - 1];
+    const point = { date: bet.date, equity };
+    if (lastPoint && lastPoint.date === bet.date && !lastPoint.isBaseline) {
+      points[points.length - 1] = point;
+    } else {
+      points.push(point);
+    }
   });
   return points;
 }
