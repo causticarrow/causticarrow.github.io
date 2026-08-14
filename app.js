@@ -30,6 +30,14 @@ function pct(value, signed = false) {
   return `${sign}${value.toFixed(1)}%`;
 }
 
+function escapeHTML(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 function riskForOdds(odds, isExtra) {
   const base = isExtra ? 0.5 : 1;
   return odds > 0 ? base * 100 / odds : base * Math.abs(odds) / 100;
@@ -304,7 +312,7 @@ function equitySeries(items) {
   let equity = 0;
   settled.forEach(({ bet }) => {
     equity += profitForBet(bet);
-    points.push({ date: bet.date, equity });
+    points.push({ date: bet.date, equity, bet });
   });
   return points;
 }
@@ -411,6 +419,31 @@ function renderEquityChart(items) {
     const firstPt = pts[0];
     return `${line} L${lastPt.x.toFixed(2)},${zeroY.toFixed(2)} L${firstPt.x.toFixed(2)},${zeroY.toFixed(2)} Z`;
   };
+  const tooltipFor = (point, index) => {
+    if (!point.bet) return "";
+    const x = xAt(index);
+    const y = yAt(point.equity);
+    const tooltipW = 138;
+    const tooltipH = 40;
+    const tx = Math.min(Math.max(x - tooltipW / 2, pad.left), width - pad.right - tooltipW);
+    const ty = y - tooltipH - 10 < pad.top ? y + 10 : y - tooltipH - 10;
+    const leftBound = index === 0 ? pad.left : (xAt(index - 1) + x) / 2;
+    const rightBound = index === points.length - 1 ? width - pad.right : (x + xAt(index + 1)) / 2;
+    const signClass = equitySignClass(equitySign(point.equity));
+    const title = `${formatDate(point.date)} ${selectedTeamName(point.bet)}`;
+    return `
+      <g class="equity-point ${signClass}">
+        <rect class="equity-hover-target" x="${leftBound.toFixed(2)}" y="${pad.top}" width="${(rightBound - leftBound).toFixed(2)}" height="${innerH.toFixed(2)}"></rect>
+        <line class="equity-hover-line" x1="${x.toFixed(2)}" y1="${pad.top}" x2="${x.toFixed(2)}" y2="${(height - pad.bottom).toFixed(2)}"></line>
+        <circle class="equity-hover-dot" cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="4.5"></circle>
+        <g class="equity-tooltip" transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)})">
+          <rect width="${tooltipW}" height="${tooltipH}" rx="4"></rect>
+          <text x="8" y="15">${escapeHTML(title)}</text>
+          <text x="8" y="31">${escapeHTML(units(point.equity, true))}</text>
+        </g>
+      </g>
+    `;
+  };
 
   equityChart.setAttribute("viewBox", `0 0 ${width} ${height}`);
   equityChart.innerHTML = `
@@ -426,6 +459,7 @@ function renderEquityChart(items) {
     <circle class="equity-dot ${equitySignClass(lastSign)}" cx="${xAt(points.length - 1).toFixed(2)}" cy="${yAt(last).toFixed(2)}" r="3.5"></circle>
     <text class="equity-axis" x="${pad.left}" y="${(height - 6).toFixed(2)}" text-anchor="start">${startDate ? formatDate(startDate) : ""}</text>
     <text class="equity-axis" x="${(width - pad.right).toFixed(2)}" y="${(height - 6).toFixed(2)}" text-anchor="end">${endDate ? formatDate(endDate) : ""}</text>
+    ${points.map(tooltipFor).join("")}
   `;
 }
 
