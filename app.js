@@ -118,15 +118,11 @@ function clvMetrics(takenAmerican, closeAmerican) {
 }
 
 function maxDrawdownPct(items) {
-  const settled = items
-    .map((bet, index) => ({ bet, index }))
-    .filter(({ bet }) => bet.result !== "pending" && bet.result !== "push")
-    .sort((a, b) => displayBetComparator(a.bet, b.bet) || a.index - b.index);
-
+  const settled = orderedSettledBets(items);
   let equity = 0;
   let peak = 0;
   let maxDd = 0;
-  settled.forEach(({ bet }) => {
+  settled.forEach((bet) => {
     equity += profitForBet(bet);
     if (equity > peak) peak = equity;
     const dd = peak - equity;
@@ -263,6 +259,10 @@ function displayBetComparator(a, b) {
   return b.date.localeCompare(a.date) || compareSelectedTeamDesc(a, b);
 }
 
+function orderedSettledBets(items) {
+  return items.filter((bet) => bet.result !== "pending" && bet.result !== "push");
+}
+
 function gameClass(game) {
   const key = String(game || "").toLowerCase();
   if (key === "cs2") return "game-cs2";
@@ -299,14 +299,10 @@ function formatPickLabelHTML(bet) {
 }
 
 function equitySeries(items) {
-  const settled = items
-    .map((bet, index) => ({ bet, index }))
-    .filter(({ bet }) => bet.result !== "pending" && bet.result !== "push")
-    .sort((a, b) => displayBetComparator(a.bet, b.bet) || a.index - b.index);
-
-  const points = [{ date: settled[0]?.bet.date || "", equity: 0 }];
+  const settled = orderedSettledBets(items);
+  const points = [];
   let equity = 0;
-  settled.forEach(({ bet }) => {
+  settled.forEach((bet) => {
     equity += profitForBet(bet);
     points.push({ date: bet.date, equity, bet });
   });
