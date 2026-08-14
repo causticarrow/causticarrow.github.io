@@ -149,7 +149,7 @@ function detectResult(play, score) {
   let left = parts[0];
   const right = parts[1];
   const handicap = play.match(/\s([+-]\d+\.?\d*)\s+vs\.?\s+/i);
-  if (handicap && !/\bPK\b/.test(play)) left += Number(handicap[1]);
+  if (handicap) left += Number(handicap[1]);
   if (left > right) return "won";
   if (left < right) return "lost";
   return "push";
@@ -199,14 +199,14 @@ function parsePlay(play) {
 
   const left = parts[0];
   const right = normalizeTeamName(parts[1]);
-  const leftMatch = left.match(/^(.+?)\s+(PK|[+-]\d+\.?\d*|Over\s+\d+\.?\d*|Under\s+\d+\.?\d*)$/i);
+  const leftMatch = left.match(/^(.+?)\s+([+-]\d+\.?\d*|Over\s+\d+\.?\d*|Under\s+\d+\.?\d*)$/i);
   const away = normalizeTeamName(leftMatch ? leftMatch[1] : left);
   const market = leftMatch ? leftMatch[2] : "";
 
   return {
     away,
     home: right,
-    pick: market ? `${away} ${market}` : cleaned
+    pick: market ? `${away} ${market}` : ""
   };
 }
 
@@ -272,7 +272,8 @@ function formatPickLabelHTML(bet) {
       }).join("")
     : "";
 
-  return `<span class="market-type">${market}</span><span class="market-odds">${moneyline(bet.odds)}</span>${details}`;
+  const marketType = market ? `<span class="market-type">${market}</span>` : "";
+  return `${marketType}<span class="market-odds">${moneyline(bet.odds)}</span>${details}`;
 }
 
 function equitySeries(items) {
