@@ -429,8 +429,11 @@ function renderEquityChart(items) {
     const y = yAt(point.equity);
     const tooltipW = 112;
     const tooltipH = 48;
-    const tx = Math.min(Math.max(x - tooltipW / 2, pad.left), width - pad.right - tooltipW);
-    const ty = y - tooltipH - 10 < pad.top ? y + 10 : y - tooltipH - 10;
+    const tooltipGap = 14;
+    const tx = x + tooltipGap + tooltipW <= width - pad.right
+      ? x + tooltipGap
+      : Math.max(pad.left, x - tooltipGap - tooltipW);
+    const ty = Math.min(Math.max(y - tooltipH / 2, pad.top), height - pad.bottom - tooltipH);
     const leftBound = index === 0 ? pad.left : (xAt(index - 1) + x) / 2;
     const rightBound = index === points.length - 1 ? width - pad.right : (x + xAt(index + 1)) / 2;
     const signClass = equitySignClass(equitySign(point.equity));
