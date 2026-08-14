@@ -54,7 +54,6 @@ function americanToDecimal(american) {
   return american > 0 ? 1 + american / 100 : 1 + 100 / Math.abs(american);
 }
 
-/** -110/-110 overround (22/21). Infer the other side of a 2-way close. */
 function closeMarketDecimals(closeAmerican) {
   const overround = 22 / 21;
   const ours = americanToDecimal(closeAmerican);
@@ -63,7 +62,6 @@ function closeMarketDecimals(closeAmerican) {
   return [ours, 1 / otherProb];
 }
 
-/** Power/log de-vig: solve Σ(1/Oᵢ)^c = 1, fair Oᶠ = Oᵢ^c. */
 function powerFairDecimal(decimals, sideIndex = 0) {
   const inv = decimals.map((d) => 1 / d);
   const sumAt = (c) => inv.reduce((sum, x) => sum + x ** c, 0);
@@ -86,11 +84,6 @@ function powerFairDecimal(decimals, sideIndex = 0) {
   return decimals[sideIndex] ** c;
 }
 
-/**
- * No-vig close fair probability for our side.
- * Closing line assumes -110/-110 vig; other side inferred from overround,
- * then power de-vig: Σ(1/Oᵢ)^c = 1, Oᶠ = Oᵢ^c, p = 1/Oᶠ.
- */
 function fairCloseProb(closeAmerican) {
   if (closeAmerican == null || closeAmerican === "" || Number.isNaN(Number(closeAmerican))) {
     return null;
@@ -102,11 +95,6 @@ function fairCloseProb(closeAmerican) {
   return 1 / fair;
 }
 
-/**
- * CLV metrics vs no-vig close:
- * - probEdge: p_fair − p_taken (percentage points) → No-Vig CLV
- * - roiEdge: D_taken * p_fair − 1 → Expected ROI / EV
- */
 function clvMetrics(takenAmerican, closeAmerican) {
   const pFair = fairCloseProb(closeAmerican);
   if (pFair == null) return null;
@@ -623,4 +611,3 @@ try {
   feed.innerHTML = `<div class="empty-state">${error.message}</div>`;
 }
 revealWhenReady();
-/* d705314319cf */
