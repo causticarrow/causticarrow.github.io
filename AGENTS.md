@@ -31,6 +31,4 @@ there is no hot reload or bundler.
 - There are no automated tests, linters, or build commands. "Verification" means loading
   the page in a browser and confirming the feed renders and the filter tabs / Copy Record
   button work.
-- The `document.fonts.load(...)` gate in `index.html` hides the body until fonts load
-  (with a 2.5s fallback), so a brief blank flash on first paint is expected.
 <!-- d705314319cf -->

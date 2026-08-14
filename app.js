@@ -613,23 +613,7 @@ window.addEventListener("resize", () => {
 });
 
 function revealWhenReady() {
-  const reveal = () => document.documentElement.classList.remove("booting");
-  if (!(document.fonts && document.fonts.load)) {
-    reveal();
-    return;
-  }
-  const loads = Promise.all([
-    document.fonts.load("400 1em Radiance"),
-    document.fonts.load("700 1em Radiance"),
-    document.fonts.load("900 1em Radiance"),
-    document.fonts.load("400 1em Reaver"),
-    document.fonts.load("600 1em Reaver"),
-    document.fonts.load("700 1em Reaver")
-  ]);
-  Promise.race([
-    loads.then(() => document.fonts.ready),
-    new Promise((resolve) => setTimeout(resolve, 1800))
-  ]).then(reveal).catch(reveal);
+  document.documentElement.classList.remove("booting");
 }
 
 try {
