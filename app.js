@@ -113,7 +113,7 @@ function maxDrawdownPct(items) {
   const settled = items
     .map((bet, index) => ({ bet, index }))
     .filter(({ bet }) => bet.result !== "pending" && bet.result !== "push")
-    .sort((a, b) => a.bet.date.localeCompare(b.bet.date) || a.index - b.index);
+    .sort((a, b) => chartBetComparator(a.bet, b.bet) || a.index - b.index);
 
   let equity = 0;
   let peak = 0;
@@ -238,7 +238,25 @@ function loadBets() {
 }
 
 function filteredBets() {
-  return bets.filter((bet) => gameFilter === "all" || bet.game === gameFilter);
+  return bets
+    .filter((bet) => gameFilter === "all" || bet.game === gameFilter)
+    .sort(displayBetComparator);
+}
+
+function selectedTeamName(bet) {
+  return normalizeTeamName(bet.away || "");
+}
+
+function compareSelectedTeamDesc(a, b) {
+  return selectedTeamName(b).localeCompare(selectedTeamName(a), undefined, { sensitivity: "base" });
+}
+
+function displayBetComparator(a, b) {
+  return b.date.localeCompare(a.date) || compareSelectedTeamDesc(a, b);
+}
+
+function chartBetComparator(a, b) {
+  return a.date.localeCompare(b.date) || compareSelectedTeamDesc(a, b);
 }
 
 function gameClass(game) {
@@ -280,7 +298,7 @@ function equitySeries(items) {
   const settled = items
     .map((bet, index) => ({ bet, index }))
     .filter(({ bet }) => bet.result !== "pending" && bet.result !== "push")
-    .sort((a, b) => a.bet.date.localeCompare(b.bet.date) || a.index - b.index);
+    .sort((a, b) => chartBetComparator(a.bet, b.bet) || a.index - b.index);
 
   const points = [{ date: settled[0]?.bet.date || "", equity: 0 }];
   let equity = 0;

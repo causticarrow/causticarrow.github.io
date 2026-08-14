@@ -563,7 +563,6 @@ h1 {
 .team-copy {
   position: relative;
   min-width: 0;
-  max-width: 190px;
 }
 
 .team.away .team-copy {
@@ -577,11 +576,9 @@ h1 {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 2px;
-  line-height: 1.12;
-  overflow-wrap: normal;
-  text-wrap: balance;
+  line-height: 1.15;
   text-transform: uppercase;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .logo-box {
@@ -626,21 +623,12 @@ h1 {
   max-width: 220px;
   margin-top: 0;
   padding: 0;
-  color: rgba(241, 238, 233, 0.78);
+  color: var(--dim);
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 1.35px;
   line-height: 1.15;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
-}
-
-.market-type {
-  color: rgba(241, 238, 233, 0.68);
-}
-
-.market-odds {
-  color: rgba(255, 252, 246, 0.98);
-  text-shadow: 0 0 10px rgba(241, 238, 233, 0.18), 0 1px 0 rgba(0, 0, 0, 0.7);
 }
 
 .market-detail {
