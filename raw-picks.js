@@ -1,4 +1,5 @@
 window.RAW_PICKS = [
+  { date: "2026-08-28", tournament: "BLAST Open Porto", play: "Spirit -1.5 vs. G2", odds: +110, score: "2-0", game: "CS2" },
   { date: "2026-08-26", tournament: "BLAST Open Porto", play: "Natus Vincere -1.5 vs. M80", odds: -125, score: "1-2", game: "CS2" },
   { date: "2026-08-22", tournament: "EWC", play: "Spirit -1.5 vs. Legacy", odds: +110, score: "2-0", game: "CS2" },
   { date: "2026-08-22", tournament: "EWC", play: "FURIA vs. FUT", odds: -185, score: "1-2", game: "CS2" },
