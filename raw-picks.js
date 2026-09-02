@@ -1,5 +1,6 @@
 window.RAW_PICKS = [
-  { date: "2026-09-02", tournament: "IEM Beijing", play: "B8 -1.5 vs. EYEBALLERS", odds: +140, score: "", game: "CS2", extra: true },
+  { date: "2026-09-02", tournament: "IEM Beijing CQ", play: "B8 -1.5 vs. EYEBALLERS", odds: +140, score: "", game: "CS2", extra: true },
+  { date: "2026-09-02", tournament: "IEM Beijing CQ", play: "B8 -1.5 vs. EYEBALLERS", odds: +140, score: "", game: "CS2", extra: true },
   { date: "2026-09-01", tournament: "Moscow Cyber Games", play: "HOTU vs. Color", odds: +150, score: "2-1", game: "CS2", extra: true },
   { date: "2026-08-28", tournament: "BLAST Open Porto", play: "Spirit -1.5 vs. G2", odds: +110, score: "2-0", game: "CS2" },
   { date: "2026-08-26", tournament: "BLAST Open Porto", play: "Natus Vincere -1.5 vs. M80", odds: -125, score: "1-2", game: "CS2" },
@@ -154,7 +155,7 @@ window.RAW_PICKS = [
   { date: "2026-01-28", tournament: "IEM Krakow", play: "Liquid vs. NiP", odds: -105, score: "2-0", game: "CS2" },
   { date: "2026-01-23", tournament: "BLAST Bounty", play: "PARIVISION +1.5 vs. Spirit", odds: -110, score: "2-1", game: "CS2" },
   { date: "2026-01-22", tournament: "BLAST Bounty", play: "FURIA -1.5 vs. HEROIC", odds: -110, score: "2-1", game: "CS2" },
-  { date: "2026-01-21", tournament: "IEM Rio", play: "HOTU vs. Gentle Mates", odds: +150, score: "2-0", game: "CS2", extra: true },
+  { date: "2026-01-21", tournament: "IEM Rio CQ", play: "HOTU vs. Gentle Mates", odds: +150, score: "2-0", game: "CS2", extra: true },
   { date: "2026-01-18", tournament: "BLAST Bounty", play: "Astralis vs. PARIVISION", odds: +140, score: "0-2", game: "CS2" },
   { date: "2026-01-17", tournament: "BLAST Bounty", play: "HEROIC vs. paiN", odds: +125, score: "2-0", game: "CS2" },
   { date: "2026-01-15", tournament: "BLAST Bounty", play: "Liquid vs. Ninjas in Pyjamas", odds: +115, score: "2-1", game: "CS2" },
