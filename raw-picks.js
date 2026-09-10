@@ -1,7 +1,7 @@
 window.RAW_PICKS = [
   { date: "2026-09-10", tournament: "TPWC GQ", play: "BBL +1.5 vs. 3DMAX", odds: -145, score: "", game: "CS2", extra: true },
   { date: "2026-09-10", tournament: "PGL Bucharest EUQ", play: "Nemiga vs. SINNERS", odds: -135, score: "", game: "CS2", extra: true },
-  { date: "2026-09-10", tournament: "FISSURE Playground", play: "9z +1.5 vs. G2", odds: -150, score: "", game: "CS2" },
+  { date: "2026-09-10", tournament: "FISSURE Playground", play: "9z +1.5 vs. G2", odds: -150, score: "1-2", game: "CS2" },
   { date: "2026-09-09", tournament: "FISSURE Playground", play: "MIBR vs. 9z", odds: +160, score: "2-0", game: "CS2" },
   { date: "2026-09-06", tournament: "BLAST Open Porto", play: "Spirit vs. MOUZ", odds: -220, score: "3-1", game: "CS2" },
   { date: "2026-09-05", tournament: "BLAST Open Porto", play: "Spirit vs. Falcons", odds: -160, score: "2-0", game: "CS2" },
